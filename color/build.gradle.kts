@@ -9,7 +9,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 android {
     compileSdk = 34

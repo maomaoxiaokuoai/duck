@@ -22,38 +22,46 @@ duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，�
 - **Material You**：跟随系统取色的动态主题，支持深色模式与自定义配色
 - **多语言**：内置 60+ 语言的界面翻译资源
 
-## 截图
+## 下载安装
 
-> 首次构建后可在 `app/src/main/res/drawable-hdpi` 等目录看到占位图；本仓库不附带商店截图，请自行补充到 `artwork/`。
+不提供本地构建产物。所有 APK 均由 GitHub Actions 在云端编译：
+
+1. 打开 [Actions](../../actions/workflows/android.yml) 页面，点开最近一次成功的 **Android CI** 运行
+2. 在页面底部的 **Artifacts** 里下载 `duck-debug-apk`
+3. 解压后得到各 ABI 的 debug APK，按手机架构安装
+
+打上 `v*` 标签（例如 `git tag v1.0.0 && git push origin v1.0.0`）会自动构建
+release 版并发布到 Releases 页面。
 
 ## 构建
 
-### 环境要求
+### 推荐：云端构建
+
+本仓库的主构建路径是 GitHub Actions —— 推送即编译，本地不需要 Android SDK：
+
+- **debug**：push 到 `main` 或手动触发 `workflow_dispatch`
+- **release**：推送 `v*` 标签
+- 产物：`duck-<version>-generic-<abi>.apk`
+
+### 本地构建（可选，仅用于调试）
+
+仅在你需要本地调试时使用，需自备环境：
 
 | 组件 | 版本 |
 | --- | --- |
-| JDK | 21（Gradle 工具链） |
+| JDK | 21 |
 | Android SDK | compileSdk 35 / minSdk 24 |
 | Gradle | 8.10.2（随 wrapper 提供） |
-
-### 步骤
 
 ```bash
 git clone <this-repo> duck
 cd duck
 
-# 指向本机 Android SDK
 echo "sdk.dir=/path/to/Android/Sdk" > local.properties
-
-# 通用版本（默认 arm64-v8a 以外按需开启 split）
 ./gradlew :app:assembleGenericDebug
-
-# 产物
-ls app/build/outputs/apk/generic/debug/
 ```
 
-发布版默认开启 R8 代码压缩与资源裁剪；如需给 APK 签名，在项目根目录放一个
-`keystore.properties`：
+如需签名，在根目录放 `keystore.properties`：
 
 ```properties
 storeFile=/absolute/path/to/release.jks
@@ -66,14 +74,15 @@ keyPassword=******
 
 | Flavor | applicationId | 说明 |
 | --- | --- | --- |
-| `generic` | `com.duck.app` | 默认分渠道 |
+| `generic` | `com.duck.app` | 默认渠道 |
 | `githubPreview` | `com.duck.app.preview` | 可与正式版共存 |
-| `fdroid` | `com.duck.app` | 关闭应用内自更新入口 |
+| `fdroid` | `com.duck.app` | 关闭应用内更新入口 |
 
 ## 项目结构
 
 ```
 duck/
+├── .github/workflows/       # 云端构建流水线
 ├── app/                     # 主应用模块
 │   ├── src/main/java/com/duck/app/
 │   │   ├── ui/              # Compose 界面：下载页、设置、主题、组件
@@ -90,15 +99,15 @@ duck/
 ## 技术栈
 
 Kotlin · Jetpack Compose · Material 3 · Room · Koin · OkHttp · MMKV · Coil ·
-[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) · youtubedl-android
+kotlinx.serialization · youtubedl-android
 
 ## 开源说明
 
 - 本项目以 **GNU General Public License v3.0** 发布，完整条款见 [LICENSE](LICENSE)。
 - 你可以自由使用、修改、分发本项目，但分发衍生作品时**必须同样以 GPL-3.0 开源**，
   并提供对应的完整源代码。
-- 第三方组件的版权与许可证（yt-dlp、FFmpeg、aria2、AndroidX、Kotlin 等）归各自作者所有，
-  完整清单见应用内「设置 → 关于 → Credits」以及 [NOTICE.md](NOTICE.md)。
+- 第三方组件的版权与许可证归各自作者所有，完整清单见 [NOTICE.md](NOTICE.md)
+  以及应用内「设置 → 关于 → Credits」。
 - `duck` 是本项目的名称与图标，代表本项目的构建与发布。
 
 ## 致谢

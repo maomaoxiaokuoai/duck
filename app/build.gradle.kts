@@ -156,7 +156,7 @@ android {
 
 ktfmt { kotlinLangStyle() }
 
-kotlin { jvmToolchain(17) }
+kotlin { jvmToolchain(21) }
 
 dependencies {
     implementation(project(":color"))
