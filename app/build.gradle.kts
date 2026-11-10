@@ -28,15 +28,33 @@ val currentVersionCode = currentVersion.code.toInt()
 android {
     compileSdk = 35
 
-    if (keystorePropertiesFile.exists()) {
+    // Signing material comes either from keystore.properties (local) or from CI environment
+    // variables, so release builds are reproducible without committing secrets.
+    val envStore = System.getenv("DUCK_KEYSTORE_PATH")
+    val envStorePassword = System.getenv("DUCK_KEYSTORE_PASSWORD")
+    val envKeyAlias = System.getenv("DUCK_KEY_ALIAS")
+    val envKeyPassword = System.getenv("DUCK_KEY_PASSWORD")
+    val hasEnvSigning =
+        !envStore.isNullOrBlank() && !envStorePassword.isNullOrBlank() && !envKeyAlias.isNullOrBlank()
+
+    if (keystorePropertiesFile.exists() || hasEnvSigning) {
         val keystoreProperties = Properties()
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+        if (keystorePropertiesFile.exists()) {
+            keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+        }
         signingConfigs {
             create("githubPublish") {
-                keyAlias = keystoreProperties["keyAlias"].toString()
-                keyPassword = keystoreProperties["keyPassword"].toString()
-                storeFile = file(keystoreProperties["storeFile"]!!)
-                storePassword = keystoreProperties["storePassword"].toString()
+                if (hasEnvSigning) {
+                    keyAlias = envKeyAlias
+                    keyPassword = envKeyPassword
+                    storeFile = file(envStore!!)
+                    storePassword = envStorePassword
+                } else {
+                    keyAlias = keystoreProperties["keyAlias"].toString()
+                    keyPassword = keystoreProperties["keyPassword"].toString()
+                    storeFile = file(keystoreProperties["storeFile"]!!)
+                    storePassword = keystoreProperties["storePassword"].toString()
+                }
             }
         }
     }
@@ -47,7 +65,7 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 200_000_150
+        versionCode = 100_000_400
         check(versionCode == currentVersionCode)
 
         versionName = baseVersionName
@@ -100,7 +118,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            if (keystorePropertiesFile.exists()) {
+            if (keystorePropertiesFile.exists() || hasEnvSigning) {
                 signingConfig = signingConfigs.getByName("githubPublish")
             }
         }
