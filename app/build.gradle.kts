@@ -106,6 +106,7 @@ android {
                 if (baseAbiCode != null) {
                     output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0))
                 }
+
             }
         }
     }

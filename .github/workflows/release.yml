@@ -1,0 +1,156 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build all ABIs
+    runs-on: ubuntu-latest
+
+    # Signing secrets are optional. Without them the APKs are still built,
+    # just unsigned (and therefore not installable).
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Prepare signing material
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/duck-release.jks"
+          {
+            echo "DUCK_KEYSTORE_PATH=$RUNNER_TEMP/duck-release.jks"
+            echo "DUCK_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "DUCK_KEY_ALIAS=$KEY_ALIAS"
+            echo "DUCK_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+          echo "signing: enabled"
+
+      # No -PnoSplits: build one APK per ABI plus a universal one.
+      - name: Build release APKs (all ABIs)
+        run: ./gradlew :app:assembleGenericRelease --stacktrace
+
+      - name: Collect APKs
+        run: |
+          mkdir -p artifacts
+          find app/build/outputs/apk -name '*.apk' -exec cp {} artifacts/ \;
+          echo "### APK" >> "$GITHUB_STEP_SUMMARY"
+          for f in artifacts/*.apk; do
+            size=$(du -h "$f" | cut -f1)
+            echo "- \`$(basename "$f")\` — $size" >> "$GITHUB_STEP_SUMMARY"
+          done
+          ls -lh artifacts
+
+      - name: Verify signatures
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          ok=0; bad=0
+          for f in artifacts/*.apk; do
+            if "$BT/apksigner" verify "$f" 2>/dev/null; then
+              echo "signed:   $(basename "$f")"; ok=$((ok+1))
+            else
+              echo "UNSIGNED: $(basename "$f")"; bad=$((bad+1))
+            fi
+          done
+          echo "signed=$ok unsigned=$bad" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$bad" -gt 0 ]; then
+            echo "::error::$bad APK(s) are not signed and cannot be installed"
+            exit 1
+          fi
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v5
+        with:
+          name: duck-apk-${{ github.ref_name }}
+          path: artifacts/*.apk
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download APKs
+        uses: actions/download-artifact@v5
+        with:
+          name: duck-apk-${{ github.ref_name }}
+          path: artifacts
+
+      # Turn the matching CHANGELOG section into the release body.
+      - name: Extract changelog for this tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          VER="${TAG#v}"
+          python3 - "$VER" <<'PYEOF' > notes.md
+          import re, sys
+          ver = sys.argv[1]
+          text = open('CHANGELOG.md', encoding='utf-8').read()
+          # grab "## [1.2.3] ... " up to the next "## ["
+          pat = re.compile(r'^## \[' + re.escape(ver) + r'\].*?$(.*?)(?=^## \[|\Z)', re.S | re.M)
+          m = pat.search(text)
+          if m:
+              body = m.group(1).strip()
+              print(body if body else '_该版本无详细说明_')
+          else:
+              print('_未在 CHANGELOG.md 中找到 %s 的说明_' % ver)
+          PYEOF
+          {
+            echo "## 变更内容"
+            echo
+            cat notes.md
+            echo
+            echo "## 下载说明"
+            echo
+            echo "| 文件 | 适用设备 |"
+            echo "| --- | --- |"
+            echo "| `*-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） |"
+            echo "| `*-armeabi-v7a-release.apk` | 老设备（32 位 ARM） |"
+            echo "| `*-x86_64-release.apk` | 模拟器 / x86 平板 |"
+            echo "| `*-x86-release.apk` | 老模拟器 |"
+            echo "| `*-universal-release.apk` | 不确定架构时用，体积最大 |"
+          } > body.md
+          cat body.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.apk
+          body_path: body.md
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

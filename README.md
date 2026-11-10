@@ -24,33 +24,24 @@ duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，�
 
 ## 下载安装
 
-不提供本地构建产物。所有 APK 均由 GitHub Actions 在云端编译：
+所有 APK 均由 GitHub Actions 在云端构建并发布到 [Releases](../../releases)，**不提供本地构建产物**。
 
-1. 打开 [Actions](../../actions/workflows/android.yml) 页面，点开最近一次成功的 **Android CI** 运行
-2. 在页面底部的 **Artifacts** 里下载 `duck-debug-apk`
-3. 解压后得到各 ABI 的 debug APK，按手机架构安装
+每个版本会同时产出 5 个 APK：
 
-打上 `v*` 标签（例如 `git tag v1.0.0 && git push origin v1.0.0`）会自动构建
-release 版并发布到 Releases 页面。
+| 文件 | 适用设备 | 体积 |
+| --- | --- | --- |
+| `duck-<版本>-generic-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） | 约 41 MB |
+| `duck-<版本>-generic-armeabi-v7a-release.apk` | 老设备（32 位 ARM） | 约 40 MB |
+| `duck-<版本>-generic-x86_64-release.apk` | 模拟器 / x86 平板 | 约 42 MB |
+| `duck-<版本>-generic-x86-release.apk` | 老模拟器 | 约 41 MB |
+| `duck-<版本>-generic-universal-release.apk` | 不确定架构时用 | 约 110 MB |
 
-### 让 CI 产出已签名的 release
+> 拿不准就下 `universal`，一个包装所有架构，只是体积大。
 
-release 默认构建但**不签名**（未签名的 APK 装不上）。要拿到可安装的正式包，
-在仓库的 Settings → Secrets and variables → Actions 里加四个 secret：
+### 版本说明
 
-| Secret | 内容 |
-| --- | --- |
-| KEYSTORE_BASE64 | 你的 jks 文件 base64：base64 -w0 duck.jks |
-| KEYSTORE_PASSWORD | keystore 密码 |
-| KEY_ALIAS | 密钥别名 |
-| KEY_PASSWORD | 密钥密码 |
-
-没配这几个 secret 时流水线仍会跑通，只是产物未签名。
-
-当前仓库**已经配置好**这四个 secret，所以推 tag 会直接产出签名 APK，
-指纹：`21:12:66:D1:BD:A5:55:E0:77:CE:98:F9:B7:48:C6:5A:B7:31:E7:63:82:2A:25:51:32:5F:EE:20:A0:03:CB:48`。
-
-> 签名密钥请离线备份。丢了就无法给老用户推送更新。
+每个 Release 的正文会自动从 [CHANGELOG.md](CHANGELOG.md) 里提取对应版本号的
+「新增 / 变更 / 修复」小节，所以每个版本的改动都有记录可查。
 
 ## 构建
 
@@ -58,9 +49,10 @@ release 默认构建但**不签名**（未签名的 APK 装不上）。要拿到
 
 本仓库的主构建路径是 GitHub Actions —— 推送即编译，本地不需要 Android SDK：
 
-- **debug**：push 到 `main` 或手动触发 `workflow_dispatch`
-- **release**：推送 `v*` 标签
-- 产物：`duck-<version>-generic-<abi>.apk`
+- **push 到 `main` / PR / 手动触发**：构建全部 ABI 的 release APK，作为 Actions artifact 保留
+- **推送 `v*` 标签**：额外发布到 Releases 页面
+- 产物：`duck-<version>-generic-<abi>-release.apk`（5 个）
+- 流水线会校验签名，未签名的 APK 直接判定失败
 
 ### 本地构建（可选，仅用于调试）
 
