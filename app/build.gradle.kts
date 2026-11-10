@@ -65,7 +65,7 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 101_010_400
+        versionCode = 101_020_400
         check(versionCode == currentVersionCode)
 
         versionName = baseVersionName

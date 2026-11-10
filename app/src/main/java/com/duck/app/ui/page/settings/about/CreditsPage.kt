@@ -42,6 +42,7 @@ private const val youtubedlAndroidUrl = "https://github.com/yausername/youtubedl
 private const val ytdlpUrl = "https://github.com/yt-dlp/yt-dlp"
 private const val readYou = "https://github.com/Ashinch/ReadYou"
 private const val dvd = "https://github.com/yausername/dvd"
+private const val icons8 = "https://icons8.com/"
 private const val materialIcon = "https://fonts.google.com/icons"
 private const val materialColor = "https://github.com/material-foundation/material-color-utilities"
 private const val monet = "https://github.com/Kyant0/Monet"
@@ -88,6 +89,11 @@ fun CreditsPage(onNavigateBack: () -> Unit) {
             Credit("OkHttp", APACHE_V2, okhttp),
             Credit("material-motion-compose", APACHE_V2, materialMotionCompose),
             Credit("unDraw", null, unDraw),
+            Credit(
+                "App icon by Icons8",
+                "Universal Multimedia Licensing Agreement for Icons8",
+                icons8,
+            ),
         )
     val uriHandler = LocalUriHandler.current
     fun openUrl(url: String) {

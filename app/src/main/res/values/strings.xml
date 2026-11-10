@@ -434,4 +434,21 @@
         <item quantity="other">%d audios</item>
     </plurals>
 <string name="ytdlp_update_done">yt-dlp has been updated</string>
+    <string name="github_issue">GitHub issue</string>
+    <string name="github_issue_desc">Submit an issue for bug report or feature request</string>
+    <string name="issue_tracker_hint">Encountered an error? Before reporting a new issue, please search our issue tracker. Many common problems have already been addressed and documented there.</string>
+    <string name="matrix_space">Matrix space</string>
+    <string name="readme" translatable="false">README</string>
+    <string name="readme_desc">Check the GitHub repository and the README</string>
+    <string name="release">Latest release</string>
+    <string name="release_desc">Look for changelogs and new versions</string>
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_desc">Support this app by sponsoring on GitHub</string>
+    <string name="sponsor_msg">Seal will be always free and open source for everyone. If you like it, please consider sponsoring me on GitHub!</string>
+    <string name="sponsor_msg2">Thank you very much!</string>
+    <string name="sponsors">Sponsors</string>
+    <string name="switch_to_github_builds">switching to GitHub builds</string>
+    <string name="telegram_channel">Telegram channel</string>
+    <string name="translate">Translate</string>
+    <string name="translate_desc">Help translate this app on Hosted Weblate</string>
 </resources>

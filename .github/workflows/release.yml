@@ -139,15 +139,6 @@ jobs:
             echo
             cat notes.md
             echo
-            echo "## 下载说明"
-            echo
-            echo "| 文件 | 适用设备 |"
-            echo "| --- | --- |"
-            echo '| `*-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） |'
-            echo '| `*-armeabi-v7a-release.apk` | 老设备（32 位 ARM） |'
-            echo '| `*-x86_64-release.apk` | 模拟器 / x86 平板 |'
-            echo '| `*-x86-release.apk` | 老模拟器 |'
-            echo '| `*-universal-release.apk` | 不确定架构时用，体积最大 |'
           } > body.md
           cat body.md
 

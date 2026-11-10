@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.SignalWifi4Bar
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material.icons.rounded.VideoFile
 import androidx.compose.material.icons.rounded.ViewComfy
+import androidx.compose.material.icons.rounded.VolunteerActivism
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,11 +49,14 @@ import androidx.compose.ui.unit.dp
 import com.duck.app.App
 import com.duck.app.R
 import com.duck.app.ui.common.Route
+import com.duck.app.ui.common.intState
 import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.PreferencesHintCard
 import com.duck.app.ui.component.SettingItem
 import com.duck.app.util.EXTRACT_AUDIO
 import com.duck.app.util.PreferenceUtil.getBoolean
+import com.duck.app.util.PreferenceUtil.updateInt
+import com.duck.app.util.SHOW_SPONSOR_MSG
 
 @SuppressLint("BatteryLife")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,6 +103,10 @@ fun SettingsPage(onNavigateBack: () -> Unit, onNavigateTo: (String) -> Unit) {
         }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
+    val showSponsorMessage by SHOW_SPONSOR_MSG.intState
+
+    LaunchedEffect(Unit) { SHOW_SPONSOR_MSG.updateInt(showSponsorMessage + 1) }
+
     val typography = MaterialTheme.typography
 
     Scaffold(
@@ -135,6 +144,16 @@ fun SettingsPage(onNavigateBack: () -> Unit, onNavigateTo: (String) -> Unit) {
                     }
                 }
             }
+            if (!showBatteryHint && showSponsorMessage > 30)
+                item {
+                    PreferencesHintCard(
+                        title = stringResource(id = R.string.sponsor),
+                        icon = Icons.Rounded.VolunteerActivism,
+                        description = stringResource(id = R.string.sponsor_desc),
+                    ) {
+                        onNavigateTo(Route.DONATE)
+                    }
+                }
             item {
                 SettingItem(
                     title = stringResource(id = R.string.general_settings),

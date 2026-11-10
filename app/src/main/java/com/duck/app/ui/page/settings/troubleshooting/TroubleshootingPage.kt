@@ -66,6 +66,18 @@ fun TroubleShootingPage(
         LazyColumn(contentPadding = it) {
             item {
                 OutlinedCard(modifier = Modifier.padding(16.dp)) {
+                    PreferenceInfo(
+                        modifier = Modifier,
+                        text = stringResource(R.string.issue_tracker_hint),
+                    )
+                    val knownIssueUrlDuck = "https://github.com/maomaoxiaokuoai/duck/issues"
+                    PreferenceItem(
+                        title = "duck Issue Tracker",
+                        description = null,
+                        icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                        onClick = { uriHandler.openUri(knownIssueUrlDuck) },
+                    )
+
                     val knownIssueUrlYtdlp = "https://github.com/yt-dlp/yt-dlp/issues/3766"
                     PreferenceItem(
                         title = "yt-dlp Issue Tracker",

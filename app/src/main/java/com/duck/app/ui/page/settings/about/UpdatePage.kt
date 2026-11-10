@@ -42,15 +42,16 @@ import com.duck.app.ui.component.PreferenceInfo
 import com.duck.app.ui.component.PreferenceSingleChoiceItem
 import com.duck.app.ui.component.PreferenceSubtitle
 import com.duck.app.ui.component.PreferenceSwitchWithContainer
+import com.duck.app.ui.page.UpdateDialog
 import com.duck.app.util.AUTO_UPDATE
 import com.duck.app.util.PRE_RELEASE
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.PreferenceUtil.updateBoolean
 import com.duck.app.util.PreferenceUtil.updateInt
-import com.duck.app.util.UpdateUtil
 import com.duck.app.util.STABLE
 import com.duck.app.util.ToastUtil
 import com.duck.app.util.UPDATE_CHANNEL
+import com.duck.app.util.UpdateUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,6 +69,8 @@ fun UpdatePage(onNavigateBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    var release by remember { mutableStateOf(UpdateUtil.Release()) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
     var showUnavailableDialog by remember { mutableStateOf(App.isFDroidBuild()) }
 
     Scaffold(
@@ -121,7 +124,7 @@ fun UpdatePage(onNavigateBack: () -> Unit) {
                     }
                 }
                 item {
-                    var isUpdatingYtDlp by remember { mutableStateOf(false) }
+                    var isLoading by remember { mutableStateOf(false) }
                     Row(
                         horizontalArrangement = Arrangement.End,
                         modifier = Modifier.fillMaxWidth(),
@@ -131,28 +134,32 @@ fun UpdatePage(onNavigateBack: () -> Unit) {
                                 Modifier.padding(horizontal = 24.dp)
                                     .padding(top = 6.dp)
                                     .padding(bottom = 12.dp),
-                            text = stringResource(id = R.string.ytdlp_update_action),
+                            text = stringResource(id = R.string.check_for_updates),
                             icon = Icons.Outlined.Update,
-                            isLoading = isUpdatingYtDlp,
+                            isLoading = isLoading,
                         ) {
-                            if (!isUpdatingYtDlp)
+                            if (!isLoading)
                                 scope.launch {
-                                    isUpdatingYtDlp = true
                                     runCatching {
+                                            isLoading = true
                                             withContext(Dispatchers.IO) {
-                                                UpdateUtil.updateYtDlp()
+                                                UpdateUtil.checkForUpdate()?.let {
+                                                    release = it
+                                                    showUpdateDialog = true
+                                                }
+                                                    ?: ToastUtil.makeToastSuspend(
+                                                        context.getString(R.string.app_up_to_date)
+                                                    )
                                             }
-                                            ToastUtil.makeToastSuspend(
-                                                context.getString(R.string.ytdlp_update_done)
-                                            )
+                                            isLoading = false
                                         }
                                         .onFailure {
                                             it.printStackTrace()
                                             ToastUtil.makeToastSuspend(
                                                 context.getString(R.string.app_update_failed)
                                             )
+                                            isLoading = false
                                         }
-                                    isUpdatingYtDlp = false
                                 }
                         }
                     }
@@ -167,6 +174,9 @@ fun UpdatePage(onNavigateBack: () -> Unit) {
             }
         },
     )
+    if (showUpdateDialog)
+        UpdateDialog(onDismissRequest = { showUpdateDialog = false }, release = release)
+
     if (showUnavailableDialog) {
         AutoUpdateUnavailableDialog {
             showUnavailableDialog = false

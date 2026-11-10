@@ -48,6 +48,7 @@ import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.PreferenceSingleChoiceItem
 import com.duck.app.ui.component.PreferenceSubtitle
 import com.duck.app.ui.component.PreferencesHintCard
+import com.duck.app.ui.page.settings.about.weblate
 import com.duck.app.ui.theme.DuckTheme
 import com.duck.app.util.LocaleLanguageCodeMap
 import com.duck.app.util.PreferenceUtil
@@ -164,6 +165,16 @@ private fun LanguagePageImpl(
         },
         content = {
             LazyColumn(modifier = Modifier, contentPadding = it) {
+                item {
+                    PreferencesHintCard(
+                        title = stringResource(R.string.translate),
+                        description = stringResource(R.string.translate_desc),
+                        icon = Icons.Outlined.Translate,
+                    ) {
+                        uriHandler.openUri(weblate)
+                    }
+                }
+
                 if (suggestedLocales.isNotEmpty()) {
 
                     item { PreferenceSubtitle(text = stringResource(id = R.string.suggested)) }

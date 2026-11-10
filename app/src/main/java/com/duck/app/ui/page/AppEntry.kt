@@ -48,6 +48,7 @@ import com.duck.app.ui.page.downloadv2.DownloadPageV2
 import com.duck.app.ui.page.settings.SettingsPage
 import com.duck.app.ui.page.settings.about.AboutPage
 import com.duck.app.ui.page.settings.about.CreditsPage
+import com.duck.app.ui.page.settings.about.SponsorsPage
 import com.duck.app.ui.page.settings.about.UpdatePage
 import com.duck.app.ui.page.settings.appearance.AppearancePreferences
 import com.duck.app.ui.page.settings.appearance.DarkThemePreferences
@@ -211,8 +212,10 @@ fun NavGraphBuilder.settingsGraph(
                 onNavigateBack = onNavigateBack,
                 onNavigateToCreditsPage = { onNavigateTo(Route.CREDITS) },
                 onNavigateToUpdatePage = { onNavigateTo(Route.AUTO_UPDATE) },
+                onNavigateToDonatePage = { onNavigateTo(Route.DONATE) },
             )
         }
+        animatedComposable(Route.DONATE) { SponsorsPage(onNavigateBack) }
         animatedComposable(Route.CREDITS) { CreditsPage(onNavigateBack) }
         animatedComposable(Route.AUTO_UPDATE) { UpdatePage(onNavigateBack) }
         animatedComposable(Route.APPEARANCE) {
