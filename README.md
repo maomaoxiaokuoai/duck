@@ -30,11 +30,11 @@ duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，�
 
 | 文件 | 适用设备 | 体积 |
 | --- | --- | --- |
-| `duck-<版本>-generic-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） | 约 41 MB |
-| `duck-<版本>-generic-armeabi-v7a-release.apk` | 老设备（32 位 ARM） | 约 40 MB |
-| `duck-<版本>-generic-x86_64-release.apk` | 模拟器 / x86 平板 | 约 42 MB |
-| `duck-<版本>-generic-x86-release.apk` | 老模拟器 | 约 41 MB |
-| `duck-<版本>-generic-universal-release.apk` | 不确定架构时用 | 约 110 MB |
+| `duck-<版本>-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） | 约 41 MB |
+| `duck-<版本>-armeabi-v7a-release.apk` | 老设备（32 位 ARM） | 约 40 MB |
+| `duck-<版本>-x86_64-release.apk` | 模拟器 / x86 平板 | 约 42 MB |
+| `duck-<版本>-x86-release.apk` | 老模拟器 | 约 41 MB |
+| `duck-<版本>-universal-release.apk` | 不确定架构时用 | 约 110 MB |
 
 > 拿不准就下 `universal`，一个包装所有架构，只是体积大。
 
@@ -51,7 +51,7 @@ duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，�
 
 - **push 到 `main` / PR / 手动触发**：构建全部 ABI 的 release APK，作为 Actions artifact 保留
 - **推送 `v*` 标签**：额外发布到 Releases 页面
-- 产物：`duck-<version>-generic-<abi>-release.apk`（5 个）
+- 产物：`duck-<version>-<abi>-release.apk`（5 个）
 - 流水线会校验签名，未签名的 APK 直接判定失败
 
 ### 本地构建（可选，仅用于调试）

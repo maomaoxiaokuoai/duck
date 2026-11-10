@@ -65,7 +65,7 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 101_000_400
+        versionCode = 101_010_400
         check(versionCode == currentVersionCode)
 
         versionName = baseVersionName
@@ -156,9 +156,14 @@ android {
     lint { disable.addAll(listOf("MissingTranslation", "ExtraTranslation", "MissingQuantity")) }
 
     applicationVariants.all {
+        // The publish-channel flavor ("generic") is an internal build detail, so keep it out of
+        // the artifact name:  duck-1.1.1-arm64-v8a-release.apk  instead of
+        //                     duck-1.1.1-generic-arm64-v8a-release.apk
+        val channel = flavorName
         outputs.all {
+            val segments = name.split("-").filterNot { it == channel }
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "duck-${defaultConfig.versionName}-${name}.apk"
+                "duck-${defaultConfig.versionName}-${segments.joinToString("-")}.apk"
         }
     }
 
