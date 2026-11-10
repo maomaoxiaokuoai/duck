@@ -111,6 +111,7 @@ class PaletteStyle(
             neutral2Spec = ColorSpec({ 0.0 }) { 0.0 },
         )
 
+
         private fun Double.hueRotation(list: Array<Pair<Int, Int>>): Double {
             var i = 0
             val size = list.size - 2

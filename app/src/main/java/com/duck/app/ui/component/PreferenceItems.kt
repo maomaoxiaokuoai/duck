@@ -61,17 +61,12 @@ import com.duck.app.ui.theme.FixedAccentColors
 import com.duck.app.ui.theme.DuckTheme
 import com.duck.app.ui.theme.applyOpacity
 import com.duck.app.ui.theme.harmonizeWithPrimary
+import com.duck.app.ui.theme.preferenceTitle
 import com.kyant.monet.LocalTonalPalettes
 import com.kyant.monet.TonalPalettes.Companion.toTonalPalettes
 
 private const val horizontal = 8
-private const val vertical = 12
-
-private val PreferenceTitleVariant: TextStyle
-    @Composable get() = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
-
-private val PreferenceTitle
-    @Composable get() = MaterialTheme.typography.titleMedium
+private const val vertical = 16
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -88,17 +83,18 @@ fun PreferenceItem(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier =
-            Modifier.combinedClickable(
-                onClick = onClick,
-                onClickLabel = onClickLabel,
-                enabled = enabled,
-                onLongClickLabel = onLongClickLabel,
-                onLongClick = onLongClick,
-            )
+        modifier = Modifier.combinedClickable(
+            onClick = onClick,
+            onClickLabel = onClickLabel,
+            enabled = enabled,
+            onLongClickLabel = onLongClickLabel,
+            onLongClick = onLongClick
+        )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal.dp, vertical.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal.dp, vertical.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             leadingIcon?.invoke()
@@ -108,8 +104,10 @@ fun PreferenceItem(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled)
                     )
                 }
 
@@ -117,37 +115,40 @@ fun PreferenceItem(
                     Icon(
                         painter = icon,
                         contentDescription = null,
-                        modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled)
                     )
                 }
             }
 
             Column(
-                modifier =
-                    Modifier.weight(1f)
-                        .padding(
-                            horizontal = if (icon == null && leadingIcon == null) 8.dp else 0.dp
-                        )
-                        .padding(end = 8.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = if (icon == null && leadingIcon == null) 12.dp else 0.dp)
+                    .padding(end = 8.dp)
             ) {
                 PreferenceItemTitle(text = title, enabled = enabled)
-                if (!description.isNullOrEmpty())
-                    PreferenceItemDescription(text = description, enabled = enabled)
+                if (!description.isNullOrEmpty()) PreferenceItemDescription(
+                    text = description,
+                    enabled = enabled
+                )
             }
             trailingIcon?.let {
                 VerticalDivider(
-                    modifier =
-                        Modifier.height(32.dp)
-                            .padding(horizontal = 8.dp)
-                            .align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .height(32.dp)
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.CenterVertically),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                    thickness = 1.dp,
+                    thickness = 1.dp
                 )
                 trailingIcon.invoke()
             }
         }
     }
+
 }
 
 @Composable
@@ -161,12 +162,7 @@ fun PreferenceItemPreview() {
                 PreferenceItem(
                     title = "title",
                     description = "description",
-                    icon = Icons.Outlined.Update,
-                )
-                PreferenceItemVariant(
-                    title = "title",
-                    description = "description",
-                    icon = Icons.Outlined.Update,
+                    icon = Icons.Outlined.Update
                 )
             }
         }
@@ -187,40 +183,54 @@ fun PreferenceItemVariant(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier =
-            Modifier.combinedClickable(
-                enabled = enabled,
-                onClick = onClick,
-                onClickLabel = onClickLabel,
-                onLongClick = onLongClick,
-                onLongClickLabel = onLongClickLabel,
-            )
+        modifier = Modifier.combinedClickable(
+            enabled = enabled,
+            onClick = onClick,
+            onClickLabel = onClickLabel,
+            onLongClick = onLongClick,
+            onLongClickLabel = onLongClickLabel
+        )
     ) {
         Row(
-            modifier = modifier.fillMaxWidth().padding(12.dp, 16.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(12.dp, vertical.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             icon?.let {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 16.dp)
+                        .size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled)
                 )
             }
             Column(
-                modifier =
-                    Modifier.weight(1f)
-                        .padding(horizontal = if (icon == null) 12.dp else 0.dp)
-                        .padding(end = 8.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = if (icon == null) 12.dp else 0.dp)
+                    .padding(end = 8.dp)
             ) {
-                PreferenceItemTitle(text = title, enabled = enabled)
-                if (description != null) {
-                    PreferenceItemDescription(text = description, enabled = enabled)
+                with(MaterialTheme) {
+                    Text(
+                        text = title,
+                        maxLines = 1,
+                        style = typography.titleMedium,
+                        color = colorScheme.onSurface.applyOpacity(enabled)
+                    )
+                    if (description != null) Text(
+                        text = description,
+                        color = colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                        maxLines = 2, overflow = TextOverflow.Ellipsis,
+                        style = typography.bodyMedium,
+                    )
                 }
             }
         }
     }
+
 }
 
 @Composable
@@ -228,27 +238,39 @@ fun PreferenceSingleChoiceItem(
     modifier: Modifier = Modifier,
     text: String,
     selected: Boolean,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
-    onClick: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 18.dp),
+    onClick: () -> Unit
 ) {
-    Surface(modifier = Modifier.selectable(selected = selected, onClick = onClick)) {
+    Surface(
+        modifier = Modifier.selectable(
+            selected = selected, onClick = onClick
+        )
+    ) {
         Row(
-            modifier = modifier.fillMaxWidth().padding(contentPadding),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp)
+            ) {
                 Text(
                     text = text,
                     maxLines = 1,
-                    style = PreferenceTitleVariant,
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                     color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             RadioButton(
                 selected = selected,
                 onClick = onClick,
-                modifier = Modifier.padding().clearAndSetSemantics {},
+                modifier = Modifier
+                    .padding()
+                    .clearAndSetSemantics { },
             )
         }
     }
@@ -259,10 +281,10 @@ internal fun PreferenceItemTitle(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 2,
-    style: TextStyle = PreferenceTitle,
+    style: TextStyle = preferenceTitle,
     enabled: Boolean,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
+    overflow: TextOverflow = TextOverflow.Ellipsis
 ) {
     Text(
         modifier = modifier,
@@ -270,7 +292,7 @@ internal fun PreferenceItemTitle(
         maxLines = maxLines,
         style = style,
         color = color.applyOpacity(enabled),
-        overflow = overflow,
+        overflow = overflow
     )
 }
 
@@ -282,15 +304,15 @@ internal fun PreferenceItemDescription(
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     enabled: Boolean,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
+    overflow: TextOverflow = TextOverflow.Ellipsis
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.padding(top = 2.dp),
         text = text,
         maxLines = maxLines,
         style = style,
         color = color.applyOpacity(enabled),
-        overflow = overflow,
+        overflow = overflow
     )
 }
 
@@ -303,7 +325,7 @@ fun PreferenceSwitchPreview() {
             title = "PreferenceSwitch",
             description = "Supporting text",
             icon = Icons.Outlined.ToggleOn,
-            isChecked = b,
+            isChecked = b
         ) {
             b = !b
         }
@@ -321,11 +343,16 @@ fun PreferenceSwitchWithDividerPreview() {
 }
 
 @Composable
-fun rememberThumbContent(
-    isChecked: Boolean,
+fun PreferenceSwitch(
+    title: String,
+    description: String? = null,
+    icon: ImageVector? = null,
+    enabled: Boolean = true,
+    isChecked: Boolean = true,
     checkedIcon: ImageVector = Icons.Outlined.Check,
-): (@Composable () -> Unit)? =
-    remember(isChecked, checkedIcon) {
+    onClick: (() -> Unit) = {},
+) {
+    val thumbContent: (@Composable () -> Unit)? = remember(isChecked) {
         if (isChecked) {
             {
                 Icon(
@@ -339,47 +366,42 @@ fun rememberThumbContent(
         }
     }
 
-@Composable
-fun PreferenceSwitchVariant(
-    title: String,
-    description: String? = null,
-    icon: ImageVector? = null,
-    enabled: Boolean = true,
-    isChecked: Boolean = true,
-    thumbContent: (@Composable () -> Unit)? = rememberThumbContent(isChecked = isChecked),
-    onClick: (() -> Unit) = {},
-) {
-
     val interactionSource = remember { MutableInteractionSource() }
     Surface(
-        modifier =
-            Modifier.toggleable(
-                value = isChecked,
-                enabled = enabled,
-                onValueChange = { onClick() },
-                indication = LocalIndication.current,
-                interactionSource = interactionSource,
-            )
+        modifier = Modifier.toggleable(
+            value = isChecked,
+            enabled = enabled,
+            onValueChange = { onClick() },
+            indication = LocalIndication.current,
+            interactionSource = interactionSource
+        )
     ) {
         Row(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal.dp, vertical.dp)
-                    .padding(start = if (icon == null) 12.dp else 0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal.dp, vertical.dp)
+                .padding(start = if (icon == null) 12.dp else 0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             icon?.let {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 16.dp)
+                        .size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled)
                 )
             }
-            Column(modifier = Modifier.weight(1f)) {
-                PreferenceItemTitle(text = title, enabled = enabled, style = PreferenceTitleVariant)
-                if (!description.isNullOrEmpty())
-                    PreferenceItemDescription(text = description, enabled = enabled)
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                PreferenceItemTitle(
+                    text = title, enabled = enabled
+                )
+                if (!description.isNullOrEmpty()) PreferenceItemDescription(
+                    text = description, enabled = enabled
+                )
             }
             Switch(
                 checked = isChecked,
@@ -387,65 +409,12 @@ fun PreferenceSwitchVariant(
                 interactionSource = interactionSource,
                 modifier = Modifier.padding(start = 20.dp, end = 6.dp),
                 enabled = enabled,
-                thumbContent = thumbContent,
+                thumbContent = thumbContent
             )
         }
     }
 }
 
-@Composable
-fun PreferenceSwitch(
-    title: String,
-    description: String? = null,
-    icon: ImageVector? = null,
-    enabled: Boolean = true,
-    isChecked: Boolean = true,
-    thumbContent: (@Composable () -> Unit)? = rememberThumbContent(isChecked = isChecked),
-    onClick: (() -> Unit) = {},
-) {
-
-    val interactionSource = remember { MutableInteractionSource() }
-    Surface(
-        modifier =
-            Modifier.toggleable(
-                value = isChecked,
-                enabled = enabled,
-                onValueChange = { onClick() },
-                indication = LocalIndication.current,
-                interactionSource = interactionSource,
-            )
-    ) {
-        Row(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal.dp, vertical.dp)
-                    .padding(start = if (icon == null) 12.dp else 0.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            icon?.let {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                PreferenceItemTitle(text = title, enabled = enabled)
-                if (!description.isNullOrEmpty())
-                    PreferenceItemDescription(text = description, enabled = enabled)
-            }
-            Switch(
-                checked = isChecked,
-                onCheckedChange = null,
-                interactionSource = interactionSource,
-                modifier = Modifier.padding(start = 20.dp, end = 6.dp),
-                enabled = enabled,
-                thumbContent = thumbContent,
-            )
-        }
-    }
-}
 
 @Composable
 fun PreferenceSwitchWithDivider(
@@ -455,54 +424,75 @@ fun PreferenceSwitchWithDivider(
     enabled: Boolean = true,
     isSwitchEnabled: Boolean = enabled,
     isChecked: Boolean = true,
-    thumbContent: (@Composable () -> Unit)? = rememberThumbContent(isChecked = isChecked),
+    checkedIcon: ImageVector = Icons.Outlined.Check,
     onClick: (() -> Unit) = {},
-    onChecked: () -> Unit = {},
+    onChecked: () -> Unit = {}
 ) {
+    val thumbContent: (@Composable () -> Unit)? = remember(isChecked) {
+        if (isChecked) {
+            {
+                Icon(
+                    imageVector = checkedIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+        } else {
+            null
+        }
+    }
 
     Surface(
-        modifier =
-            Modifier.clickable(
-                enabled = enabled,
-                onClick = onClick,
-                onClickLabel = stringResource(id = R.string.open_settings),
-            )
+        modifier = Modifier.clickable(
+            enabled = enabled,
+            onClick = onClick,
+            onClickLabel = stringResource(id = R.string.open_settings)
+        )
     ) {
         Row(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal.dp, vertical.dp)
-                    .height(IntrinsicSize.Min),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal.dp, vertical.dp)
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             icon?.let {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled),
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 16.dp)
+                        .size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(enabled)
                 )
             }
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 PreferenceItemTitle(text = title, enabled = enabled)
-                if (!description.isNullOrEmpty())
-                    PreferenceItemDescription(text = description, enabled = enabled)
+                if (!description.isNullOrEmpty()) PreferenceItemDescription(
+                    text = description,
+                    enabled = enabled
+                )
             }
             VerticalDivider(
-                modifier =
-                    Modifier.height(32.dp)
-                        .padding(horizontal = 8.dp)
-                        .width(1f.dp)
-                        .align(Alignment.CenterVertically),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                modifier = Modifier
+                    .height(32.dp)
+                    .padding(horizontal = 8.dp)
+                    .width(1f.dp)
+                    .align(Alignment.CenterVertically),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
             )
             Switch(
                 checked = isChecked,
                 onCheckedChange = { onChecked() },
-                modifier =
-                    Modifier.padding(horizontal = 6.dp).semantics { contentDescription = title },
+                modifier = Modifier
+                    .padding(horizontal = 6.dp)
+                    .semantics {
+                        contentDescription = title
+                    },
                 enabled = isSwitchEnabled,
-                thumbContent = thumbContent,
+                thumbContent = thumbContent
             )
         }
     }
@@ -517,45 +507,50 @@ fun PreferencesCautionCard(
 ) {
 
     Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.errorContainer.harmonizeWithPrimary())
-                .clickable { onClick() }
-                .padding(horizontal = 12.dp, vertical = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 12.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(MaterialTheme.colorScheme.errorContainer.harmonizeWithPrimary())
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                tint = MaterialTheme.colorScheme.error.harmonizeWithPrimary(),
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(24.dp),
+                tint = MaterialTheme.colorScheme.error.harmonizeWithPrimary()
+
             )
         }
         Column(
-            modifier =
-                Modifier.weight(1f).padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
         ) {
             with(MaterialTheme) {
+
                 Text(
                     text = title,
                     maxLines = 1,
-                    style = PreferenceTitleVariant,
-                    color = colorScheme.onErrorContainer.harmonizeWithPrimary(),
+                    style = typography.titleLarge.copy(fontSize = 20.sp),
+                    color = colorScheme.onErrorContainer.harmonizeWithPrimary()
                 )
-                if (description != null)
-                    Text(
-                        text = description,
-                        color = colorScheme.onErrorContainer.harmonizeWithPrimary(),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        style = typography.bodyMedium,
-                    )
+                if (description != null) Text(
+                    text = description,
+                    color = colorScheme.onErrorContainer.harmonizeWithPrimary(),
+                    maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    style = typography.bodyMedium,
+                )
             }
         }
     }
+
+
 }
 
 @Preview
@@ -582,42 +577,43 @@ fun PreferencesHintCard(
     onClick: () -> Unit = {},
 ) {
     Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(containerColor)
-                .clickable { onClick() }
-                .padding(horizontal = 12.dp, vertical = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(containerColor)
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                tint = contentColor,
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(24.dp),
+                tint = contentColor
             )
         }
         Column(
-            modifier =
-                Modifier.weight(1f).padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
         ) {
             with(MaterialTheme) {
                 Text(
                     text = title,
                     maxLines = 1,
-                    style = PreferenceTitleVariant,
-                    color = contentColor,
+                    style = typography.titleLarge.copy(fontSize = 20.sp),
+                    color = contentColor
                 )
-                if (description != null)
-                    Text(
-                        text = description,
-                        color = contentColor,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        style = typography.bodyMedium,
-                    )
+                if (description != null) Text(
+                    text = description,
+                    color = contentColor,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    style = typography.bodyMedium,
+                )
             }
         }
     }
@@ -633,7 +629,7 @@ private fun PreferenceSwitchWithContainerPreview() {
             title = "Title ".repeat(2),
             isChecked = isChecked,
             onClick = { isChecked = !isChecked },
-            icon = null,
+            icon = null
         )
     }
 }
@@ -643,43 +639,60 @@ fun PreferenceSwitchWithContainer(
     title: String,
     icon: ImageVector? = null,
     isChecked: Boolean,
-    thumbContent: @Composable (() -> Unit)? = rememberThumbContent(isChecked = isChecked),
     onClick: () -> Unit,
 ) {
+    val thumbContent: (@Composable () -> Unit)? = remember(isChecked) {
+        if (isChecked) {
+            {
+                Icon(
+                    imageVector = Icons.Outlined.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+        } else {
+            null
+        }
+    }
 
     val interactionSource = remember { MutableInteractionSource() }
     Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .clip(MaterialTheme.shapes.extraLarge)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .toggleable(
-                    value = isChecked,
-                    onValueChange = { onClick() },
-                    interactionSource = interactionSource,
-                    indication = LocalIndication.current,
-                )
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .background(
+                MaterialTheme.colorScheme.primaryContainer
+            )
+            .toggleable(
+                value = isChecked,
+                onValueChange = { onClick() },
+                interactionSource = interactionSource,
+                indication = LocalIndication.current
+            )
+            .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.padding(start = 8.dp, end = 16.dp).size(24.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 16.dp)
+                    .size(24.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         Column(
-            modifier =
-                Modifier.weight(1f).padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = if (icon == null) 12.dp else 0.dp, end = 12.dp)
         ) {
             Text(
                 text = title,
                 maxLines = 2,
-                style = PreferenceTitleVariant,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = preferenceTitle,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         Switch(
@@ -701,23 +714,28 @@ fun CreditItem(
 ) {
     Surface(modifier = Modifier.clickable { onClick() }) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = Modifier.weight(1f).padding(horizontal = 10.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp)
+            ) {
                 with(MaterialTheme) {
                     Text(
                         text = title,
                         maxLines = 1,
                         style = typography.titleMedium,
-                        color = colorScheme.onSurface.applyOpacity(enabled),
+                        color = colorScheme.onSurface.applyOpacity(enabled)
                     )
                     license?.let {
                         Text(
                             text = it,
                             color = colorScheme.onSurfaceVariant.applyOpacity(enabled),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 2, overflow = TextOverflow.Ellipsis,
                             style = typography.bodyMedium,
                         )
                     }
@@ -725,6 +743,7 @@ fun CreditItem(
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -739,90 +758,101 @@ fun TemplateItem(
     onClick: () -> Unit = {},
     onSelect: () -> Unit = {},
     onCheckedChange: (Boolean) -> Unit = {},
-    onLongClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Surface(
-        modifier =
-            Modifier.run {
-                if (!isMultiSelectEnabled)
-                    then(
-                        this.combinedClickable(
-                            onClick = onClick,
-                            onClickLabel = stringResource(R.string.edit),
-                            onLongClick = onLongClick,
-                            onLongClickLabel = stringResource(R.string.multiselect_mode),
-                        )
-                    )
-                else {
-                    then(this.toggleable(value = checked, onValueChange = onCheckedChange))
-                }
+        modifier = Modifier.run {
+            if (!isMultiSelectEnabled) then(
+                this.combinedClickable(
+                    onClick = onClick,
+                    onClickLabel = stringResource(R.string.edit),
+                    onLongClick = onLongClick,
+                    onLongClickLabel = stringResource(R.string.multiselect_mode)
+                )
+            ) else {
+                then(this.toggleable(value = checked, onValueChange = onCheckedChange))
             }
+        }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp, 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AnimatedVisibility(visible = isMultiSelectEnabled) {
                 Checkbox(
-                    modifier = Modifier.clearAndSetSemantics {},
+                    modifier = Modifier.clearAndSetSemantics { },
                     checked = checked,
-                    onCheckedChange = onCheckedChange,
+                    onCheckedChange = onCheckedChange
                 )
             }
 
-            Column(modifier = Modifier.weight(1f).padding(horizontal = 10.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp)
+            ) {
                 with(MaterialTheme) {
                     Text(
                         text = label,
                         maxLines = 1,
                         style = typography.titleMedium,
-                        color = colorScheme.onSurface,
+                        color = colorScheme.onSurface
                     )
                     template?.let {
                         Text(
                             text = it,
                             color = colorScheme.onSurfaceVariant,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 2, overflow = TextOverflow.Ellipsis,
                             style = typography.bodyMedium,
                         )
                     }
                 }
             }
 
+
             AnimatedVisibility(!isMultiSelectEnabled) {
                 Row {
                     VerticalDivider(
-                        modifier =
-                            Modifier.height(32.dp)
-                                .padding(horizontal = 12.dp)
-                                .align(Alignment.CenterVertically),
+                        modifier = Modifier
+                            .height(32.dp)
+                            .padding(horizontal = 12.dp)
+                            .align(Alignment.CenterVertically),
                         color = MaterialTheme.colorScheme.outlineVariant,
-                        thickness = 1.dp,
+                        thickness = 1.dp
                     )
                     RadioButton(
                         modifier = Modifier.semantics { contentDescription = label },
                         selected = selected,
-                        onClick = onSelect,
+                        onClick = onSelect
                     )
                 }
+
             }
+
+
         }
+
+
     }
+
 }
 
 @Composable
 fun PreferenceSubtitle(
-    text: String,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(start = 16.dp, top = 20.dp, bottom = 8.dp),
+    contentPadding: PaddingValues = PaddingValues(start = 20.dp, top = 24.dp, bottom = 12.dp),
+    text: String,
     color: Color = MaterialTheme.colorScheme.primary,
 ) {
     Text(
         text = text,
-        modifier = modifier.padding(contentPadding),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(contentPadding),
         color = color,
-        style = MaterialTheme.typography.labelLarge,
+        style = MaterialTheme.typography.labelLarge
     )
 }
 
@@ -831,19 +861,21 @@ fun PreferenceInfo(
     modifier: Modifier = Modifier,
     text: String,
     icon: ImageVector = Icons.Outlined.Info,
-    applyPaddings: Boolean = true,
+    applyPaddings: Boolean = true
 ) {
-    Column(
-        modifier =
-            modifier.fillMaxWidth().run {
-                if (applyPaddings) padding(horizontal = 16.dp, vertical = 16.dp) else this
-            }
-    ) {
-        Icon(modifier = Modifier.padding(), imageVector = icon, contentDescription = null)
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .run {
+            if (applyPaddings) padding(horizontal = 16.dp, vertical = 16.dp)
+            else this
+        }) {
+        Icon(
+            modifier = Modifier.padding(), imageVector = icon, contentDescription = null
+        )
         Text(
             modifier = Modifier.padding(top = 16.dp),
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

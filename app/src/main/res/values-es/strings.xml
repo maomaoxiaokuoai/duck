@@ -23,7 +23,7 @@
     <string name="general_settings">General</string>
     <string name="language">Idioma</string>
     <string name="language_settings">Seleccionar idioma</string>
-    <string name="paste_msg">Pegar url</string>
+    <string name="paste_msg">Pegar el enlace desde el portapapeles</string>
     <string name="ytdlp_version">Versión de yt-dlp</string>
     <string name="ytdlp_update">Haz clic para descargar la última versión de yt-dlp</string>
     <string name="delete_info">¿Eliminar?</string>
@@ -39,6 +39,9 @@
     <string name="about_page">Versión, comentarios, actualización automática</string>
     <string name="back">Ir atrás</string>
     <string name="version">Versión</string>
+    <string name="release_desc">Buscar actualizaciones e historial de cambios</string>
+    <string name="release">Último lanzamiento</string>
+    <string name="readme_desc">Ver repositorio de GitHub y README</string>
     <string name="video">Vídeo</string>
     <string name="checked">Seleccionado</string>
     <string name="credits">Créditos</string>
@@ -99,7 +102,7 @@
     <string name="options">Opciones</string>
     <string name="additional_settings">Ajustes adicionales</string>
     <string name="share_fail_msg">No se ha podido obtener la URL desde el contenido compartido</string>
-    <string name="share_success_msg">Leyendo información del enlace compartido con duck…</string>
+    <string name="share_success_msg">Leyendo información del enlace compartido con Seal…</string>
     <string name="show_more_actions">Mostrar más acciones</string>
     <string name="download_notification">Notificación de descarga</string>
     <string name="download_notification_desc">Notificarme el progreso de las descargas y un mensaje de finalización</string>
@@ -119,8 +122,10 @@
     <string name="permission_issue_desc">Directorios fuera de las carpetas «Download/» y «Documents/» no están soportados</string>
     <string name="battery_configuration">Configuración de la batería</string>
     <string name="battery_configuration_desc">Ignorar la optimización de la batería para esta aplicación en segundo plano</string>
-    <string name="service_title">duck está descargando…</string>
+    <string name="service_title">Seal está descargando…</string>
     <string name="unknown_error">Ha ocurrido un error desconocido</string>
+    <string name="translate">Traducir</string>
+    <string name="translate_desc">Ayuda a traducir esta aplicación en Hosted Weblate</string>
     <string name="execute_command_notification">Ejecutando comandos personalizados…</string>
     <string name="playlist_indicator_text">Descargando la lista de reproducción (%1$d/%2$d)…</string>
     <string name="subdirectory_desc">Guardar los archivos en carpetas denominadas como campos respectivos</string>
@@ -135,7 +140,7 @@
     <string name="template_selection">Selección de plantillas</string>
     <string name="custom_command_template_desc">Editar y gestionar plantillas de comandos</string>
     <string name="status_enqueued">En cola</string>
-    <string name="status_completed">Finalizado</string>
+    <string name="status_completed">Completada</string>
     <string name="status_downloading">Descargando</string>
     <string name="status_canceled">Cancelada</string>
     <string name="status_fetching_video_info">Obteniendo información</string>
@@ -143,11 +148,13 @@
     <string name="restart">Reinciar</string>
     <string name="downloading_indicator_text">Descarga en curso…</string>
     <string name="task_canceled">Tarea de descarga cancelada</string>
+    <string name="github_issue">Reportar un problema en GitHub</string>
+    <string name="github_issue_desc">Envía un reporte de un problema que te ha ocurrido o haz una petición de alguna funcionalidad que te gustaría que tuviera Seal</string>
     <string name="info_copied">Información copiada al portapapeles</string>
     <string name="copy_link">Copiar enlace</string>
-    <string name="copy_error_report">Copiar el informe</string>
+    <string name="copy_error_report">Informe de errores</string>
     <string name="status_error">Error</string>
-    <string name="video_resolution">Resolución del vídeo</string>
+    <string name="video_resolution">Resolución de vídeo</string>
     <string name="video_file_size">Tamaño del archivo del vídeo</string>
     <string name="export_to_clipboard">Exportar al portapapeles</string>
     <string name="import_from_clipboard">Importar desde el portapapeles</string>
@@ -158,12 +165,12 @@
     <string name="multiselect_item_count">%1$d vídeo(s), %2$d archivo(s) de audio</string>
     <string name="delete_multiple_items_msg">¿Eliminar %1$d elemento(s) de tu historial de descargas para siempre\?</string>
     <string name="check_for_updates_desc">Buscar automáticamente por la última versión disponible en GitHub</string>
-    <string name="app_up_to_date">duck ya está puesto al día</string>
+    <string name="app_up_to_date">Seal ya está puesto al día</string>
     <string name="update">Actualizar</string>
     <string name="check_for_updates">Buscar actualizaciones</string>
     <string name="aria2_desc">Usa aria2c como descargador externo</string>
     <string name="app_update_failed">Fallo al actualizar a la última versión</string>
-    <string name="sponsorblock_desc">Eliminar o marcar segmentos en los vídeos con la API SponsorBlock</string>
+    <string name="sponsorblock_desc">Eliminar o marcar segmentos en los vídeos con la API de SponsorBlock</string>
     <string name="sponsorblock_categories_desc">Especifique las categorías en SponsorBlock que deseas eliminar o marcar en el archivo de vídeo</string>
     <string name="sponsorblock_categories">Categorías de SponsorBlock</string>
     <string name="cookies_desc">Usar cookies formateadas de Netscape para las descargas</string>
@@ -213,8 +220,10 @@
     <string name="remove_cookie_profile_desc">¿Eliminar esta entrada para \"%1$s\"? Por favor, tenga en cuenta que las cookies almacenadas para este sitio no se borrarán.</string>
     <string name="custom_command_enabled_hint">Algunas opciones no están disponibles cuando se utiliza el comando personalizado</string>
     <string name="how_does_it_work">¿Cómo funciona\?</string>
+    <string name="telegram_channel">Canal de Telegram</string>
     <string name="cookies_usage_msg">La descarga desde algunos sitios requiere información de autenticación de cuenta. Haz clic en \"Generar nuevas cookies\", introduce la URL del sitio web y, a continuación, inicia sesión con tu cuenta en la página del navegador; la aplicación la generará por ti.</string>
     <string name="cookies">Cookies</string>
+    <string name="matrix_space">Canal de Matrix</string>
     <string name="abs_hint">La mayoría de los servicios de streaming en línea proveen el audio y el vídeo por separado. De esta forma puedes seleccionar mezclar un formato de solo vídeo con otro de solo audio para crear un único vídeo con audio, dando así una mayor personalización.</string>
     <string name="sdcard_directory">Ubicación para tarjetas SD</string>
     <string name="auto_subtitle">Subtítulos generados automáticamente</string>
@@ -268,19 +277,25 @@
     <string name="second">segundo</string>
     <string name="clear_all_cookies_desc">¿Borrar definitivamente todas las cookies almacenadas en la aplicación\?</string>
     <string name="temporary_directory_desc">Almacena archivos temporales en el directorio seleccionado</string>
+    <string name="sponsor">Patrocinador</string>
+    <string name="sponsor_desc">Apoya esta aplicación patrocinando en GitHub</string>
+    <string name="sponsor_msg">Seal será siempre gratuito y de código abierto para todos. Si te gusta, ¡considera la posibilidad de patrocinarme en GitHub!</string>
     <string name="feedback">Comentario</string>
+    <string name="sponsors">Patrocinadores</string>
     <string name="audio_format">Formato del audio</string>
     <string name="no_downloaded_media">Ningún medio descargado</string>
     <string name="beta_features">Beta</string>
     <string name="enable_experimental_feature">¿Habilitar la función experimental\?</string>
     <string name="clip_video_desc">Hacer videoclips en la página de selección del formato</string>
     <string name="clip_video_dialog_msg">Las descargas que utilicen esta función serán delegadas a FFmpeg para que descargue las secciones seleccionadas del vídeo, esta función es todavía experimental y el corte no será completamente preciso, no todos los formatos soportan esta función y puede que experimentes velocidades de descarga más lentas.</string>
+    <string name="switch_to_github_builds">cambiando a las compilaciones de GitHub</string>
     <string name="okay">De acuerdo</string>
     <string name="got_it">Entendido</string>
-    <string name="auto_update_disabled_msg">La actualización automática no está disponible para %1$s builds. Si no tienes %1$s instalado en tu dispositivo, o te gustaría tener una vista previa de las próximas novedades de duck, considera %2$s.</string>
+    <string name="auto_update_disabled_msg">La actualización automática no está disponible para %1$s builds. Si no tienes %1$s instalado en tu dispositivo, o te gustaría tener una vista previa de las próximas novedades de Seal, considera %2$s.</string>
     <string name="feature_unavailable">Característica no disponible</string>
     <string name="no_custom_command_tasks">No hay tareas de comando personalizadas</string>
     <string name="msg_from_developer">Mensaje del desarrollador</string>
+    <string name="sponsor_msg2">¡Muchas gracias!</string>
     <string name="download_video_desc">Descargar los vídeos desde la URL</string>
     <string name="convert_subtitle">Convertir subtítulos</string>
     <string name="split_video_msg">El video se dividirá en %1$d capítulos</string>
@@ -323,9 +338,9 @@
     </plurals>
     <string name="ua_header">Encabezado User-Agent</string>
     <string name="export_to_file">Exportar a un archivo</string>
-    <string name="custom_command_usage_msg">yt-dlp es una potente herramienta de línea de comandos para descargar vídeos. duck facilita el uso de yt-dlp proporcionando una GUI intuitiva, preajustes para comandos comunes y otras características adicionales.
+    <string name="custom_command_usage_msg">yt-dlp es una potente herramienta de línea de comandos para descargar vídeos. Seal facilita el uso de yt-dlp proporcionando una GUI intuitiva, preajustes para comandos comunes y otras características adicionales.
 \n
-\nPara un uso avanzado de yt-dlp, duck permite crear, guardar y ejecutar plantillas de comandos personalizadas directamente, como en un terminal.
+\nPara un uso avanzado de yt-dlp, Seal permite crear, guardar y ejecutar plantillas de comandos personalizadas directamente, como en un terminal.
 \n
 \nAl utilizar comandos personalizados, la mayoría de las opciones y características de la GUI estarán desactivadas.</string>
     <string name="clear_download_archive">¿Borrar el archivo de las descargas\?</string>
@@ -354,7 +369,7 @@
     <string name="allow_once">Permitir una vez</string>
     <string name="dont_allow">No permitir</string>
     <string name="allow_always">Permitir siempre</string>
-    <string name="download_with_cellular_request">¿Permitir descargas a través de datos móviles?</string>
+    <string name="download_with_cellular_request">¿Permitir descargas a través de los datos móviles?</string>
     <string name="merge_audiostream">Fusionar varios flujos de audio</string>
     <string name="merge_audiostream_desc">Permite fusionar varios flujos de audio en un único archivo</string>
     <string name="search">Buscar</string>
@@ -362,7 +377,7 @@
     <string name="auto_translated_subtitles">Subtítulos traducidos automáticamente</string>
     <string name="subtitle_language_desc">Idioma de los subtítulos a descargar en la selección de formato automático, separados por comas.</string>
     <string name="remember_for_next_download">Recordar para la próxima descarga</string>
-    <string name="look_and_feel"><![CDATA[Apariencia]]></string>
+    <string name="look_and_feel">Tema</string>
     <string name="use_previous_selection">Utilizar la selección anterior</string>
     <string name="none">Ninguno</string>
     <string name="reset">Restablecer</string>
@@ -376,7 +391,7 @@
     <string name="clipboard">Portapapeles</string>
     <string name="import_download_history">¿Importar el historial de descargas?</string>
     <string name="export_download_history_msg">Exportando %1$s del historial de descargas. No se realizará una copia de seguridad de los archivos descargados ni de las preferencias.</string>
-    <string name="interface_and_interaction"><![CDATA[Interfaz e interacción]]></string>
+    <string name="interface_and_interaction">Interfaz e interacción</string>
     <string name="export_backup">Exportar</string>
     <string name="import_backup">Importar</string>
     <string name="full_backup">Copia de seguridad completa</string>
@@ -394,40 +409,4 @@
     <string name="every_week">Semanalmente</string>
     <string name="every_month">Mensual</string>
     <string name="cookies_in_database">%1$d cookies de %2$d páginas web en total</string>
-    <string name="proceed">Continuar</string>
-    <string name="preset">Programar</string>
-    <string name="custom_format_selection_desc">Elige entre formatos, subtítulos y personaliza aún más</string>
-    <string name="edit_preset">Editar ajuste preestablecido</string>
-    <plurals name="video_count">
-        <item quantity="one">%d vídeo</item>
-        <item quantity="many">%d vídeos</item>
-        <item quantity="other">%d vídeos</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d audio</item>
-        <item quantity="many">%d audios</item>
-        <item quantity="other">%d audios</item>
-    </plurals>
-    <string name="all_languages">Todos los idiomas</string>
-    <string name="playlist">Lista de reproducción</string>
-    <string name="prefer_placeholder">Prefiero %1$s</string>
-    <string name="preset_format_selection_desc">Descargar automáticamente utilizando tus preferencias de formato</string>
-    <string name="best_quality_desc">Descargar en el mejor formato disponible</string>
-    <string name="task_added">Tarea añadida a la cola</string>
-    <string name="you_ll_find_your_downloads_here">Encontrarás tus descargas aquí</string>
-    <string name="download_hint">Pulsa el botón de descarga o comparte un enlace de vídeo en esta aplicación para iniciar la descarga</string>
-    <string name="status_downloaded">Descargado</string>
-    <string name="all">Todo</string>
-    <string name="download_queue">Cola de descarga</string>
-    <string name="select_multiple_link">Seleccione entre %1$d enlaces</string>
-    <string name="show_navigation_drawer">Mostrar cajón de navegación</string>
-    <string name="delete">Borrar</string>
-    <string name="resume">Resumen</string>
-    <string name="media_info">Información multimedia</string>
-    <string name="issue_tracker">Rastreador de problemas</string>
-    <string name="trouble_shooting_desc">Soluciona errores comunes y comprueba si hay errores conocidos</string>
-    <string name="trouble_shooting">Diagnosticar y resolver un problema</string>
-    <string name="add_to">Añadir a %1$s</string>
-    <string name="add_new_url">Añadir nuevo enlace</string>
-    <string name="saved_urls">Enlaces guardados</string>
 </resources>

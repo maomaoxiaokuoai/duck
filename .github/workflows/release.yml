@@ -60,7 +60,7 @@ jobs:
 
       # No -PnoSplits: build one APK per ABI plus a universal one.
       - name: Build release APKs (all ABIs)
-        run: ./gradlew :app:assembleGenericRelease --stacktrace
+        run: ./gradlew :app:assembleRelease --stacktrace
 
       - name: Collect APKs
         run: |

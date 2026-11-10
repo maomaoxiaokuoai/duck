@@ -21,20 +21,32 @@ import com.duck.app.ui.common.HapticFeedback.slightHapticFeedback
 @Composable
 fun PasteFromClipBoardButton(onPaste: (String) -> Unit = {}) {
     val clipboardManager = LocalClipboardManager.current
-    PasteButton(onClick = { clipboardManager.getText()?.let { onPaste(it.toString()) } })
+    PasteButton(onClick = {
+        clipboardManager.getText()?.let { onPaste(it.toString()) }
+    })
 }
 
 @Composable
 fun PasteButton(onClick: () -> Unit = {}) {
     IconButton(onClick = onClick) {
-        Icon(Icons.Outlined.ContentPaste, stringResource(R.string.paste))
+        Icon(
+            Icons.Outlined.ContentPaste,
+            stringResource(R.string.paste)
+        )
     }
 }
 
 @Composable
 fun AddButton(onClick: () -> Unit, enabled: Boolean = true) {
-    IconButton(onClick = onClick, enabled = enabled) {
-        Icon(imageVector = Icons.Outlined.Add, contentDescription = stringResource(R.string.add))
+    IconButton(
+        onClick = onClick, enabled = enabled
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Add,
+            contentDescription = stringResource(
+                R.string.add
+            )
+        )
     }
 }
 
@@ -45,7 +57,7 @@ fun ClearButton(onClick: () -> Unit) {
             modifier = Modifier.size(24.dp),
             imageVector = Icons.Outlined.Cancel,
             contentDescription = stringResource(id = R.string.clear),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -53,13 +65,10 @@ fun ClearButton(onClick: () -> Unit) {
 @Composable
 fun BackButton(onClick: () -> Unit) {
     val view = LocalView.current
-    IconButton(
-        modifier = Modifier,
-        onClick = {
-            onClick()
-            view.slightHapticFeedback()
-        },
-    ) {
+    IconButton(modifier = Modifier, onClick = {
+        onClick()
+        view.slightHapticFeedback()
+    }) {
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
             contentDescription = stringResource(R.string.back),

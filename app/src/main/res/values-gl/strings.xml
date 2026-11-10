@@ -24,6 +24,7 @@
     <string name="video_format_preference">Preferencia de formato de vídeo</string>
     <string name="link_copied">Enlace copiado ao portapapeis</string>
     <string name="credits_desc">Créditos e software de código aberto</string>
+    <string name="readme_desc">Vexa repositorio de GitHub e README</string>
     <string name="remove">Eliminar</string>
     <string name="custom_command_desc">Executar un comando de yt-dlp cun modelo personalizado</string>
     <string name="ytdlp_update">Fai clic para actualizar a libraría yt-dlp</string>
@@ -38,6 +39,7 @@
     <string name="video_quality">Calidade do vídeo</string>
     <string name="display_settings">Modo escuro, cores dinámicas, lingua</string>
     <string name="settings_before_download_desc">Configurar axustes antes de descargar</string>
+    <string name="release_desc">Procurar actualizacións e historial de cambios</string>
     <string name="ytdlp_version">Versión de yt-dlp</string>
     <string name="display">Aspecto</string>
     <string name="off">Desactivado</string>
@@ -45,6 +47,7 @@
     <string name="error_copied">O erro reportado foi copiado ao portapapeis</string>
     <string name="back">Atrás</string>
     <string name="downloads_history">Descargas</string>
+    <string name="release">Versión máis recente</string>
     <string name="version">Versión</string>
     <string name="general_settings">Xeral</string>
     <string name="print_details_desc">Mostrar en pantalla mensaxes relevantes durante a descarga</string>

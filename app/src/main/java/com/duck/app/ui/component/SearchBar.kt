@@ -38,7 +38,8 @@ fun DuckSearchBar(
     val view = LocalView.current
 
     Surface(
-        modifier = modifier.widthIn(360.dp, 720.dp),
+        modifier = modifier
+            .widthIn(360.dp, 720.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
@@ -47,7 +48,7 @@ fun DuckSearchBar(
             Icon(
                 imageVector = Icons.Outlined.Search,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             DuckAutoFocusTextField(
                 value = text,
@@ -57,21 +58,19 @@ fun DuckSearchBar(
                 contentDescription = stringResource(id = R.string.search),
                 trailingIcon = {
                     if (text.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                onValueChange("")
-                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                            }
-                        ) {
+                        IconButton(onClick = {
+                            onValueChange("")
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        }) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = Icons.Outlined.Clear,
                                 contentDescription = stringResource(id = R.string.clear),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
-                },
+                }
             )
         }
     }
@@ -85,10 +84,9 @@ private fun SearchBarPreview() {
         Surface {
             DuckSearchBar(
                 text = text,
-                placeholderText = stringResource(R.string.search_in_downloads),
-            ) {
-                text = it
-            }
+                placeholderText = stringResource(R.string.search_in_downloads)
+            ) { text = it }
         }
+
     }
 }

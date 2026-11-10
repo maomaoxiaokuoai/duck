@@ -1,7 +1,6 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
 
 java {
@@ -9,7 +8,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(8)
 }
 android {
     compileSdk = 34
@@ -17,12 +16,18 @@ android {
         minSdk = 21
     }
     namespace = "com.duck.app.color"
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         sourceCompatibility = JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        compose = true
+    }
     buildTypes {
-        release {
+        all {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -37,4 +42,5 @@ dependencies {
     api(libs.androidx.core.ktx)
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.material3)
+
 }

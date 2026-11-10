@@ -27,6 +27,9 @@
     <string name="remove">Verwijderen</string>
     <string name="delete_file">Bestand wissen</string>
     <string name="about">Over</string>
+    <string name="release_desc">Zoek naar wijzigingslogs en nieuwe versies</string>
+    <string name="release">Nieuwste versie</string>
+    <string name="readme_desc">Check de GitHub repository en de README</string>
     <string name="video">Video</string>
     <string name="credits">Credits</string>
     <string name="credits_desc">Credits en libre software</string>
@@ -76,7 +79,7 @@
     <string name="subdirectory_desc">Sla bestanden op in mappen met de naam van de velden</string>
     <string name="permission_issue">Probleem met opslagmachtiging</string>
     <string name="battery_configuration">Batterijconfiguratie</string>
-    <string name="service_title">duck is bezig met downloaden…</string>
+    <string name="service_title">Seal is bezig met downloaden…</string>
     <string name="video_directory">Video map</string>
     <string name="settings">Instellingen</string>
     <string name="checked">Gecheckt</string>
@@ -125,6 +128,8 @@
     <string name="download_directory_desc">Selecteer waar u video\'s en geluidsbestanden wilt opslaan</string>
     <string name="battery_configuration_desc">Negeer batterijoptimalisatie voor deze app om op de achtergrond te kunnen downloaden</string>
     <string name="unknown_error">Onbekende fout</string>
+    <string name="translate">Vertalen</string>
+    <string name="translate_desc">Help deze app te vertalen op Hosted Weblate</string>
     <string name="prefix">Path template</string>
     <string name="app_up_to_date">De huidige versie is up-to-date</string>
     <string name="template_selection">Sjabloon selectie</string>
@@ -176,6 +181,8 @@
     <string name="clear_temp_files_count">%1$d tijdelijke bestand(en) verwijderd</string>
     <string name="info_copied">Info gekopieerd naar klembord</string>
     <string name="task_canceled">Download taak beïndigt</string>
+    <string name="github_issue_desc">Dien een probleem in voor bug report of functie verzoek</string>
+    <string name="github_issue">GitHub probleem</string>
     <string name="ytdlp_update_action">Update yt-dlp</string>
     <string name="status_canceled">Onderbroken</string>
     <string name="status_fetching_video_info">Informatie aan het ophalen</string>

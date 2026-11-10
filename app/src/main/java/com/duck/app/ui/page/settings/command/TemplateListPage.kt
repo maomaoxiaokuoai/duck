@@ -30,7 +30,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -73,14 +72,14 @@ import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.ConfirmButton
 import com.duck.app.ui.component.DismissButton
 import com.duck.app.ui.component.HelpDialog
+import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.PreferenceItemVariant
 import com.duck.app.ui.component.PreferenceSwitchWithContainer
 import com.duck.app.ui.component.TemplateItem
-import com.duck.app.ui.page.settings.about.YtdlpRepository
+import com.duck.app.ui.page.settings.about.ytdlpUrl
 import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.DatabaseUtil
 import com.duck.app.util.PreferenceUtil
-import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.TEMPLATE_ID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -92,11 +91,9 @@ private const val TAG = "TemplateListPage"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> Unit) {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-            rememberTopAppBarState(),
-            canScroll = { true },
-        )
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        rememberTopAppBarState(),
+        canScroll = { true })
     val templates by PreferenceUtil.templateListStateFlow.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val hapticFeedback = LocalHapticFeedback.current
@@ -107,7 +104,10 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
 
     var isMultiSelectEnabled by remember { mutableStateOf(false) }
 
-    val selectedTemplates = remember { mutableStateListOf<CommandTemplate>() }
+
+    val selectedTemplates = remember {
+        mutableStateListOf<CommandTemplate>()
+    }
     LaunchedEffect(isMultiSelectEnabled) {
         if (!isMultiSelectEnabled) {
             delay(200)
@@ -117,142 +117,146 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showShortcutsDialog by remember { mutableStateOf(false) }
-    var isCustomCommandEnabled by remember { mutableStateOf(CUSTOM_COMMAND.getBoolean()) }
+    var isCustomCommandEnabled by remember {
+        mutableStateOf(PreferenceUtil.getValue(CUSTOM_COMMAND))
+    }
 
     var selectedTemplateId by TEMPLATE_ID.intState
     val snackbarHostState = remember { SnackbarHostState() }
 
-    BackHandler(isMultiSelectEnabled) { isMultiSelectEnabled = false }
+    BackHandler(isMultiSelectEnabled) {
+        isMultiSelectEnabled = false
+    }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
-        snackbarHost = { SnackbarHost(modifier = Modifier, hostState = snackbarHostState) },
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier, hostState = snackbarHostState
+            )
+        },
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        modifier = Modifier,
-                        text =
-                            if (isMultiSelectEnabled)
-                                stringResource(id = R.string.custom_command_template)
-                            else stringResource(id = R.string.custom_command),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                navigationIcon = { BackButton { onNavigateBack() } },
-                actions = {
-                    var expanded by remember { mutableStateOf(false) }
-                    IconButton(
-                        onClick = {
-                            view.slightHapticFeedback()
-                            showHelpDialog = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.HelpOutline,
-                            contentDescription = stringResource(id = R.string.how_does_it_work),
+            LargeTopAppBar(title = {
+                Text(
+                    modifier = Modifier,
+                    text = if (isMultiSelectEnabled) stringResource(id = R.string.custom_command_template)
+                    else stringResource(id = R.string.custom_command),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }, navigationIcon = {
+                BackButton {
+                    onNavigateBack()
+                }
+            }, actions = {
+                var expanded by remember { mutableStateOf(false) }
+                IconButton(onClick = {
+                    view.slightHapticFeedback()
+                    showHelpDialog = true
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.HelpOutline,
+                        contentDescription = stringResource(
+                            id = R.string.how_does_it_work
                         )
-                    }
-                    if (!isMultiSelectEnabled) {
-                        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
-                            IconButton(onClick = { expanded = true }) {
+                    )
+                }
+                if (!isMultiSelectEnabled) {
+                    Box(
+                        modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+                    ) {
+
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                Icons.Outlined.MoreVert, contentDescription = stringResource(
+                                    R.string.show_more_actions
+                                )
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }) {
+                            DropdownMenuItem(leadingIcon = {
                                 Icon(
-                                    Icons.Outlined.MoreVert,
-                                    contentDescription = stringResource(R.string.show_more_actions),
+                                    Icons.Outlined.ContentPasteGo, null
                                 )
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                DropdownMenuItem(
-                                    leadingIcon = { Icon(Icons.Outlined.ContentPasteGo, null) },
-                                    text = { Text(stringResource(R.string.export_to_clipboard)) },
-                                    onClick = {
-                                        scope.launch {
+                            }, text = {
+                                Text(stringResource(R.string.export_to_clipboard))
+                            }, onClick = {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        context.getString(R.string.template_exported)
+                                            .format(templates.size)
+                                    )
+                                }
+                                scope.launch {
+                                    clipboardManager.setText(
+                                        AnnotatedString(BackupUtil.exportTemplatesToJson())
+                                    )
+                                    expanded = false
+                                }
+                            })
+                            DropdownMenuItem(leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.AssignmentReturn, null
+                                )
+                            }, text = {
+                                Text(stringResource(R.string.import_from_clipboard))
+                            }, onClick = {
+                                scope.launch {
+                                    expanded = false
+                                    clipboardManager.getText()?.text?.let {
+                                        if (it.isNotEmpty()) {
+                                            val res = DatabaseUtil.importTemplatesFromJson(it)
                                             snackbarHostState.showSnackbar(
-                                                context
-                                                    .getString(R.string.template_exported)
-                                                    .format(templates.size)
+                                                context.getString(R.string.template_imported)
+                                                    .format(res)
                                             )
                                         }
-                                        scope.launch {
-                                            clipboardManager.setText(
-                                                AnnotatedString(BackupUtil.exportTemplatesToJson())
-                                            )
-                                            expanded = false
-                                        }
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    leadingIcon = { Icon(Icons.Outlined.AssignmentReturn, null) },
-                                    text = { Text(stringResource(R.string.import_from_clipboard)) },
-                                    onClick = {
-                                        scope.launch {
-                                            expanded = false
-                                            clipboardManager.getText()?.text?.let {
-                                                if (it.isNotEmpty()) {
-                                                    val res =
-                                                        DatabaseUtil.importTemplatesFromJson(it)
-                                                    snackbarHostState.showSnackbar(
-                                                        context
-                                                            .getString(R.string.template_imported)
-                                                            .format(res)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    },
-                                )
-                            }
+                                    }
+                                }
+                            })
                         }
                     }
-                },
-                scrollBehavior = scrollBehavior,
+                }
+            }, scrollBehavior = scrollBehavior
             )
         },
         bottomBar = {
-            val checkBoxState =
-                remember(isMultiSelectEnabled, selectedTemplates.size) {
-                    when (selectedTemplates.size) {
-                        templates.size -> ToggleableState.On
-                        in 1 until templates.size -> ToggleableState.Indeterminate
-                        else -> ToggleableState.Off
-                    }
+            val checkBoxState = remember(isMultiSelectEnabled, selectedTemplates.size) {
+                when (selectedTemplates.size) {
+                    templates.size -> ToggleableState.On
+                    in 1 until templates.size -> ToggleableState.Indeterminate
+                    else -> ToggleableState.Off
                 }
+            }
             AnimatedVisibility(
                 isMultiSelectEnabled,
                 enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut(),
+                exit = shrinkVertically() + fadeOut()
             ) {
+
                 BottomAppBar {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        TriStateCheckbox(
-                            state = checkBoxState,
-                            onClick = {
-                                view.slightHapticFeedback()
-                                when (checkBoxState) {
-                                    ToggleableState.On -> selectedTemplates.clear()
-                                    else ->
-                                        selectedTemplates.run {
-                                            clear()
-                                            addAll(templates)
-                                        }
+                        TriStateCheckbox(state = checkBoxState, onClick = {
+                            view.slightHapticFeedback()
+                            when (checkBoxState) {
+                                ToggleableState.On -> selectedTemplates.clear()
+                                else -> selectedTemplates.run {
+                                    clear()
+                                    addAll(templates)
                                 }
-                            },
-                            modifier = Modifier.padding(start = 12.dp),
-                        )
+                            }
+                        }, modifier = Modifier.padding(start = 12.dp))
 
                         Text(
-                            text =
-                                stringResource(
-                                    id = R.string.selected_item_count,
-                                    selectedTemplates.size,
-                                ),
+                            text = stringResource(
+                                id = R.string.selected_item_count, selectedTemplates.size
+                            ),
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.weight(1f),
                         )
@@ -262,8 +266,7 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                                 view.slightHapticFeedback()
                                 scope.launch {
                                     snackbarHostState.showSnackbar(
-                                        context
-                                            .getString(R.string.template_exported)
+                                        context.getString(R.string.template_exported)
                                             .format(selectedTemplates.size)
                                     )
                                 }
@@ -272,18 +275,18 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                                         AnnotatedString(
                                             BackupUtil.exportTemplatesToJson(
                                                 templates = selectedTemplates,
-                                                shortcuts = emptyList(),
+                                                shortcuts = emptyList()
                                             )
                                         )
                                     )
                                 }
-                            },
-                            enabled = selectedTemplates.isNotEmpty(),
+                            }, enabled = selectedTemplates.isNotEmpty()
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ContentPasteGo,
-                                contentDescription =
-                                    stringResource(id = R.string.export_to_clipboard),
+                                contentDescription = stringResource(
+                                    id = R.string.export_to_clipboard
+                                )
                             )
                         }
                         IconButton(
@@ -291,59 +294,60 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                                 view.slightHapticFeedback()
                                 showDeleteDialog = true
                             },
-                            enabled = selectedTemplates.isNotEmpty(),
+                            enabled = selectedTemplates.isNotEmpty()
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.DeleteSweep,
-                                contentDescription = stringResource(id = R.string.remove),
+                                contentDescription = stringResource(id = R.string.remove)
                             )
                         }
                     }
+
                 }
+
             }
-        },
-    ) {
-        LazyColumn(modifier = Modifier, contentPadding = it) {
+        }) {
+        LazyColumn(modifier = Modifier.padding(it)) {
             item {
-                PreferenceSwitchWithContainer(
-                    title = stringResource(R.string.use_custom_command),
+                PreferenceSwitchWithContainer(title = stringResource(R.string.use_custom_command),
                     icon = null,
                     isChecked = isCustomCommandEnabled,
                     onClick = {
                         isCustomCommandEnabled = !isCustomCommandEnabled
-                        PreferenceUtil.updateValue(CUSTOM_COMMAND, isCustomCommandEnabled)
-                    },
-                )
+                        PreferenceUtil.updateValue(
+                            CUSTOM_COMMAND, isCustomCommandEnabled
+                        )
+                    })
             }
             items(templates) { commandTemplate ->
-                TemplateItem(
-                    label = commandTemplate.name,
+                TemplateItem(label = commandTemplate.name,
                     template = commandTemplate.template,
                     selected = selectedTemplateId == commandTemplate.id,
                     isMultiSelectEnabled = isMultiSelectEnabled,
                     onCheckedChange = {
-                        if (selectedTemplates.contains(commandTemplate))
-                            selectedTemplates.remove(commandTemplate)
+                        if (selectedTemplates.contains(commandTemplate)) selectedTemplates.remove(
+                            commandTemplate
+                        )
                         else selectedTemplates.add(commandTemplate)
                     },
                     checked = selectedTemplates.contains(commandTemplate),
-                    onClick = { onNavigateToEditPage(commandTemplate.id) },
+                    onClick = {
+                        onNavigateToEditPage(commandTemplate.id)
+                    },
                     onSelect = {
                         selectedTemplateId = commandTemplate.id
                         PreferenceUtil.encodeInt(TEMPLATE_ID, selectedTemplateId)
-                    },
-                    onLongClick = {
+                    }, onLongClick = {
                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         isMultiSelectEnabled = true
                         selectedTemplates.add(commandTemplate)
-                    },
-                )
+                    })
             }
             if (!isMultiSelectEnabled) {
                 item {
                     PreferenceItemVariant(
                         title = stringResource(id = R.string.new_template),
-                        icon = Icons.Outlined.Add,
+                        icon = Icons.Outlined.Add
                     ) {
                         onNavigateToEditPage(-1)
                     }
@@ -355,24 +359,23 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                     ) {
                         showShortcutsDialog = true
                     }
+
                 }
             }
         }
     }
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
+        AlertDialog(onDismissRequest = { showDeleteDialog = false },
             icon = { Icon(Icons.Outlined.Delete, null) },
             title = { Text(stringResource(R.string.remove_template)) },
             text = {
                 Text(
                     stringResource(
-                        R.string.remove_multiple_templates_msg,
-                        pluralStringResource(
+                        R.string.remove_multiple_templates_msg, pluralStringResource(
                             id = R.plurals.item_count,
                             count = selectedTemplates.size,
-                            selectedTemplates.size,
-                        ),
+                            selectedTemplates.size
+                        )
                     )
                 )
             },
@@ -387,26 +390,25 @@ fun TemplateListPage(onNavigateBack: () -> Unit, onNavigateToEditPage: (Int) -> 
                     }
                     showDeleteDialog = false
                 }
-            },
-        )
+            })
     }
 
+
     if (showShortcutsDialog) {
-        OptionChipsDialog { showShortcutsDialog = false }
+        OptionChipsDialog {
+            showShortcutsDialog = false
+        }
     }
     val uriHandler = LocalUriHandler.current
     if (showHelpDialog) {
         HelpDialog(
             text = stringResource(id = R.string.custom_command_usage_msg),
-            onDismissRequest = { showHelpDialog = false },
-            dismissButton = null,
+            onDismissRequest = { showHelpDialog = false }, dismissButton = null
         ) {
-            TextButton(
-                onClick = {
-                    showHelpDialog = false
-                    uriHandler.openUri(YtdlpRepository)
-                }
-            ) {
+            TextButton(onClick = {
+                showHelpDialog = false
+                uriHandler.openUri(ytdlpUrl)
+            }) {
                 Text(text = stringResource(id = R.string.learn_more))
             }
         }

@@ -16,25 +16,45 @@ class CookiesViewModel : ViewModel() {
     }
 
     data class ViewState(
-        val editingCookieProfile: CookieProfile =
-            CookieProfile(id = NEW_PROFILE_ID, url = "", content = "")
+        val showEditDialog: Boolean = false,
+        val showDeleteDialog: Boolean = false,
+        val editingCookieProfile: CookieProfile = CookieProfile(
+            id = NEW_PROFILE_ID,
+            url = "",
+            content = ""
+        )
     )
 
     val cookiesFlow = DatabaseUtil.getCookiesFlow()
 
     private val mutableStateFlow = MutableStateFlow(ViewState())
     val stateFlow = mutableStateFlow.asStateFlow()
-    private val state
-        get() = stateFlow.value
 
-    fun setEditingProfile(
-        cookieProfile: CookieProfile =
-            CookieProfile(id = NEW_PROFILE_ID, url = "https://", content = "")
+    fun showEditCookieDialog(
+        cookieProfile: CookieProfile = CookieProfile(
+            id = NEW_PROFILE_ID,
+            url = "https://",
+            content = ""
+        )
     ) {
-        mutableStateFlow.update { it.copy(editingCookieProfile = cookieProfile) }
+        mutableStateFlow.update {
+            it.copy(
+                editingCookieProfile = cookieProfile,
+                showEditDialog = true
+            )
+        }
     }
 
-    fun deleteCookieProfile(cookieProfile: CookieProfile = state.editingCookieProfile) {
+    fun showDeleteCookieDialog(cookieProfile: CookieProfile) {
+        mutableStateFlow.update {
+            it.copy(
+                editingCookieProfile = cookieProfile,
+                showDeleteDialog = true
+            )
+        }
+    }
+
+    fun deleteCookieProfile(cookieProfile: CookieProfile = stateFlow.value.editingCookieProfile) {
         viewModelScope.launch(Dispatchers.IO) { DatabaseUtil.deleteCookieProfile(cookieProfile) }
     }
 
@@ -48,22 +68,38 @@ class CookiesViewModel : ViewModel() {
         }
     }
 
-    fun updateUrl(url: String) {
-        setEditingProfile(cookieProfile = state.editingCookieProfile.copy(url = url))
-    }
+    fun updateUrl(url: String) =
+        mutableStateFlow.update { it.copy(editingCookieProfile = it.editingCookieProfile.copy(url = url)) }
 
     fun updateContent(content: String) =
         mutableStateFlow.update {
-            it.copy(editingCookieProfile = it.editingCookieProfile.copy(content = content))
+            it.copy(
+                editingCookieProfile = it.editingCookieProfile.copy(
+                    content = content
+                )
+            )
         }
 
-    fun updateCookieProfile(profile: CookieProfile = state.editingCookieProfile) {
+    fun updateCookieProfile() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (profile.id == NEW_PROFILE_ID) {
-                DatabaseUtil.insertCookieProfile(profile)
-            } else {
-                DatabaseUtil.updateCookieProfile(profile)
+            mutableStateFlow.update {
+                if (it.editingCookieProfile.id == NEW_PROFILE_ID) {
+                    DatabaseUtil.insertCookieProfile(it.editingCookieProfile)
+                } else {
+                    DatabaseUtil.updateCookieProfile(it.editingCookieProfile)
+                }
+                it.copy(showEditDialog = false)
             }
         }
     }
+
+    fun hideDialog() {
+        mutableStateFlow.update {
+            it.copy(
+                showEditDialog = false,
+                showDeleteDialog = false
+            )
+        }
+    }
+
 }

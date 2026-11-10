@@ -10,7 +10,7 @@
     <string name="download_start_msg">Stahování „%1$s“</string>
     <string name="fetch_info_error_msg">Získávání informací o videu selhalo</string>
     <string name="task_running">Již probíhá jiná stahovací úloha</string>
-    <string name="paste_msg">Vložit adresu</string>
+    <string name="paste_msg">Vložena adresa ze schránky</string>
     <string name="paste_fail_msg">Nepodařilo se najít adresu ve schránce</string>
     <string name="ytdlp_version">Yt-dlp verze</string>
     <string name="delete_info">Odstranit\?</string>
@@ -20,6 +20,8 @@
     <string name="about_page">Verze, zpětná vazba, automatické aktualizace</string>
     <string name="back">Zpět</string>
     <string name="version">Verze</string>
+    <string name="release_desc">Otevřít seznamy změn a nové verze</string>
+    <string name="release">Nejnovější vydání</string>
     <string name="checked">Zkontrolováno</string>
     <string name="credits">Poděkování</string>
     <string name="custom_command">Vlastní příkaz</string>
@@ -99,6 +101,7 @@
     <string name="general_settings">Obecné</string>
     <string name="ytdlp_update">Klikněte pro nainstalování nejnovější verze yt-dlp</string>
     <string name="about">O aplikaci</string>
+    <string name="readme_desc">Otevřít repozitář na GitHubu a soubor README</string>
     <string name="video">Video</string>
     <string name="credits_desc">Poděkování a svobodný software</string>
     <string name="advanced_settings">Pokročílé</string>
@@ -124,7 +127,9 @@
     <string name="concurrent_download_num">Počet vláken pro souběžné stahování DASH/HLS native videí je %d.</string>
     <string name="download_range_desc">Upřesněte rozsah videí ke stažení z playlistu „%3$s“ (od %1$d do %2$d).</string>
     <string name="battery_configuration">Nastavení baterie</string>
-    <string name="service_title">duck stahuje…</string>
+    <string name="service_title">Seal stahuje…</string>
+    <string name="translate">Překlad</string>
+    <string name="translate_desc">Pomozte přeložit tuto aplikaci na Hosted Weblate</string>
     <string name="prefix">Předpona</string>
     <string name="status_enqueued">Ve frontě</string>
     <string name="status_completed">Dokončeno</string>
@@ -143,6 +148,8 @@
     <string name="custom_command_template_desc">Upravit a spravovat šablony příkazu</string>
     <string name="downloading_indicator_text">Probíhá stahování…</string>
     <string name="task_canceled">Stahování zrušeno</string>
+    <string name="github_issue">Problém na GitHubu</string>
+    <string name="github_issue_desc">Vytvořit nový problém pro nahlášení chyby nebo žádost o funkci</string>
     <string name="info_copied">Informace zkopírovány do schránky</string>
     <string name="general_settings_desc">Verze yt-dlp, upozornění, playlist</string>
     <string name="check_for_updates">Zkontrolovat aktualizace</string>
@@ -184,7 +191,7 @@
     <string name="sponsorblock_desc">Odstranit nebo označit sponzorované části videí pomocí API SponsorBlock</string>
     <string name="aria2_desc">Používat aria2c jako externího správce stahování</string>
     <string name="copy_link">Kopírovat odkaz</string>
-    <string name="copy_error_report">Kopírovat hlášení</string>
+    <string name="copy_error_report">Hlášení o chybě</string>
     <string name="video_file_size">Velikost souboru videa</string>
     <string name="high_contrast">Tmavý motiv s vysokým kontrastem</string>
     <string name="format_settings_desc">Formát souboru, kvalita videa, titulky</string>
@@ -202,9 +209,10 @@
     <string name="show_all_items">Zobrazit všech %1$d položek</string>
     <string name="edit_file">Upravit soubor</string>
     <string name="embed_metadata_desc">Vložit metadata a miniaturu videa do zvukového souboru</string>
-    <string name="custom_command_usage_msg">yt-dlp je výkonný nástroj pro příkazový řádek sloužící ke stahování videí. duck zjednodušuje jeho používání díky intuitivnímu grafickému rozhraní, přednastavením pro časté příkazy a dalším dodatečným funkcím.
+    <string name="switch_to_github_builds">přechod na sestavení z GitHubu</string>
+    <string name="custom_command_usage_msg">yt-dlp je výkonný nástroj pro příkazový řádek sloužící ke stahování videí. Seal zjednodušuje jeho používání díky intuitivnímu grafickému rozhraní, přednastavením pro časté příkazy a dalším dodatečným funkcím.
 \n
-\nPokročilým uživatelům nástroje yt-dlp umožňuje duck vytvářet, ukládat a přímo spouštět vlastní šablony příkazů, stejně jako v terminálu.
+\nPokročilým uživatelům nástroje yt-dlp umožňuje Seal vytvářet, ukládat a přímo spouštět vlastní šablony příkazů, stejně jako v terminálu.
 \n
 \nPři používání vlastních příkazů bude většina možností a funkcí v grafickém rozhraní vypnuta.</string>
     <string name="clear_download_archive">Vyčistit archiv stahování?</string>
@@ -270,9 +278,12 @@
     <string name="second">sekunda</string>
     <string name="set_directory_desc">Klikněte pro nastavení adresáře</string>
     <string name="update_channel">Kanál aktualizací</string>
+    <string name="sponsor_msg">Seal bude vždy zdarma a open source pro každého. Pokud se vám aplikace líbí, prosím zvažte sponzorování na GitHubu!</string>
     <string name="crop_artwork">Oříznout obrázek</string>
     <string name="subtitle_sponsorblock">Titulky mohou mít špatné časování při odstranění SponsorBlock segmentů.</string>
     <string name="start">Začít</string>
+    <string name="sponsor_msg2">Moc vám děkujeme!</string>
+    <string name="sponsor_desc">Podpořte tuto aplikaci sponzorováním na GitHubu</string>
     <string name="enable_experimental_feature">Povolit experimentální funkce?</string>
     <string name="running_tasks">Běžící úlohy</string>
     <string name="ua_header">Hlavička s User-Agentem</string>
@@ -286,6 +297,7 @@
     <string name="select_all">Vybrat vše</string>
     <string name="format_sorting_desc">Třídit formáty s možností -S v nástroji yt-dlp</string>
     <string name="auto_update">Automatické aktualizace</string>
+    <string name="sponsor">Sponzor</string>
     <string name="auto_subtitle">Automatické titulky</string>
     <string name="required">Vyžadované</string>
     <string name="embed_subtitles_mkv_msg">Pro účel vložení souborů titulků budou videa převedena do kontejneru mkv. Pro přehrávání videí se soubory titulků můžete použít například VLC Media Player nebo jiné kompatibilní aplikace.</string>
@@ -316,14 +328,16 @@
     </plurals>
     <string name="video_creator_sample_text">Ukázkový text pro autora videa</string>
     <string name="expand">Rozšířit</string>
+    <string name="telegram_channel">Kanál na Telegramu</string>
     <string name="feature_unavailable">Funkce není dostupná</string>
     <string name="temporary_directory_desc">Uložit dočasné soubory v interním adresáři</string>
-    <string name="auto_update_disabled_msg">Automatické aktualizace nejsou dostupné pro sestavení ze služby %1$s. Pokud nemáte na zařízení nainstalovanou službu %1$s nebo pokud byste chtěli vidět nadcházející nové funkce v ducku, zvažte prosím %2$s.</string>
+    <string name="auto_update_disabled_msg">Automatické aktualizace nejsou dostupné pro sestavení ze služby %1$s. Pokud nemáte na zařízení nainstalovanou službu %1$s nebo pokud byste chtěli vidět nadcházející nové funkce v Sealu, zvažte prosím %2$s.</string>
     <string name="cookies_usage_msg">Stahování z některých stránek vyžaduje autentifikační informace z účtu. Klepněte na „Vygenerovat nové cookies“, zadejte adresu stránky a poté se přihlaste s vaším účtem v okně prohlížeče, aplikace se postará o vygenerování za vás.</string>
     <string name="proxy_desc">Použít proxy pro připojení k internetu</string>
     <string name="generate_new_cookies">Vygenerovat nové cookies</string>
     <string name="quality">Kvalita</string>
     <string name="refresh_cookies_desc">Klikněte pro otevření webové stránky pro generování nových cookies:</string>
+    <string name="matrix_space">Prostor Matrix</string>
     <string name="subtitle">Titulky</string>
     <string name="msg_from_developer">Zpráva od vývojáře</string>
     <string name="import_from_preferences">Importovat</string>
@@ -341,6 +355,7 @@
     <string name="remove_multiple_templates_msg">Navždy odstranit %1$s z šablon pro příkazy?</string>
     <string name="enable_notifications">Povolit upozornění?</string>
     <string name="proxy">Proxy</string>
+    <string name="sponsors">Sponzoři</string>
     <string name="clear_all_cookies_desc">Chcete navždy smazat všechny cookies uložené v aplikaci?</string>
     <string name="minute">minuta</string>
     <string name="format_sorting">Třídění formátů</string>
@@ -363,7 +378,7 @@
     <string name="auto_translated_subtitles">Automaticky přeložené titulky</string>
     <string name="auto_translated_subtitles_msg">Automaticky přeložené titulky pro všechny jazyky budou k dispozici ve Stažených. Tyto titulky mohou být nepřesné a obtížné na porozumění.</string>
     <string name="remember_for_next_download">Zapamatovat pro další stahování</string>
-    <string name="look_and_feel"><![CDATA[Zobrazení a styl]]></string>
+    <string name="look_and_feel">Zobrazení a styl</string>
     <string name="use_previous_selection">Použít předchozí výběr</string>
     <string name="none">Žádný</string>
     <string name="subtitle_language_desc">Jazyk titulků ke stažení ve výběru Auto formátu, oddělené čárkami.</string>
@@ -377,7 +392,7 @@
     <string name="import_backup">Importovat</string>
     <string name="full_backup">Úplná záloha</string>
     <string name="export_download_history_msg">Exportování %1$s z historie stahování. Stažené soubory a preference nebudou zálohovány.</string>
-    <string name="interface_and_interaction"><![CDATA[Rozhraní a interakce]]></string>
+    <string name="interface_and_interaction">Rozhraní a interakce</string>
     <string name="backup_type">Typ zálohy</string>
     <string name="export_to">Exportovat do</string>
     <string name="clipboard">Schránka</string>
@@ -394,40 +409,4 @@
     <string name="every_day">Každý den</string>
     <string name="every_week">Každý týden</string>
     <string name="every_month">Každý měsíc</string>
-    <plurals name="audio_count">
-        <item quantity="one">%d audio</item>
-        <item quantity="few">%d audia</item>
-        <item quantity="other">%d audií</item>
-    </plurals>
-    <string name="task_added">Úloha přidána do fronty</string>
-    <plurals name="video_count">
-        <item quantity="one">%d video</item>
-        <item quantity="few">%d videa</item>
-        <item quantity="other">%d videí</item>
-    </plurals>
-    <string name="playlist">Playlist</string>
-    <string name="all_languages">Všechny jazyky</string>
-    <string name="preset">Předvolba</string>
-    <string name="proceed">Pokračovat</string>
-    <string name="prefer_placeholder">Upřednostnit %1$s</string>
-    <string name="custom_format_selection_desc">Vyberte si z formátů, titulků a dále si přizpůsobte aplikaci</string>
-    <string name="preset_format_selection_desc">Automaticky stáhnout s použitím vašich preferencí formátů</string>
-    <string name="edit_preset">Upravit předvolbu</string>
-    <string name="best_quality_desc">Stáhnout nejlepší dostupný formát</string>
-    <string name="you_ll_find_your_downloads_here">Zde najdete svá stahování</string>
-    <string name="download_hint">Pro spuštění stahování klepněte na tlačítko stahování nebo sdílejte video do této aplikace</string>
-    <string name="status_downloaded">Stažené</string>
-    <string name="all">Vše</string>
-    <string name="select_multiple_link">Vyberte z %1$d odkazů</string>
-    <string name="download_queue">Fronta stahování</string>
-    <string name="show_navigation_drawer">Zobrazit navigační lištu</string>
-    <string name="resume">Pokračovat</string>
-    <string name="delete">Smazat</string>
-    <string name="media_info">Informace o médiu</string>
-    <string name="trouble_shooting">Řešení problémů</string>
-    <string name="issue_tracker">Sledování problémů</string>
-    <string name="trouble_shooting_desc">Opravte běžné chyby a zjistěte známé problémy</string>
-    <string name="saved_urls">Uložené odkazy</string>
-    <string name="add_new_url">Přidat nový odkaz</string>
-    <string name="add_to">Přidat do %1$s</string>
 </resources>

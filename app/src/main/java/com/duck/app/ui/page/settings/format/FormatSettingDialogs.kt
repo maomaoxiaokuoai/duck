@@ -1,7 +1,5 @@
 package com.duck.app.ui.page.settings.format
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,29 +19,25 @@ import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.AudioFile
 import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SettingsSuggest
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material.icons.outlined.VideoSettings
+import androidx.compose.material.icons.outlined._4k
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -61,19 +54,15 @@ import androidx.compose.ui.unit.dp
 import com.duck.app.R
 import com.duck.app.ui.common.booleanState
 import com.duck.app.ui.common.intState
-import com.duck.app.ui.common.motion.materialSharedAxisX
 import com.duck.app.ui.common.stringState
 import com.duck.app.ui.component.ConfirmButton
 import com.duck.app.ui.component.DialogSingleChoiceItem
-import com.duck.app.ui.component.DialogSingleChoiceItemVariant
-import com.duck.app.ui.component.DialogSubtitle
+import com.duck.app.ui.component.DialogSingleChoiceItemWithLabel
 import com.duck.app.ui.component.DialogSwitchItem
 import com.duck.app.ui.component.DismissButton
+import com.duck.app.ui.component.HorizontalDivider
 import com.duck.app.ui.component.OutlinedButtonChip
-import com.duck.app.ui.component.PreferenceSubtitle
 import com.duck.app.ui.component.DuckDialog
-import com.duck.app.ui.component.DuckTextField
-import com.duck.app.ui.page.downloadv2.configure.PreferencesMock
 import com.duck.app.util.AUDIO_CONVERSION_FORMAT
 import com.duck.app.util.AUDIO_CONVERT
 import com.duck.app.util.AUDIO_FORMAT
@@ -83,528 +72,400 @@ import com.duck.app.util.CONVERT_MP3
 import com.duck.app.util.CONVERT_SUBTITLE
 import com.duck.app.util.CONVERT_VTT
 import com.duck.app.util.DEFAULT
-import com.duck.app.util.DownloadUtil
 import com.duck.app.util.FORMAT_COMPATIBILITY
 import com.duck.app.util.FORMAT_QUALITY
 import com.duck.app.util.M4A
 import com.duck.app.util.NOT_CONVERT
 import com.duck.app.util.NOT_SPECIFIED
-import com.duck.app.util.OPUS
 import com.duck.app.util.PreferenceStrings
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.PreferenceUtil.updateBoolean
 import com.duck.app.util.PreferenceUtil.updateInt
 import com.duck.app.util.PreferenceUtil.updateString
-import com.duck.app.util.RES_HIGHEST
-import com.duck.app.util.RES_LOWEST
 import com.duck.app.util.SUBTITLE_LANGUAGE
 import com.duck.app.util.ULTRA_LOW
+import com.duck.app.util.VIDEO_FORMAT
+import com.duck.app.util.VIDEO_QUALITY
 import com.duck.app.util.getStringDefault
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VideoResolutionSelectField(
-    modifier: Modifier = Modifier,
-    videoResolution: Int,
-    onSelect: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val videoResolutionText = PreferenceStrings.getVideoResolutionDesc(videoResolution)
+fun AudioQuickSettingsDialog(onDismissRequest: () -> Unit) {
+    var audioQuality by AUDIO_QUALITY.intState
+    var audioFormat by AUDIO_FORMAT.intState
 
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        DuckTextField(
-            modifier = modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            value = videoResolutionText,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            //            label = { Text(stringResource(id = R.string.video_resolution)) }
-        )
-        ExposedDropdownMenu(
-            modifier = Modifier,
-            scrollState = rememberScrollState(),
+    @Composable
+    fun audioQualitySelectField(modifier: Modifier = Modifier) {
+        var expanded by remember { mutableStateOf(false) }
+        var audioQualityText by remember { mutableStateOf(PreferenceStrings.getAudioQualityDesc()) }
+
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            for (i in RES_HIGHEST..RES_LOWEST) DropdownMenuItem(
-                text = { Text(PreferenceStrings.getVideoResolutionDesc(i)) },
-                onClick = {
-                    onSelect(i)
-                    expanded = false
-                },
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun VideoFormatPreferenceSelectField(
-    modifier: Modifier = Modifier,
-    videoFormatPreference: Int,
-    onSelect: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val videoFormatText = PreferenceStrings.getVideoFormatLabel(videoFormatPreference)
-
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        OutlinedTextField(
-            modifier = modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            value = videoFormatText,
-            onValueChange = {},
-            readOnly = true,
-            leadingIcon = { Icon(Icons.Outlined.VideoFile, null) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            label = { Text(stringResource(id = R.string.video_format_preference)) },
-        )
-        ExposedDropdownMenu(
-            modifier = Modifier.verticalScroll(rememberScrollState()),
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            for (i in listOf(FORMAT_COMPATIBILITY, FORMAT_QUALITY)) DropdownMenuItem(
-                text = { Text(PreferenceStrings.getVideoFormatLabel(i)) },
-                onClick = {
-                    onSelect(i)
-                    expanded = false
-                },
-            )
-        }
-    }
-}
-
-@Composable
-fun VideoQuickSettingsDialog(
-    videoResolution: Int,
-    videoFormatPreference: Int,
-    onResolutionSelect: (Int) -> Unit,
-    onFormatSelect: (Int) -> Unit,
-    onSave: () -> Unit = {},
-    onDismissRequest: () -> Unit = {},
-) {
-    DuckDialog(
-        onDismissRequest = onDismissRequest,
-        icon = { Icon(Icons.Outlined.VideoFile, null) },
-        title = { Text(text = stringResource(id = R.string.edit_preset)) },
-        dismissButton = {
-            OutlinedButton(onClick = onDismissRequest) { Text(stringResource(R.string.cancel)) }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onSave()
-                    onDismissRequest()
-                }
-            ) {
-                Text(text = stringResource(R.string.save))
-            }
-        },
-        text = {
-            Column {
-                LazyColumn() {
-                    item { DialogSubtitle(text = stringResource(R.string.video_format_preference)) }
-                    for (i in listOf(FORMAT_COMPATIBILITY, FORMAT_QUALITY)) {
-                        item {
-                            DialogSingleChoiceItemVariant(
-                                modifier = Modifier,
-                                title = PreferenceStrings.getVideoFormatLabel(i),
-                                desc = PreferenceStrings.getVideoFormatDescComp(i),
-                                selected = videoFormatPreference == i,
-                            ) {
-                                onFormatSelect(i)
-                            }
-                        }
-                    }
-                    item { DialogSubtitle(text = stringResource(R.string.video_resolution)) }
-                    item {
-                        VideoResolutionSelectField(
-                            modifier = Modifier.padding(horizontal = 12.dp),
-                            videoResolution = videoResolution,
-                            onSelect = onResolutionSelect,
-                        )
-                    }
-                }
-            }
-        },
-    )
-}
-
-@Preview
-@Composable
-private fun VideoPreview() {
-    VideoQuickSettingsDialog(
-        videoResolution = RES_HIGHEST,
-        videoFormatPreference = FORMAT_QUALITY,
-        onResolutionSelect = {},
-        onFormatSelect = {},
-    ) {}
-}
-
-@Preview
-@Composable
-private fun AudioPreview() {
-    var b by remember { mutableStateOf(false) }
-    var b1 by remember { mutableStateOf(false) }
-
-    var i1 by remember { mutableIntStateOf(1) }
-    var i2 by remember { mutableIntStateOf(0) }
-    var i3 by remember { mutableIntStateOf(NOT_SPECIFIED) }
-
-    AudioQuickSettingsDialog(
-        preferences = PreferencesMock,
-        convertAudio = b,
-        useCustomAudioPreset = b1,
-        onCustomPresetToggle = { b1 = it },
-        preferredFormat = i1,
-        conversionFormat = i2,
-        onConvertToggled = { b = it },
-        onPreferredSelect = { i1 = it },
-        onConversionSelect = { i2 = it },
-        audioQuality = i3,
-        onQualitySelect = { i3 = it },
-        onSave = {},
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AudioFormatSelectField(
-    modifier: Modifier = Modifier,
-    convertAudio: Boolean,
-    preferredFormat: Int,
-    conversionFormat: Int,
-    onConvertToggled: (Boolean) -> Unit,
-    onPreferredSelect: (Int) -> Unit,
-    onConversionSelect: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val preferredFormatText = PreferenceStrings.getAudioFormatDesc(preferredFormat)
-    val conversionFormatText = PreferenceStrings.getAudioConvertDesc(conversionFormat)
-    val userSelectionText = if (convertAudio) conversionFormatText else preferredFormatText
-
-    PreferenceSubtitle(text = stringResource(R.string.audio_format))
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        DuckTextField(
-            modifier = modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            value = userSelectionText,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-        )
-        ExposedDropdownMenu(
-            modifier = Modifier,
-            scrollState = rememberScrollState(),
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            for (i in OPUS..M4A) {
-                DropdownMenuItem(
-                    text = { Text(PreferenceStrings.getAudioFormatDesc(i)) },
-                    onClick = {
-                        onPreferredSelect(i)
-                        onConvertToggled(false)
-                        expanded = false
-                    },
-                )
-            }
-            for (i in CONVERT_MP3..CONVERT_M4A) {
-                DropdownMenuItem(
-                    text = { Text(PreferenceStrings.getAudioConvertDesc(i)) },
-                    onClick = {
-                        onConversionSelect(i)
-                        onConvertToggled(true)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AudioQualitySelectField(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    audioQuality: Int,
-    onSelect: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    PreferenceSubtitle(text = stringResource(R.string.audio_quality))
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        DuckTextField(
-            enabled = enabled,
-            modifier =
-                modifier
+            onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                modifier = modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = enabled),
-            value =
-                if (!enabled) stringResource(R.string.unavailable)
-                else PreferenceStrings.getAudioQualityDesc(audioQuality),
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-        )
-        ExposedDropdownMenu(
-            modifier = Modifier,
-            scrollState = rememberScrollState(),
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            for (i in NOT_SPECIFIED..ULTRA_LOW) {
-                DropdownMenuItem(
-                    text = { Text(PreferenceStrings.getAudioQualityDesc(i)) },
-                    onClick = {
-                        onSelect(i)
-                        expanded = false
-                    },
-                )
+                    .menuAnchor(),
+                value = audioQualityText,
+                onValueChange = {},
+                readOnly = true,
+                leadingIcon = { Icon(Icons.Outlined.HighQuality, null) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                label = { Text(stringResource(id = R.string.audio_quality)) }
+            )
+            ExposedDropdownMenu(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }) {
+                for (i in NOT_SPECIFIED..ULTRA_LOW)
+                    DropdownMenuItem(
+                        text = { Text(PreferenceStrings.getAudioQualityDesc(i)) },
+                        onClick = {
+                            audioQualityText =
+                                PreferenceStrings.getAudioQualityDesc(i)
+                            audioQuality = i
+                            expanded = false
+                        })
             }
         }
     }
-}
 
-@Composable
-fun AudioQuickSettingsDialog(
-    modifier: Modifier = Modifier,
-    preferences: DownloadUtil.DownloadPreferences,
-    onDismissRequest: () -> Unit = {},
-    useCustomAudioPreset: Boolean,
-    onCustomPresetToggle: (Boolean) -> Unit,
-    convertAudio: Boolean,
-    preferredFormat: Int,
-    conversionFormat: Int,
-    onConvertToggled: (Boolean) -> Unit,
-    onPreferredSelect: (Int) -> Unit,
-    onConversionSelect: (Int) -> Unit,
-    audioQuality: Int,
-    onQualitySelect: (Int) -> Unit,
-    onSave: () -> Unit,
-) {
-    var editingPreset by remember { mutableStateOf(false) }
-    DuckDialog(
-        modifier = modifier,
+    @Composable
+    fun audioFormatSelectField(modifier: Modifier = Modifier) {
+        var expanded by remember { mutableStateOf(false) }
+        var audioFormatText by remember { mutableStateOf(PreferenceStrings.getAudioFormatDesc()) }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                value = audioFormatText,
+                onValueChange = {},
+                readOnly = true,
+                leadingIcon = { Icon(Icons.Outlined.AudioFile, null) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                label = { Text(stringResource(id = R.string.audio_format_preference)) }
+            )
+            ExposedDropdownMenu(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }) {
+                for (i in NOT_SPECIFIED..M4A)
+                    DropdownMenuItem(
+                        text = { Text(PreferenceStrings.getAudioFormatDesc(i)) },
+                        onClick = {
+                            audioFormatText =
+                                PreferenceStrings.getAudioFormatDesc(i)
+                            audioFormat = i
+                            expanded = false
+                        })
+            }
+        }
+    }
+
+
+    AlertDialog(
         onDismissRequest = onDismissRequest,
         icon = { Icon(Icons.Outlined.AudioFile, null) },
-        title = { Text(stringResource(R.string.edit_preset)) },
-        text = {
-            AnimatedContent(
-                editingPreset,
-                transitionSpec = {
-                    materialSharedAxisX(initialOffsetX = { it / 5 }, targetOffsetX = { -it / 5 })
-                        .using(SizeTransform())
-                },
-                label = "",
-            ) {
-                if (!it) {
-                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        DialogSubtitle(text = stringResource(R.string.presets))
-                        DialogSingleChoiceItemVariant(
-                            title = stringResource(R.string.best_quality),
-                            selected = !useCustomAudioPreset,
-                            desc = stringResource(R.string.best_quality_desc),
-                            onClick = { onCustomPresetToggle(false) },
-                        )
-
-                        DialogSingleChoiceItemVariant(
-                            title = stringResource(R.string.custom),
-                            selected = useCustomAudioPreset,
-                            onClick = { onCustomPresetToggle(true) },
-                            desc =
-                                PreferenceStrings.getAudioPresetText(
-                                    preferences.copy(useCustomAudioPreset = true)
-                                ),
-                            action = {
-                                if (useCustomAudioPreset) {
-                                    Spacer(Modifier.width(8.dp))
-                                    VerticalDivider(Modifier.height(32.dp))
-                                    IconButton(onClick = { editingPreset = true }) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Settings,
-                                            contentDescription = stringResource(R.string.edit),
-                                        )
-                                    }
-                                }
-                            },
-                        )
-                    }
-                } else {
-                    Column(
-                        modifier =
-                            Modifier.verticalScroll(rememberScrollState())
-                                .padding(horizontal = 16.dp)
-                    ) {
-                        AudioFormatSelectField(
-                            convertAudio = convertAudio,
-                            preferredFormat = preferredFormat,
-                            conversionFormat = conversionFormat,
-                            onConvertToggled = onConvertToggled,
-                            onPreferredSelect = onPreferredSelect,
-                            onConversionSelect = onConversionSelect,
-                        )
-                        AudioQualitySelectField(
-                            audioQuality = audioQuality,
-                            enabled = !convertAudio,
-                            onSelect = onQualitySelect,
-                        )
-                    }
+        title = {
+            Text(
+                text = stringResource(id = R.string.audio_format)
+            )
+        }, dismissButton = {
+            DismissButton {
+                onDismissRequest()
+            }
+        }, confirmButton = {
+            ConfirmButton {
+                AUDIO_FORMAT.updateInt(audioFormat)
+                AUDIO_QUALITY.updateInt(audioQuality)
+                onDismissRequest()
+            }
+        }, text = {
+            LazyColumn() {
+                item {
+                    audioFormatSelectField()
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                item {
+                    audioQualitySelectField()
                 }
             }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismissRequest) { Text(stringResource(R.string.cancel)) }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onSave()
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(R.string.save))
-            }
-        },
-    )
+        })
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VideoQuickSettingsDialog(onDismissRequest: () -> Unit = {}) {
+    var videoResolution by VIDEO_QUALITY.intState
+    var videoFormat by VIDEO_FORMAT.intState
+
+    @Composable
+    fun videoResolutionSelectField(modifier: Modifier = Modifier) {
+        var expanded by remember { mutableStateOf(false) }
+        var videoResolutionText = PreferenceStrings.getVideoResolutionDesc(videoResolution)
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                value = videoResolutionText,
+                onValueChange = {},
+                readOnly = true,
+                leadingIcon = { Icon(Icons.Outlined._4k, null) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                label = { Text(stringResource(id = R.string.video_resolution)) }
+            )
+            ExposedDropdownMenu(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }) {
+                for (i in 0..7)
+                    DropdownMenuItem(
+                        text = { Text(PreferenceStrings.getVideoResolutionDesc(i)) },
+                        onClick = {
+//                            videoResolutionText =
+//                                PreferenceStrings.getVideoResolutionDesc(i)
+                            videoResolution = i
+                            expanded = false
+                        })
+            }
+        }
+    }
+
+    @Composable
+    fun videoFormatSelectField(modifier: Modifier = Modifier) {
+        var expanded by remember { mutableStateOf(false) }
+        var videoFormatText by remember { mutableStateOf(PreferenceStrings.getVideoFormatDesc()) }
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }) {
+            OutlinedTextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                value = videoFormatText,
+                onValueChange = {},
+                readOnly = true,
+                leadingIcon = { Icon(Icons.Outlined.VideoFile, null) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                label = { Text(stringResource(id = R.string.video_format_preference)) }
+            )
+            ExposedDropdownMenu(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }) {
+                for (i in listOf(NOT_SPECIFIED, FORMAT_COMPATIBILITY, FORMAT_QUALITY))
+                    DropdownMenuItem(
+                        text = { Text(PreferenceStrings.getVideoFormatDesc(i)) },
+                        onClick = {
+                            videoFormatText =
+                                PreferenceStrings.getVideoFormatDesc(i)
+                            videoFormat = i
+                            expanded = false
+                        })
+            }
+        }
+    }
+
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        icon = { Icon(Icons.Outlined.VideoFile, null) },
+        title = {
+            Text(
+                text = stringResource(id = R.string.video_format)
+            )
+        }, dismissButton = {
+            DismissButton {
+                onDismissRequest()
+            }
+        }, confirmButton = {
+            ConfirmButton {
+                VIDEO_FORMAT.updateInt(videoFormat)
+                VIDEO_QUALITY.updateInt(videoResolution)
+                onDismissRequest()
+            }
+        }, text = {
+            LazyColumn() {
+                item {
+                    videoFormatSelectField()
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                item {
+                    videoResolutionSelectField()
+                }
+            }
+        })
+}
+
 
 @Composable
 fun AudioConversionDialog(
     onDismissRequest: () -> Unit,
-    audioFormat: Int,
-    onConfirm: (Int) -> Unit = {},
+    onConfirm: () -> Unit = {}
 ) {
-    var audioFormat by remember { mutableIntStateOf(audioFormat) }
+    var audioFormat by remember { mutableStateOf(PreferenceUtil.getAudioConvertFormat()) }
+    var convertAudio by AUDIO_CONVERT.booleanState
     DuckDialog(
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.dismiss)) }
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.dismiss))
+            }
         },
         icon = { Icon(Icons.Outlined.Sync, null) },
-        title = { Text(stringResource(R.string.convert_audio_format)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    AUDIO_CONVERSION_FORMAT.updateInt(audioFormat)
-                    onConfirm(audioFormat)
-                    onDismissRequest()
-                }
-            ) {
+        title = {
+            Text(stringResource(R.string.convert_audio_format))
+        }, confirmButton = {
+            TextButton(onClick = {
+                AUDIO_CONVERSION_FORMAT.updateInt(audioFormat)
+                onConfirm()
+                onDismissRequest()
+            }) {
                 Text(text = stringResource(R.string.confirm))
             }
-        },
-        text = {
+        }, text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
                     text = stringResource(R.string.convert_audio_format_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
-                for (i in CONVERT_MP3..CONVERT_M4A) DialogSingleChoiceItem(
-                    modifier = Modifier,
-                    text = PreferenceStrings.getAudioConvertDesc(i),
-                    selected = audioFormat == i,
-                ) {
-                    audioFormat = i
-                }
+                for (i in CONVERT_MP3..CONVERT_M4A)
+                    DialogSingleChoiceItem(
+                        modifier = Modifier,
+                        text = PreferenceStrings.getAudioConvertDesc(i),
+                        selected = audioFormat == i
+                    ) { audioFormat = i }
             }
-        },
-    )
+        })
 }
 
 @Composable
-fun AudioConversionQuickSettingsDialog(onDismissRequest: () -> Unit, onConfirm: () -> Unit = {}) {
+fun AudioConversionQuickSettingsDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit = {}
+) {
     var audioFormat by remember { mutableIntStateOf(PreferenceUtil.getAudioConvertFormat()) }
     var convertAudio by AUDIO_CONVERT.booleanState
     DuckDialog(
         onDismissRequest = onDismissRequest,
-        dismissButton = { DismissButton { onDismissRequest() } },
+        dismissButton = {
+            DismissButton { onDismissRequest() }
+        },
         icon = { Icon(Icons.Outlined.Sync, null) },
-        title = { Text(stringResource(R.string.convert_audio_format)) },
-        confirmButton = {
+        title = {
+            Text(stringResource(R.string.convert_audio_format))
+        }, confirmButton = {
             ConfirmButton {
                 AUDIO_CONVERT.updateBoolean(convertAudio)
                 AUDIO_CONVERSION_FORMAT.updateInt(audioFormat)
                 onConfirm()
                 onDismissRequest()
             }
-        },
-        text = {
+
+        }, text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
                     text = stringResource(R.string.convert_audio_format_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 DialogSingleChoiceItem(
                     text = stringResource(id = R.string.not_convert),
-                    selected = !convertAudio,
+                    selected = !convertAudio
                 ) {
                     convertAudio = false
                 }
-                for (i in CONVERT_MP3..CONVERT_M4A) DialogSingleChoiceItem(
-                    modifier = Modifier,
-                    text = PreferenceStrings.getAudioConvertDesc(i),
-                    selected = audioFormat == i && convertAudio,
-                ) {
-                    audioFormat = i
-                    convertAudio = true
-                }
+                for (i in CONVERT_MP3..CONVERT_M4A)
+                    DialogSingleChoiceItem(
+                        modifier = Modifier,
+                        text = PreferenceStrings.getAudioConvertDesc(i),
+                        selected = audioFormat == i && convertAudio
+                    ) {
+                        audioFormat = i
+                        convertAudio = true
+                    }
             }
-        },
-    )
+        })
 }
+
 
 @Composable
 @Preview
 fun VideoFormatDialog(
     videoFormatPreference: Int = FORMAT_COMPATIBILITY,
     onDismissRequest: () -> Unit = {},
-    onConfirm: (Int) -> Unit = {},
+    onConfirm: (Int) -> Unit = {}
 ) {
     var preference by remember { mutableIntStateOf(videoFormatPreference) }
     DuckDialog(
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.dismiss)) }
-        },
-        icon = { Icon(Icons.Outlined.VideoFile, null) },
-        title = { Text(stringResource(R.string.video_format_preference)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm(preference)
-                    onDismissRequest()
-                }
-            ) {
+
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.dismiss))
+            }
+
+
+        }, icon = { Icon(Icons.Outlined.VideoFile, null) },
+        title = {
+            Text(stringResource(R.string.video_format_preference))
+        }, confirmButton = {
+            TextButton(onClick = {
+                onConfirm(preference)
+                onDismissRequest()
+            }) {
                 Text(text = stringResource(R.string.confirm))
             }
-        },
-        text = {
+        }, text = {
             Column {
-                androidx.compose.material3.HorizontalDivider()
+                HorizontalDivider()
                 LazyColumn(modifier = Modifier, contentPadding = PaddingValues(vertical = 8.dp)) {
-                    for (i in listOf(FORMAT_COMPATIBILITY, FORMAT_QUALITY)) item {
-                        DialogSingleChoiceItemVariant(
-                            modifier = Modifier,
-                            title = PreferenceStrings.getVideoFormatLabel(i),
-                            desc = PreferenceStrings.getVideoFormatDescComp(i),
-                            selected = preference == i,
-                        ) {
-                            preference = i
+
+                    for (i in listOf(FORMAT_COMPATIBILITY, FORMAT_QUALITY))
+                        item {
+                            DialogSingleChoiceItemWithLabel(
+                                modifier = Modifier,
+                                text = PreferenceStrings.getVideoFormatLabel(i),
+                                label = PreferenceStrings.getVideoFormatDescComp(i),
+                                selected = preference == i,
+                            ) { preference = i }
                         }
-                    }
                 }
-                androidx.compose.material3.HorizontalDivider()
+                HorizontalDivider()
+
             }
-        },
-    )
+
+        })
 }
 
 @Composable
@@ -613,34 +474,35 @@ fun AudioFormatDialog(onDismissRequest: () -> Unit) {
     DuckDialog(
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.dismiss)) }
-        },
-        icon = { Icon(Icons.Outlined.AudioFile, null) },
-        title = { Text(stringResource(R.string.audio_format_preference)) },
-        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.dismiss))
+            }
+        }, icon = { Icon(Icons.Outlined.AudioFile, null) },
+        title = {
+            Text(stringResource(R.string.audio_format_preference))
+        }, confirmButton = {
             ConfirmButton {
                 AUDIO_FORMAT.updateInt(audioFormat)
                 onDismissRequest()
             }
-        },
-        text = {
+        }, text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
                     text = stringResource(R.string.preferred_format_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
-                for (i in DEFAULT..M4A) DialogSingleChoiceItem(
-                    modifier = Modifier,
-                    text = PreferenceStrings.getAudioFormatDesc(i),
-                    selected = audioFormat == i,
-                ) {
-                    audioFormat = i
-                }
+                for (i in DEFAULT..M4A)
+                    DialogSingleChoiceItem(
+                        modifier = Modifier,
+                        text = PreferenceStrings.getAudioFormatDesc(i),
+                        selected = audioFormat == i
+                    ) { audioFormat = i }
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -648,33 +510,34 @@ fun AudioQualityDialog(onDismissRequest: () -> Unit) {
     var audioQuality by AUDIO_QUALITY.intState
     DuckDialog(
         onDismissRequest = onDismissRequest,
-        dismissButton = { DismissButton { onDismissRequest() } },
-        icon = { Icon(Icons.Outlined.HighQuality, null) },
-        title = { Text(stringResource(R.string.audio_quality)) },
-        confirmButton = {
+        dismissButton = {
+            DismissButton { onDismissRequest() }
+        }, icon = { Icon(Icons.Outlined.HighQuality, null) },
+        title = {
+            Text(stringResource(R.string.audio_quality))
+        }, confirmButton = {
             ConfirmButton {
                 AUDIO_QUALITY.updateInt(audioQuality)
                 onDismissRequest()
             }
-        },
-        text = {
+        }, text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
                     text = stringResource(R.string.audio_quality_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
-                for (i in NOT_SPECIFIED..ULTRA_LOW) DialogSingleChoiceItem(
-                    modifier = Modifier,
-                    text = PreferenceStrings.getAudioQualityDesc(i),
-                    selected = audioQuality == i,
-                ) {
-                    audioQuality = i
-                }
+                for (i in NOT_SPECIFIED..ULTRA_LOW)
+                    DialogSingleChoiceItem(
+                        modifier = Modifier,
+                        text = PreferenceStrings.getAudioQualityDesc(i),
+                        selected = audioQuality == i
+                    ) { audioQuality = i }
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -685,70 +548,74 @@ fun FormatSortingDialog(
     onSwitchChecked: (Boolean) -> Unit = {},
     onImport: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
-    onConfirm: (String) -> Unit = {},
+    onConfirm: (String) -> Unit = {}
 ) {
-    var sortingFields by remember(fields) { mutableStateOf(fields) }
+    var sortingFields by remember(fields) {
+        mutableStateOf(fields)
+    }
     DuckDialog(
         onDismissRequest = onDismissRequest,
-        dismissButton = { DismissButton { onDismissRequest() } },
-        icon = { Icon(Icons.AutoMirrored.Outlined.Sort, null) },
-        title = { Text(stringResource(R.string.format_sorting)) },
-        confirmButton = {
+        dismissButton = {
+            DismissButton { onDismissRequest() }
+        }, icon = { Icon(Icons.AutoMirrored.Outlined.Sort, null) },
+        title = {
+            Text(stringResource(R.string.format_sorting))
+        }, confirmButton = {
             ConfirmButton(text = stringResource(id = R.string.save)) {
                 onConfirm(sortingFields)
                 onDismissRequest()
             }
-        },
-        text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        }, text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            ) {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 12.dp),
                     text = stringResource(R.string.format_sorting_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 OutlinedTextField(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                     value = sortingFields,
                     onValueChange = { sortingFields = it },
                     leadingIcon = { Text(text = "-S", fontFamily = FontFamily.Monospace) },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                 )
                 val uriHandler = LocalUriHandler.current
                 Row(
-                    modifier =
-                        Modifier.padding(horizontal = 16.dp)
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 8.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp)
                 ) {
                     OutlinedButtonChip(
                         modifier = Modifier.padding(end = 8.dp),
                         label = stringResource(id = R.string.import_from_preferences),
-                        icon = Icons.Outlined.SettingsSuggest,
+                        icon = Icons.Outlined.SettingsSuggest
                     ) {
                         onImport()
                     }
                     OutlinedButtonChip(
                         label = stringResource(R.string.yt_dlp_docs),
-                        icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                        icon = Icons.AutoMirrored.Outlined.OpenInNew
                     ) {
                         uriHandler.openUri(sortingFormats)
                     }
                 }
                 if (showSwitch) {
                     Spacer(modifier = Modifier.height(12.dp))
-                    androidx.compose.material3.HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
                     DialogSwitchItem(
                         text = stringResource(id = R.string.use_format_sorting),
                         value = toggleableValue,
-                        onValueChange = onSwitchChecked,
+                        onValueChange = onSwitchChecked
                     )
                 }
             }
-        },
-    )
+        })
 }
 
 @Preview
@@ -759,50 +626,51 @@ private fun FormatSortingDialogPreview() {
         fields = "",
         showSwitch = true,
         toggleableValue = value,
-        onSwitchChecked = { value = it },
-    )
+        onSwitchChecked = { value = it })
 }
 
 @Composable
 fun VideoQualityDialog(
     videoQuality: Int = 0,
     onDismissRequest: () -> Unit = {},
-    onConfirm: (Int) -> Unit = {},
+    onConfirm: (Int) -> Unit = {}
 ) {
     var videoResolution by remember { mutableIntStateOf(videoQuality) }
 
     DuckDialog(
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.dismiss)) }
-        },
-        icon = { Icon(Icons.Outlined.HighQuality, null) },
-        title = { Text(stringResource(R.string.video_quality)) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm(videoResolution)
-                    onDismissRequest()
-                }
-            ) {
-                Text(text = stringResource(R.string.confirm))
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.dismiss))
             }
         },
-        text = {
+        icon = { Icon(Icons.Outlined.HighQuality, null) },
+        title = {
+            Text(stringResource(R.string.video_quality))
+        }, confirmButton = {
+            TextButton(onClick = {
+                onConfirm(videoResolution)
+                onDismissRequest()
+            }) {
+                Text(text = stringResource(R.string.confirm))
+            }
+        }, text = {
             Column() {
                 Text(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(bottom = 12.dp).padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp),
                     text = stringResource(R.string.video_quality_desc),
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 LazyColumn() {
-                    //                    item { videoResolutionSelectField() }
+//                    item { videoResolutionSelectField() }
                     for (i in 0..7) {
                         item {
                             DialogSingleChoiceItem(
                                 text = PreferenceStrings.getVideoResolutionDesc(i),
-                                selected = videoResolution == i,
+                                selected = videoResolution == i
                             ) {
                                 videoResolution = i
                             }
@@ -810,8 +678,7 @@ fun VideoQualityDialog(
                     }
                 }
             }
-        },
-    )
+        })
 }
 
 private const val subtitleOptions = "https://github.com/yt-dlp/yt-dlp#subtitle-options"
@@ -833,6 +700,7 @@ fun SubtitleLanguageDialog(onDismissRequest: () -> Unit) {
     )
 }
 
+
 @Composable
 @Preview
 private fun SubtitleLanguageDialogImpl(
@@ -851,90 +719,96 @@ private fun SubtitleLanguageDialogImpl(
             Column() {
                 Text(
                     text = stringResource(id = R.string.subtitle_language_desc),
-                    modifier = Modifier.padding(horizontal = 24.dp),
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                ProvideTextStyle(
-                    value = LocalTextStyle.current.merge(fontFamily = FontFamily.Monospace)
-                ) {
+                ProvideTextStyle(value = LocalTextStyle.current.merge(fontFamily = FontFamily.Monospace)) {
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
                         value = languages,
                         onValueChange = { languages = it },
-                        label = { Text(stringResource(id = R.string.subtitle_language)) },
+                        label = {
+                            Text(stringResource(id = R.string.subtitle_language))
+                        },
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
-                    modifier =
-                        Modifier.padding(horizontal = 16.dp)
-                            .horizontalScroll(rememberScrollState())
-                            .padding(horizontal = 8.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp)
                 ) {
                     OutlinedButtonChip(
                         modifier = Modifier.padding(end = 8.dp),
                         label = stringResource(id = R.string.reset),
-                        icon = Icons.Outlined.Sync,
+                        icon = Icons.Outlined.Sync
                     ) {
                         onReset()
                     }
                     OutlinedButtonChip(
                         label = stringResource(R.string.yt_dlp_docs),
-                        icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                        icon = Icons.AutoMirrored.Outlined.OpenInNew
                     ) {
                         uriHandler.openUri(sortingFormats)
                     }
                 }
             }
-        },
-        confirmButton = {
+        }, confirmButton = {
             ConfirmButton() {
                 onConfirm(languages)
                 onDismissRequest()
             }
-        },
-        dismissButton = { DismissButton() { onDismissRequest() } },
-    )
+        }, dismissButton = {
+            DismissButton() {
+                onDismissRequest()
+            }
+        })
 }
 
 @Composable
 fun SubtitleConversionDialog(onDismissRequest: () -> Unit) {
     var currentFormat by CONVERT_SUBTITLE.intState
-    DuckDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            ConfirmButton {
-                CONVERT_SUBTITLE.updateInt(currentFormat)
-                onDismissRequest()
-            }
-        },
-        dismissButton = { DismissButton { onDismissRequest() } },
-        title = { Text(text = stringResource(id = R.string.convert_subtitle)) },
-        icon = { Icon(imageVector = Icons.Outlined.Sync, contentDescription = null) },
-        text = {
+    DuckDialog(onDismissRequest = onDismissRequest, confirmButton = {
+        ConfirmButton {
+            CONVERT_SUBTITLE.updateInt(currentFormat)
+            onDismissRequest()
+        }
+    }, dismissButton = {
+        DismissButton { onDismissRequest() }
+    }, title = { Text(text = stringResource(id = R.string.convert_subtitle)) },
+        icon = {
+            Icon(
+                imageVector = Icons.Outlined.Sync,
+                contentDescription = null
+            )
+        }, text = {
             LazyColumn {
                 item {
                     Text(
                         text = stringResource(id = R.string.convert_subtitle_desc),
-                        modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 12.dp),
-                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 12.dp),
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
                 for (format in NOT_CONVERT..CONVERT_VTT) {
                     item {
                         DialogSingleChoiceItem(
                             text = PreferenceStrings.getSubtitleConversionFormat(format),
-                            selected = currentFormat == format,
+                            selected = currentFormat == format
                         ) {
                             currentFormat = format
                         }
                     }
                 }
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -943,20 +817,23 @@ fun VideoQualityPreferenceChip(
     modifier: Modifier = Modifier,
     videoQualityPreference: Int = FORMAT_COMPATIBILITY,
     enabled: Boolean = true,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit = {}
 ) {
     ElevatedAssistChip(
         modifier = modifier,
         onClick = onClick,
-        label = { Text(text = PreferenceStrings.getVideoFormatLabel(videoQualityPreference)) },
+        label = {
+            Text(
+                text = PreferenceStrings.getVideoFormatLabel(videoQualityPreference)
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.VideoSettings,
                 contentDescription = null,
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
+                modifier = Modifier.size(AssistChipDefaults.IconSize)
             )
-        },
-    )
+        })
 }
 
 @Composable
@@ -965,18 +842,21 @@ fun VideoResolutionChip(
     modifier: Modifier = Modifier,
     videoResolution: Int = 0,
     enabled: Boolean = true,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit = {}
 ) {
     ElevatedAssistChip(
         modifier = modifier,
         onClick = onClick,
-        label = { Text(text = PreferenceStrings.getVideoResolutionDesc(videoResolution)) },
+        label = {
+            Text(
+                text = PreferenceStrings.getVideoResolutionDescComp(videoResolution)
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.VideoSettings,
                 contentDescription = null,
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
+                modifier = Modifier.size(AssistChipDefaults.IconSize)
             )
-        },
-    )
+        })
 }

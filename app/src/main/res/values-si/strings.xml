@@ -23,6 +23,7 @@
     <string name="about">විස්තර</string>
     <string name="about_page">අනුවාදය, නිකුත් කිරීම්, ස්තූතීන්</string>
     <string name="back">ආපසු</string>
+    <string name="readme_desc">GitHub ගබඩාව සහ README පරීක්ෂා කරන්න</string>
     <string name="start_execute">විධානය ක්‍රියාත්මක කරන්න</string>
     <string name="print_details">විස්තරාත්මක ප්‍රතිදාන</string>
     <string name="print_details_desc">බාගත කිරීමේදී විස්තරාත්මක පණිවිඩ පෙන්වන්න</string>
@@ -42,8 +43,10 @@
     <string name="video_url">වීඩියො සබැඳිය</string>
     <string name="share_fail_msg">බෙදාගත් අන්තර්ගතයෙන් URL ගැලපීමට නොහැක</string>
     <string name="share_success_msg">බෙදාගත් අන්තර්ගතයෙන් වීඩියෝ සබැඳිය කියවමින් පවතී…</string>
-    <string name="service_title">duck බාගත කරගනිමින් පවතී…</string>
+    <string name="service_title">Seal බාගත කරගනිමින් පවතී…</string>
     <string name="unknown_error">නොදන්නා දෝෂයක්</string>
+    <string name="translate">පරිවර්තනය</string>
+    <string name="translate_desc">යෙදුම Hosted Weblate මත පරිවර්තනය කිරීමට සහාය වන්න</string>
     <string name="remove_template">ඉවත් කරන්න\?</string>
     <string name="task_canceled">බාගැනීම අවලංගු කරන ලදී</string>
     <string name="info_copied">තොරතුරු ක්ලිප්බෝඩයට පිටපත් විය</string>
@@ -94,6 +97,8 @@
     <string name="language">සංදර්ශක භාෂාව</string>
     <string name="task_running">පවතින බාගැනීම් කාර්යයක් දැනටමත් ක්‍රියාත්මක වේ</string>
     <string name="version">අනුවාදය</string>
+    <string name="release_desc">වෙනස් කිරීම් සහ නව අනුවාද</string>
+    <string name="release">නවතම අනුවාදය</string>
     <string name="video">වීඩියෝ</string>
     <string name="custom_command">අභිරුචි විධානයන්</string>
     <string name="custom_command_desc">අභිරුචි ටෙම්ප්ලේට සමඟ yt-dlp විධානය ක්‍රියාත්මක කරන්න</string>
@@ -164,7 +169,9 @@
     <string name="embed_subtitles">උපසිරැසි ඇතුළත් කරන්න</string>
     <string name="template_label">ලේබල්</string>
     <string name="downloading_indicator_text">බාගනිමින් පවතී, අවලංගු කිරීමට ක්ලික් කරන්න.</string>
+    <string name="github_issue">GitHub වාර්තා කිරීම්</string>
     <string name="restart">යළි අරඹන්න</string>
+    <string name="github_issue_desc">ගැටලු හෝ විශේෂාංග දැනුම්දීමට Issue ලෙස වාර්තා කරන්න</string>
     <string name="status_completed">සම්පූර්ණයි</string>
     <string name="import_from_clipboard">ක්ලිප්බෝඩයෙන් ලබාගන්න</string>
     <string name="check_for_updates">යාවත්කාලීනයන් පරීක්ෂා කරන්න</string>

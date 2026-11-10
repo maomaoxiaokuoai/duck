@@ -26,7 +26,7 @@
     <string name="general_settings">പൊതുവായ</string>
     <string name="language">പ്രദർശന ഭാഷ</string>
     <string name="task_running">നിലവിലുള്ള ഒരു ഡൗൺലോഡ് ടാസ്‌ക് ഇതിനകം പ്രവർത്തിക്കുന്നു</string>
-    <string name="paste_msg">URL ഒട്ടിക്കുക</string>
+    <string name="paste_msg">ക്ലിപ്പ്ബോർഡിൽ നിന്ന് URL ഒട്ടിക്കുക</string>
     <string name="language_settings">പ്രദർശന ഭാഷ സജ്ജമാക്കുക</string>
     <string name="paste_fail_msg">ക്ലിപ്പ്ബോർഡിലെ URL-മായി പൊരുത്തപ്പെടാൻ കഴിഞ്ഞില്ല</string>
     <string name="version">പതിപ്പ്</string>
@@ -38,6 +38,9 @@
     <string name="open_url">ലിങ്ക് തുറക്കുക</string>
     <string name="about">ഇതേക്കുറിച്ച്</string>
     <string name="remove">നീക്കം ചെയ്യുക</string>
+    <string name="release_desc">ചേഞ്ച് ലോഗുകളും പുതിയ പതിപ്പുകളും തിരയുക</string>
+    <string name="readme_desc">ഗിറ്റ്ഹബ് റെപ്പോസിറ്ററിയും README-യും പരിശോധിക്കുക</string>
+    <string name="release">ഏറ്റവും പുതിയ റിലീസ്</string>
     <string name="url_empty">ലിങ്ക് ശൂന്യമാക്കാൻ കഴിയില്ല</string>
     <string name="video">വീഡിയോ</string>
     <string name="checked">പരിശോധിച്ചു</string>
@@ -126,12 +129,13 @@
     <string name="template_selection">ടെംപ്ലേറ്റ് തിരഞ്ഞെടുക്കൽ</string>
     <string name="custom_command_template_desc">കമാൻഡ് ടെംപ്ലേറ്റുകൾ എഡിറ്റ് ചെയ്യുകയും നിയന്ത്രിക്കുകയും ചെയ്യുക</string>
     <string name="task_canceled">ഡൗൺലോഡ് ടാസ്‌ക് റദ്ദാക്കി</string>
+    <string name="github_issue">ഗിറ്റ്ഹബ് പ്രശ്നം</string>
     <string name="info_copied">ലിങ്ക് ക്ലിപ്പ്ബോർഡിലേക്ക് പകർത്തി</string>
     <string name="status_downloading">ഡൌൺലോഡ് ചെയ്യുന്നു</string>
     <string name="status_canceled">റദ്ദാക്കി</string>
     <string name="open_file">ഫയൽ തുറക്കുക</string>
     <string name="status_error">പിശക്</string>
-    <string name="copy_error_report">റിപ്പോർട്ട് പകർത്തുക</string>
+    <string name="copy_error_report">പിശക് റിപ്പോർട്ട്</string>
     <string name="import_from_clipboard">ക്ലിപ്ബോർഡിൽ നിന്ന് ഇംപോർട്ട് ചെയ്യുക</string>
     <string name="download_task_count">%1$d ജോലികൾ ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="recently_added">അടുത്തിടെ ചേർത്തത്</string>
@@ -142,30 +146,33 @@
     <string name="app_update_failed">ഏറ്റവും പുതിയ പതിപ്പിലേക്ക് അപ്ഡേറ്റ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു</string>
     <string name="update">അപ്ഡേറ്റ് ചെയ്യുക</string>
     <string name="clear_temp_files">താൽക്കാലിക ഫയലുകൾ മായ്ച്ചുകളയുക</string>
-    <string name="private_mode">സ്വകാര്യ</string>
+    <string name="private_mode">സ്വകാര്യ മോഡ്</string>
     <string name="dynamic_color">ഡൈനാമിക് നിറം</string>
     <string name="download_with_cellular">സെല്ലുലാർ ഉപയോഗിച്ച് ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="file_unavailable">ഈ ഫയൽ ഇനി ലഭ്യമല്ല</string>
     <string name="network">നെറ്റ് വർക്ക്</string>
     <string name="rate_limit">നിരക്ക് പരിധി</string>
-    <string name="rate_limit_desc">പരമാവധി ഡൗൺലോഡ് വേഗത പരിമിതപ്പെടുത്തുക</string>
+    <string name="rate_limit_desc">ഡൗൺലോഡുകളുടെ പരമാവധി നിരക്ക് പരിമിതപ്പെടുത്തുക</string>
     <string name="max_rate">പരമാവധി നിരക്ക്</string>
     <string name="lowest_quality">ഏറ്റവും കുറഞ്ഞ നിലവാരം</string>
     <string name="dynamic_color_desc">വാൾപേപ്പറുകളിൽ നിന്ന് ആപ്പ് തീമിലേക്ക് നിറങ്ങൾ പ്രയോഗിക്കുക</string>
     <string name="battery_configuration_desc">പശ്ചാത്തലത്തിൽ ഡൗൺലോഡ് ചെയ്യാൻ ഈ ആപ്പിനായി ബാറ്ററി ഒപ്റ്റിമൈസേഷൻ അവഗണിക്കുക</string>
     <string name="remove_template_desc">കമാൻഡ് ടെംപ്ലേറ്റുകളിൽ നിന്ന് \"%1$s\" നീക്കം ചെയ്യണോ\?</string>
     <string name="video_file_size">വീഡിയോ ഫയലിന്റെ വലിപ്പം</string>
+    <string name="translate">വിവർത്തനം ചെയ്യുക</string>
     <string name="new_template">പുതിയ ടെംപ്ലേറ്റ്</string>
     <string name="remove_template">നീക്കം ചെയ്യണോ\?</string>
     <string name="status_fetching_video_info">വിവരങ്ങൾ ശേഖരിക്കുന്നു</string>
-    <string name="playlist_indicator_text">പ്ലേലിസ്റ്റ് ഡൗൺലോഡ് ചെയ്യുന്നു (%1$d/%2$d)…</string>
+    <string name="translate_desc">ഹോസ്റ്റുചെയ്ത വെബ്ലേറ്റിൽ ഈ ആപ്പ് പരിഭാഷപ്പെടുത്താൻ സഹായിക്കുക</string>
+    <string name="github_issue_desc">ബഗ് റിപ്പോർട്ടിനോ ഫീച്ചർ അഭ്യർത്ഥനയ്‌ക്കോ ഒരു പ്രശ്നം സമർപ്പിക്കുക</string>
+    <string name="playlist_indicator_text">പ്ലേലിസ്റ്റ് ഡൗൺലോഡ് ചെയ്യുന്നു (%1$d/%2$d)</string>
     <string name="download_directory">ഡയറക്ടറി ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="subdirectory_desc">ഫയലുകൾ ബന്ധപ്പെട്ട ഫീൽഡുകളായി പേരുള്ള ഫോൾഡറുകളിൽ സംരക്ഷിക്കുക</string>
     <string name="prefix">പാത്ത് ടെംപ്ലേറ്റ്</string>
     <string name="downloading_indicator_text">ഡൗൺലോഡ് പുരോഗമിക്കുന്നു…</string>
     <string name="embed_subtitles_desc">ലഭ്യമെങ്കിൽ വീഡിയോകളിൽ നൽകിയിരിക്കുന്ന സബ്‌ടൈറ്റിലുകൾ ഉൾച്ചേർക്കുക</string>
     <string name="status_enqueued">വരിവരിയായി</string>
-    <string name="status_completed">തീർന്നു</string>
+    <string name="status_completed">പൂർത്തിയാക്കി</string>
     <string name="restart">പുനരാരംഭിക്കുക</string>
     <string name="copy_link">ലിങ്ക് പകർത്തുക</string>
     <string name="export_to_clipboard">ക്ലിപ്പ്ബോർഡിലേക്ക് കയറ്റുമതി ചെയ്യുക</string>
@@ -216,6 +223,8 @@
     <string name="abs_hint">മിക്ക വീഡിയോ സ്ട്രീമിംഗ് പ്ലാറ്റ്‌ഫോമുകളും ഓഡിയോയും വീഡിയോയും വെവ്വേറെ ഡെലിവർ ചെയ്യുന്നു, നിങ്ങൾക്ക് ഒരു ഓഡിയോ മാത്രമുള്ള ഫോർമാറ്റ് തിരഞ്ഞെടുത്ത് ഒരു വീഡിയോ മാത്രമുള്ള ഫോർമാറ്റിൽ ഒരു വീഡിയോയിലേക്ക് ലയിപ്പിക്കാം.</string>
     <string name="custom_command_enabled_hint">കസ്റ്റം കമാൻഡ് ഉപയോഗിക്കുമ്പോൾ ചില ഓപ്ഷനുകൾ ലഭ്യമല്ല</string>
     <string name="cookies_usage_msg">ചില സൈറ്റുകളിൽ നിന്ന് ഡൗൺലോഡ് ചെയ്യുന്നതിന് അക്കൗണ്ട് പ്രാമാണീകരണ വിവരങ്ങൾ ആവശ്യമാണ്. \"പുതിയ കുക്കികൾ സൃഷ്ടിക്കുക\" എന്നതിൽ ക്ലിക്ക് ചെയ്യുക, വെബ്‌സൈറ്റിന്റെ URL നൽകുക, തുടർന്ന് ബ്രൗസർ പേജിൽ നിങ്ങളുടെ അക്കൗണ്ട് ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക, ആപ്പ് നിങ്ങൾക്കായി അത് ജനറേറ്റ് ചെയ്യും.</string>
+    <string name="telegram_channel">ടെലിഗ്രാം ചാനൽ</string>
+    <string name="matrix_space">മാട്രിക്സ് സ്പേസ്</string>
     <string name="download_subtitles">സബ്ടൈറ്റിലുകൾ ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="video_title_sample_text">വീഡിയോ ശീർഷകം മാതൃകാ വാചകം</string>
     <string name="video_creator_sample_text">വീഡിയോ ക്രിയേറ്റർ മാതൃകാ വാചകം</string>
@@ -276,6 +285,8 @@
     <string name="update_channel_desc">പുതിയ ഫീച്ചറുകളും മാറ്റങ്ങളും പ്രിവ്യൂ ചെയ്യുന്നതിന് പ്രീ-റിലീസ് ബിൽഡുകൾ ഇൻസ്റ്റാൾ ചെയ്യുക.
 \n
 \nഈ പതിപ്പുകളിൽ ചില അസ്ഥിരതകൾ ഉണ്ടാകും, അതിനാൽ ഭാവിയിൽ ആപ്പ് മെച്ചപ്പെടുത്താൻ ഞങ്ങളെ സഹായിക്കുന്നതിന് എന്തെങ്കിലും പ്രശ്‌നങ്ങൾ നേരിടുകയാണെങ്കിൽ ഞങ്ങൾക്ക് ഫീഡ്‌ബാക്ക് നൽകാൻ മടിക്കരുത്.</string>
+    <string name="sponsor">സ്പോൺസർ</string>
+    <string name="sponsor_desc">GitHub-ൽ സ്പോൺസർ ചെയ്തുകൊണ്ട് ഈ ആപ്പിനെ പിന്തുണയ്ക്കുക</string>
     <string name="auto_update_disabled_msg">%1$s ബിൽഡുകൾക്ക് സ്വയമേവയുള്ള അപ്ഡേറ്റ് ലഭ്യമല്ല. നിങ്ങളുടെ ഉപകരണത്തിൽ %1$s ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ലെങ്കിലോ സീലിൽ വരാനിരിക്കുന്ന പുതിയ ഫീച്ചറുകൾ പ്രിവ്യൂ ചെയ്യാൻ ആഗ്രഹിക്കുന്നുവെങ്കിലോ, ദയവായി %2$s പരിഗണിക്കുക.</string>
     <string name="feature_unavailable">ഫീച്ചർ ലഭ്യമല്ല</string>
     <string name="no_custom_command_tasks">ഇഷ്‌ടാനുസൃത കമാൻഡ് ടാസ്‌ക്കുകളൊന്നുമില്ല</string>
@@ -311,7 +322,9 @@
     <string name="got_it">മനസ്സിലായി</string>
     <string name="subdirectory_hint">നിങ്ങളുടെ ഡൗൺലോഡുകൾ ഇങ്ങനെ സംരക്ഷിക്കപ്പെടും:</string>
     <string name="enable_experimental_feature">പരീക്ഷണാത്മക ഫീച്ചർ പ്രവർത്തനക്ഷമമാക്കണോ?</string>
+    <string name="sponsor_msg">സീൽ എല്ലായ്‌പ്പോഴും സൗജന്യവും ഓപ്പൺ സോഴ്‌സും ആയിരിക്കും. നിങ്ങൾക്കത് ഇഷ്‌ടമാണെങ്കിൽ, GitHub-ൽ എന്നെ സ്‌പോൺസർ ചെയ്യുന്നത് പരിഗണിക്കൂ!</string>
     <string name="feedback">പ്രതികരണം</string>
+    <string name="sponsors">സ്പോൺസർമാർ</string>
     <string name="split_video">വീഡിയോ വിഭജിക്കുക</string>
     <string name="split_video_msg">വീഡിയോ %1$d അധ്യായങ്ങളായി വിഭജിക്കും</string>
     <string name="ua_header">User-Agent തലക്കെട്ട്</string>
@@ -362,8 +375,10 @@
     <string name="clip_start">ആരംഭിക്കുക</string>
     <string name="clip_end">അവസാനിക്കുന്നു</string>
     <string name="clip_video_desc">ഫോർമാറ്റ് തിരഞ്ഞെടുക്കൽ പേജിൽ വീഡിയോ ക്ലിപ്പുകൾ ഉണ്ടാക്കുക</string>
+    <string name="switch_to_github_builds">GitHub ബിൽഡുകളിലേക്ക് മാറുന്നു</string>
     <string name="okay">ശരി</string>
     <string name="msg_from_developer">ഡെവലപ്പറിൽ നിന്നുള്ള സന്ദേശം</string>
+    <string name="sponsor_msg2">വളരെ നന്ദി!</string>
     <string name="unknown_error_title">ശ്ശോ! എന്തോ കുഴപ്പം സംഭവിച്ചു</string>
     <string name="disable">പ്രവർത്തനരഹിതമാക്കുക</string>
     <string name="set_directory_desc">ഡയറക്ടറി സജ്ജീകരിക്കാൻ ടാപ്പ് ചെയ്യുക</string>
@@ -393,35 +408,4 @@
     <string name="every_month">എല്ലാ മാസവും</string>
     <string name="download_history_imported">ചരിത്രം ഡൗൺലോഡ് ചെയ്യാൻ %1$s ഇറക്കുമതി ചെയ്തു</string>
     <string name="redownload">വീണ്ടും ഡൗൺലോഡ് ചെയ്യുക</string>
-    <string name="edit_preset">പ്രീസെറ്റ് എഡിറ്റ് ചെയ്യുക</string>
-    <string name="task_added">ക്യൂവിൽ ടാസ്ക് ചേർത്തു</string>
-    <string name="you_ll_find_your_downloads_here">നിങ്ങളുടെ ഡൗൺലോഡുകൾ ഇവിടെ കാണാം</string>
-    <string name="download_hint">ഡൗൺലോഡ് ആരംഭിക്കാൻ ഡൗൺലോഡ് ബട്ടണിൽ ടാപ്പ് ചെയ്യുക അല്ലെങ്കിൽ ഈ ആപ്പിലേക്ക് ഒരു വീഡിയോ ലിങ്ക് പങ്കിടുക</string>
-    <string name="status_downloaded">ഡൗൺലോഡ് ചെയ്തു</string>
-    <string name="playlist">പ്ലേലിസ്റ്റ്</string>
-    <string name="proceed">തുടരുക</string>
-    <string name="preset">പ്രീസെറ്റ്</string>
-    <string name="prefer_placeholder">%1$s തിരഞ്ഞെടുക്കുക</string>
-    <string name="custom_format_selection_desc">ഫോർമാറ്റുകൾ, സബ്‌ടൈറ്റിലുകൾ എന്നിവയിൽ നിന്ന് തിരഞ്ഞെടുത്ത് കൂടുതൽ ഇഷ്ടാനുസൃതമാക്കുക</string>
-    <string name="best_quality_desc">ലഭ്യമായ ഏറ്റവും മികച്ച ഫോർമാറ്റ് ഡൗൺലോഡ് ചെയ്യുക</string>
-    <string name="all">എല്ലാം</string>
-    <plurals name="video_count">
-        <item quantity="one">%d വീഡിയോ</item>
-        <item quantity="other">%d വീഡിയോകൾ</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d ഓഡിയോ</item>
-        <item quantity="other">%d ഓഡിയോകൾ</item>
-    </plurals>
-    <string name="select_multiple_link">%1$d ലിങ്കുകളിൽ നിന്ന് തിരഞ്ഞെടുക്കുക</string>
-    <string name="download_queue">ഡൗൺലോഡ് ക്യൂ</string>
-    <string name="all_languages">എല്ലാ ഭാഷകളും</string>
-    <string name="preset_format_selection_desc">നിങ്ങളുടെ ഫോർമാറ്റ് മുൻഗണനകൾ ഉപയോഗിച്ച് സ്വയമേവ ഡൗൺലോഡ് ചെയ്യുക</string>
-    <string name="show_navigation_drawer">നാവിഗേഷൻ ഡ്രോയർ കാണിക്കുക</string>
-    <string name="resume">പുനരാരംഭിക്കുക</string>
-    <string name="delete">ഇല്ലാതാക്കുക</string>
-    <string name="media_info">മീഡിയയുടെ വിവരം</string>
-    <string name="trouble_shooting_desc">പൊതുവായ പിശകുകൾ പരിഹരിക്കുക, അറിയപ്പെടുന്ന പ്രശ്നങ്ങൾ കാണുക</string>
-    <string name="trouble_shooting">പ്രശ്നനിർണയവും പരിഹാരവും</string>
-    <string name="issue_tracker">പ്രശ്ന ട്രാക്കർ</string>
 </resources>

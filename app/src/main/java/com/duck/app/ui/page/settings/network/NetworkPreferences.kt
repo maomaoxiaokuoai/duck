@@ -1,6 +1,7 @@
 package com.duck.app.ui.page.settings.network
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bolt
@@ -12,7 +13,6 @@ import androidx.compose.material.icons.outlined.SignalCellularConnectedNoInterne
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.VpnKey
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import com.duck.app.R
 import com.duck.app.ui.common.booleanState
 import com.duck.app.ui.component.BackButton
+import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.PreferenceInfo
 import com.duck.app.ui.component.PreferenceItem
 import com.duck.app.ui.component.PreferenceSubtitle
@@ -39,50 +40,62 @@ import com.duck.app.util.COOKIES
 import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.FORCE_IPV4
 import com.duck.app.util.PROXY
-import com.duck.app.util.PreferenceUtil.getBoolean
+import com.duck.app.util.PreferenceUtil.getValue
 import com.duck.app.util.PreferenceUtil.updateBoolean
 import com.duck.app.util.PreferenceUtil.updateValue
 import com.duck.app.util.RATE_LIMIT
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetworkPreferences(navigateToCookieProfilePage: () -> Unit = {}, onNavigateBack: () -> Unit) {
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-            rememberTopAppBarState(),
-            canScroll = { true },
-        )
+fun NetworkPreferences(
+    navigateToCookieProfilePage: () -> Unit = {},
+    onNavigateBack: () -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        rememberTopAppBarState(),
+        canScroll = { true }
+    )
 
     var showConcurrentDownloadDialog by remember { mutableStateOf(false) }
     var showRateLimitDialog by remember { mutableStateOf(false) }
     var showProxyDialog by remember { mutableStateOf(false) }
-    var aria2c by remember { mutableStateOf(ARIA2C.getBoolean()) }
+    var aria2c by remember { mutableStateOf(getValue(ARIA2C)) }
     var proxy by PROXY.booleanState
     var isCookiesEnabled by COOKIES.booleanState
     var forceIpv4 by FORCE_IPV4.booleanState
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text(modifier = Modifier, text = stringResource(id = R.string.network)) },
-                navigationIcon = { BackButton { onNavigateBack() } },
-                scrollBehavior = scrollBehavior,
+                title = {
+                    Text(
+                        modifier = Modifier,
+                        text = stringResource(id = R.string.network),
+                    )
+                }, navigationIcon = {
+                    BackButton {
+                        onNavigateBack()
+                    }
+                }, scrollBehavior = scrollBehavior
             )
-        },
-        content = {
+        }, content = {
             val isCustomCommandEnabled by CUSTOM_COMMAND.booleanState
 
-            LazyColumn(contentPadding = it) {
+            LazyColumn(Modifier.padding(it)) {
                 if (isCustomCommandEnabled)
                     item {
-                        PreferenceInfo(
-                            text = stringResource(id = R.string.custom_command_enabled_hint)
-                        )
+                        PreferenceInfo(text = stringResource(id = R.string.custom_command_enabled_hint))
                     }
-                item { PreferenceSubtitle(text = stringResource(R.string.general_settings)) }
                 item {
-                    var isRateLimitEnabled by remember { mutableStateOf(RATE_LIMIT.getBoolean()) }
+                    PreferenceSubtitle(text = stringResource(R.string.general_settings))
+                }
+                item {
+                    var isRateLimitEnabled by remember {
+                        mutableStateOf(getValue(RATE_LIMIT))
+                    }
 
                     PreferenceSwitchWithDivider(
                         title = stringResource(R.string.rate_limit),
@@ -92,41 +105,50 @@ fun NetworkPreferences(navigateToCookieProfilePage: () -> Unit = {}, onNavigateB
                         isChecked = isRateLimitEnabled,
                         onChecked = {
                             isRateLimitEnabled = !isRateLimitEnabled
-                            updateValue(RATE_LIMIT, isRateLimitEnabled)
+                            updateValue(
+                                RATE_LIMIT,
+                                isRateLimitEnabled
+                            )
                         },
-                        onClick = { showRateLimitDialog = true },
+                        onClick = { showRateLimitDialog = true }
                     )
                 }
                 item {
                     var isDownloadWithCellularEnabled by remember {
-                        mutableStateOf(CELLULAR_DOWNLOAD.getBoolean())
+                        mutableStateOf(getValue(CELLULAR_DOWNLOAD))
                     }
                     PreferenceSwitch(
                         title = stringResource(R.string.download_with_cellular),
                         description = stringResource(R.string.download_with_cellular_desc),
-                        icon =
-                            if (isDownloadWithCellularEnabled) Icons.Outlined.SignalCellular4Bar
-                            else Icons.Outlined.SignalCellularConnectedNoInternet4Bar,
+                        icon = if (isDownloadWithCellularEnabled) Icons.Outlined.SignalCellular4Bar
+                        else Icons.Outlined.SignalCellularConnectedNoInternet4Bar,
                         isChecked = isDownloadWithCellularEnabled,
                         onClick = {
                             isDownloadWithCellularEnabled = !isDownloadWithCellularEnabled
-                            updateValue(CELLULAR_DOWNLOAD, isDownloadWithCellularEnabled)
-                        },
+                            updateValue(
+                                CELLULAR_DOWNLOAD,
+                                isDownloadWithCellularEnabled
+                            )
+                        }
                     )
                 }
 
-                item { PreferenceSubtitle(text = stringResource(id = R.string.advanced_settings)) }
+                item {
+                    PreferenceSubtitle(text = stringResource(id = R.string.advanced_settings))
+                }
 
                 item {
                     PreferenceSwitch(
                         title = stringResource(R.string.aria2),
                         icon = Icons.Outlined.Bolt,
-                        description = stringResource(R.string.aria2_desc),
+                        description = stringResource(
+                            R.string.aria2_desc
+                        ),
                         isChecked = aria2c,
                         onClick = {
                             aria2c = !aria2c
                             updateValue(ARIA2C, aria2c)
-                        },
+                        }
                     )
                 }
                 item {
@@ -140,7 +162,7 @@ fun NetworkPreferences(navigateToCookieProfilePage: () -> Unit = {}, onNavigateB
                             PROXY.updateBoolean(proxy)
                         },
                         onClick = { showProxyDialog = true },
-                        enabled = !isCustomCommandEnabled,
+                        enabled = !isCustomCommandEnabled
                     )
                 }
                 item {
@@ -149,9 +171,7 @@ fun NetworkPreferences(navigateToCookieProfilePage: () -> Unit = {}, onNavigateB
                         description = stringResource(R.string.concurrent_download_desc),
                         icon = Icons.Outlined.OfflineBolt,
                         enabled = !aria2c && !isCustomCommandEnabled,
-                    ) {
-                        showConcurrentDownloadDialog = true
-                    }
+                    ) { showConcurrentDownloadDialog = true }
                 }
                 item {
                     PreferenceSwitch(
@@ -159,32 +179,36 @@ fun NetworkPreferences(navigateToCookieProfilePage: () -> Unit = {}, onNavigateB
                         description = stringResource(id = R.string.force_ipv4_desc),
                         icon = Icons.Outlined.SettingsEthernet,
                         enabled = !isCustomCommandEnabled,
-                        isChecked = forceIpv4,
+                        isChecked = forceIpv4
                     ) {
                         forceIpv4 = !forceIpv4
                         FORCE_IPV4.updateBoolean(forceIpv4)
                     }
                 }
                 item {
-                    PreferenceItem(
-                        title = stringResource(R.string.cookies),
+                    PreferenceItem(title = stringResource(R.string.cookies),
                         description = stringResource(R.string.cookies_desc),
                         icon = Icons.Outlined.Cookie,
-                        onClick = { navigateToCookieProfilePage() },
-                    )
+                        onClick = { navigateToCookieProfilePage() })
                 }
+
             }
-        },
-    )
+        })
 
     if (showConcurrentDownloadDialog) {
-        ConcurrentDownloadDialog { showConcurrentDownloadDialog = false }
+        ConcurrentDownloadDialog {
+            showConcurrentDownloadDialog = false
+        }
     }
 
     if (showRateLimitDialog) {
-        RateLimitDialog { showRateLimitDialog = false }
+        RateLimitDialog {
+            showRateLimitDialog = false
+        }
     }
     if (showProxyDialog) {
-        ProxyConfigurationDialog { showProxyDialog = false }
+        ProxyConfigurationDialog {
+            showProxyDialog = false
+        }
     }
 }

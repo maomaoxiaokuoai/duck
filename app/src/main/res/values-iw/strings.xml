@@ -13,10 +13,13 @@
     <string name="fetching_info">משיג מידע על הסרטון…</string>
     <string name="back">אחורה</string>
     <string name="version">גרסה</string>
-    <string name="delete_file">מחיקת קובץ</string>
+    <string name="delete_file">מחיקה</string>
     <string name="about">אודות</string>
+    <string name="release_desc">חפש יומני שינויים וגרסאות חדשות</string>
     <string name="about_page">גרסה, משוב, עדכון אוטומטי</string>
     <string name="video">וידאו</string>
+    <string name="release">המהדורה האחרונה</string>
+    <string name="readme_desc">בדוק את מאגר GitHub ואת ה-README</string>
     <string name="audio">אודיו</string>
     <string name="dismiss">ביטול</string>
     <string name="general_settings">כללי</string>
@@ -34,7 +37,7 @@
     <string name="language">שפת תצוגה</string>
     <string name="language_settings">הגדר שפת תצוגה</string>
     <string name="task_running">משימת הורדה כבר פועלת</string>
-    <string name="paste_msg">הדבק כתובת URL</string>
+    <string name="paste_msg">הודבקה כתובת URL מהלוח</string>
     <string name="paste_fail_msg">לא נמצאה כתובת URL בלוח</string>
     <string name="ytdlp_version">גרסת yt-dlp</string>
     <string name="ytdlp_update">לחץ כדי להתקין את גרסת yt-dlp העדכנית ביותר</string>
@@ -73,7 +76,7 @@
     <string name="file_unavailable">הקובץ הזה אינו זמין יותר</string>
     <string name="download_task_count">%1$d משימות הורדה</string>
     <string name="quality">איכות</string>
-    <string name="enable_notifications">הפעל התראות?</string>
+    <string name="enable_notifications">להפעיל התראות?</string>
     <string name="disable">השבתה</string>
     <string name="lowest_quality">האיכות הנמוכה ביותר</string>
     <string name="running_tasks">משימות פועלות</string>
@@ -84,8 +87,10 @@
     <string name="stable_channel">יציב</string>
     <string name="enable_auto_update">הפעלת עדכון אוטומטי</string>
     <string name="discard">השלכה</string>
+    <string name="sponsor">חסות</string>
     <string name="feedback">משוב</string>
     <string name="convert_subtitle">המרת כתוביות</string>
+    <string name="sponsor_msg2">תודה רבה לך!</string>
     <string name="split_video">פיצול וידאו</string>
     <string name="convert_subtitle_desc">המר את הכתוביות לפורמט אחר</string>
     <string name="unknown_error_title">אופס! משהו השתבש</string>
@@ -106,8 +111,10 @@
     <string name="video_title_sample_text">כותרת סרטון לדוגמה</string>
     <string name="download_subtitles">הורדת כתוביות</string>
     <string name="subtitle_language">שפת כתוביות</string>
+    <string name="sponsors">נותני חסות</string>
     <string name="rename">שינוי שם</string>
     <string name="audio_format">פורמט אודיו</string>
+    <string name="switch_to_github_builds">מעבר ל-GitHub builds</string>
     <string name="got_it">הבנתי</string>
     <string name="okay">אישור</string>
     <string name="feature_unavailable">התכונה לא זמינה</string>
@@ -120,7 +127,7 @@
     <string name="status_downloading">מוריד</string>
     <string name="status_canceled">בוטל</string>
     <string name="copy_link">העתק קישור</string>
-    <string name="copy_error_report">העתק דו\"ח</string>
+    <string name="copy_error_report">דיווח שגיאה</string>
     <string name="video_resolution">רזולוציית וידאו</string>
     <string name="template_imported">יובאו %1$d תבניות</string>
     <string name="clear_temp_files_count">נמחקו %1$d קבצים זמניים</string>
@@ -133,16 +140,18 @@
     <string name="multiselect_mode">מצב בחירה מרובה</string>
     <string name="private_mode">מצב אנונימי</string>
     <string name="suggested">מוצע</string>
+    <string name="telegram_channel">ערוץ טלגרם</string>
     <string name="auto_subtitle">כתוביות אוטומטיות</string>
     <string name="show_logs">הצג יומן</string>
     <string name="logs">לוג</string>
     <string name="edit_shortcuts_desc">ערוך את הקיצורים המותאמים אישית שניתן להשתמש בהם כדי ליצור תבניות פקודות.</string>
+    <string name="sponsor_msg">Seal יהיה תמיד קוד פתוח ובחינם לכולם. אם אתה אוהב את זה, בבקשה שקול לתת לי חסות ב-GitHub!</string>
     <string name="clear_all_cookies_desc">האם למחוק לצמיתות את כל העוגיות המאוחסנות באפליקציה?</string>
     <string name="clip_video_desc">צור קטעי וידאו בדף בחירת הפורמט</string>
     <string name="proxy">פרוקסי</string>
     <string name="proxy_desc">השתמש בפרוקסי כדי להתחבר לאינטרנט</string>
     <string name="legacy">מיושן</string>
-    <string name="enable_notifications_desc">היישום צריך את ההרשאה שלך כדי להציג התראות לגבי סטטוס הורדה והתקדמות.</string>
+    <string name="enable_notifications_desc">האפליקציה זקוקה לאישור שלך כדי להציג התראות על התקדמות והשלמת הורדות.</string>
     <string name="clip_video_dialog_msg">הורדות המשתמשות בתכונה זו יואצלו ל-FFmpeg להורדת קטעים נבחרים של הסרטון, תכונה זו עדיין ניסיונית והחיתוך לא יהיה מדויק לחלוטין. לא כל הפורמטים תומכים בתכונה זו וייתכן שתחווה מהירויות הורדה איטיות יותר.</string>
     <string name="edit">עריכה</string>
     <string name="custom_command_template">תבנית פקודה</string>
@@ -157,7 +166,7 @@
     <string name="error_copied">דו\"ח שגיאה הועתק ללוח</string>
     <string name="open_settings">פתח הגדרות</string>
     <string name="convert_to">המרה ל-%1$s</string>
-    <string name="rate_limit_desc">הגבל את מהירות ההורדה</string>
+    <string name="rate_limit_desc">הגבל את כמות ההורדות במקביל</string>
     <string name="generate_new_cookies">צור עוגיות חדשות</string>
     <string name="crop_artwork">חתוך תמונת אלבום</string>
     <string name="check_for_updates">חפש עדכונים</string>
@@ -180,7 +189,7 @@
     <string name="off">כבוי</string>
     <string name="cancel">ביטול</string>
     <string name="settings_before_download">הגדרה לפני הורדה</string>
-    <string name="settings_before_download_text">התאם הורדה זו</string>
+    <string name="settings_before_download_text">התאם הורדה זאת</string>
     <string name="settings_before_download_desc">הגדר העדפות לפני הורדה</string>
     <string name="thumbnail">תמונה ממוזערת</string>
     <string name="not_convert">ללא המרה</string>
@@ -207,8 +216,11 @@
     <string name="subdirectory">שמור לתת תיקייה</string>
     <string name="permission_issue">בעיית הרשאות אחסון</string>
     <string name="battery_configuration_desc">התעלם מאופטימיזציה של סוללה כדי לאפשר לאפליקציה להוריד ברקע</string>
+    <string name="translate">תרגום</string>
     <string name="embed_subtitles">כתוביות מוטמעות</string>
     <string name="custom_command_template_desc">ערוך ונהל תבניות פקודות</string>
+    <string name="github_issue">בעיית GitHub</string>
+    <string name="github_issue_desc">צור בעיה כדי לדווח באג או לבקש תכונה</string>
     <string name="status_enqueued">ממתין בתור</string>
     <string name="status_completed">הושלם</string>
     <string name="status_fetching_video_info">משיג מידע</string>
@@ -240,9 +252,9 @@
     <string name="beta_features">בטא</string>
     <string name="split_video_msg">הסרטון יפוצל ל-%1$d פרקים</string>
     <string name="cookies_usage_msg">הורדה מאתרים מסוימים דורשת אימות חשבון. לחץ על \"צור עוגיות חדשות\", הזן את כתובת האתר ולאחר מכן התחבר עם חשבונך בדף הדפדפן, והאפליקציה תייצר אותן עבורך.</string>
-    <string name="custom_command_usage_msg">yt-dlp הוא כלי שורת פקודה רב עוצמה להורדת סרטונים. duck מקל על השימוש ב-yt-dlp על ידי מתן GUI אינטואיטיבי, הגדרות קבועות מראש לפקודות נפוצות ותכונות נוספות אחרות.
+    <string name="custom_command_usage_msg">yt-dlp הוא כלי שורת פקודה רב עוצמה להורדת סרטונים. Seal מקל על השימוש ב-yt-dlp על ידי מתן GUI אינטואיטיבי, הגדרות קבועות מראש לפקודות נפוצות ותכונות נוספות אחרות.
 \n
-\nלשימוש מתקדם ב-yt-dlp, אפליקציית duck מאפשרת ליצור, לשמור ולבצע תבניות פקודות מותאמות אישית ישירות, ממש כמו בטרמינל.
+\nלשימוש מתקדם ב-yt-dlp, אפליקציית Seal מאפשרת ליצור, לשמור ולבצע תבניות פקודות מותאמות אישית ישירות, ממש כמו בטרמינל.
 \n
 \nבעת שימוש בפקודות מותאמות אישית, רוב אפשרויות ה-GUI והתכונות יהיו מושבתות.</string>
     <string name="abs_hint">רוב פלטפורמות הזרמת הווידאו מספקות אודיו ווידאו בנפרד, ניתן לבחור ולמזג פורמט אודיו בלבד עם פורמט וידאו בלבד לסרטון אחד.</string>
@@ -250,6 +262,7 @@
 \n
 \nתיתכן חוסר יציבות בגרסאות אלה, אז אנא אל תהסס לשלוח לנו משוב אם אתה נתקל בבעיות כלשהן, כדי לעזור לנו לשפר את האפליקציה בעתיד.</string>
     <string name="auto_update">עדכון אוטומטי</string>
+    <string name="sponsor_desc">תמכו באפליקציה זו על ידי מתן חסות ב-GitHub</string>
     <string name="subtitle">כתוביות</string>
     <string name="clip_video">חיתוך וידאו</string>
     <string name="clip_start">התחלה</string>
@@ -266,12 +279,13 @@
     <string name="clear_temp_files_desc">מחק את כל הקבצים הזמניים מהתיקייה הזמנית</string>
     <string name="fetching_playlist_info">משיג מידע פלייליסט…</string>
     <string name="unknown_error">שגיאה לא ידועה</string>
+    <string name="translate_desc">עזור לתרגם אפליקציה זו ב- Hosted Weblate</string>
     <string name="template_label">תווית</string>
     <string name="invalid_input">קלט לא חוקי</string>
     <string name="private_directory_desc">אחסן את ההורדות בתיקייה נסתרת</string>
     <string name="format_selection">בחירת פורמט</string>
-    <string name="convert_audio_format">המר פורמט שמע</string>
-    <string name="best_quality">האיכות הכי טובה</string>
+    <string name="convert_audio_format">המרת פורמט שמע</string>
+    <string name="best_quality">איכות מקסימלית</string>
     <string name="concurrent_download">הורדה באמצעות ת\'רדים מרובים</string>
     <string name="concurrent_download_num">%d ת\'רדים ישמשו להורדה מקבילה של וידאו DASH/HLS.</string>
     <string name="allow_once">אפשר פעם אחת</string>
@@ -286,7 +300,7 @@
     <string name="aria2_desc">השתמש ב-aria2c בתור מוריד חיצוני</string>
     <string name="start_execute">התחל הרצת פקודה</string>
     <string name="download_range_desc">ציין את טווח הסרטונים להורדה מהפלייליסט \"%3$s\" (מ-%1$d עד %2$d).</string>
-    <string name="service_title">duck מוריד…</string>
+    <string name="service_title">Seal מוריד…</string>
     <string name="download_with_cellular">הורדה באמצעות חיבור סלולרי</string>
     <string name="export_to_file">ייצוא לקובץ</string>
     <string name="sponsorblock_desc">הסר או סמן קטעים בסרטונים באמצעות SponsorBlock API</string>
@@ -339,8 +353,8 @@
     <string name="custom_command_directory">ספריית פקודות מותאמות אישית</string>
     <string name="prefer_quality_desc">העדף פורמט AV1, VP9 או H.265 לצפייה באפליקציות תואמות</string>
     <string name="multiselect_item_count">%1$d סרטונים, %2$d קובצי שמע</string>
-    <string name="embed_subtitles_mkv_msg">כדי להטמיע כתוביות רכות, סרטונים יבוצעו מחדש לתוך מיכל mkv. אתה יכול להשתמש ב-VLC Media Player או באפליקציות תואמות אחרות כדי לצפות בסרטונים עם כתוביות רכות.</string>
-    <string name="auto_update_disabled_msg">עדכון אוטומטי אינו זמין עבור בניית %1$s. אם אין לך %1$s מותקן במכשיר שלך, או אם תרצה לקבל תצוגה מקדימה של תכונות חדשות של duck, שקול להשתמש ב-%2$s.</string>
+    <string name="embed_subtitles_mkv_msg">כדי להטמיע כתוביות, סרטונים יבוצעו מחדש לתוך מיכל mkv. אתה יכול להשתמש ב-VLC Media Player או באפליקציות תואמות אחרות כדי לצפות בסרטונים עם כתוביות משובצות.</string>
+    <string name="auto_update_disabled_msg">עדכון אוטומטי אינו זמין עבור בניית %1$s. אם אין לך %1$s מותקן במכשיר שלך, או אם תרצה לקבל תצוגה מקדימה של תכונות חדשות של Seal, שקול להשתמש ב-%2$s.</string>
     <string name="ua_header">כותרת User-Agent</string>
     <string name="dynamic_color_desc">החל צבעים מהטפט על ערכת הנושא של האפליקציה</string>
     <string name="custom_command_enabled_hint">חלק מהאפשרויות אינן זמינות בעת שימוש בפקודה מותאמת אישית</string>
@@ -357,6 +371,7 @@
     <string name="permission_issue_desc">תיקיות מחוץ ל\"הורדות\" ו\"מסמכים\" אינן נתמכות</string>
     <string name="cookies_desc">השתמש בעוגיות בפורמט Netscape להורדות</string>
     <string name="output_template">תבנית פלט</string>
+    <string name="matrix_space">צ\'אט Matrix</string>
     <string name="preferred_format_desc">פורמט מועדף כאשר מרובים זמינים</string>
     <string name="no_custom_command_tasks">אין משימות פקודה מותאמת אישית</string>
     <string name="remove_multiple_templates_msg">להסיר לצמיתות את %1$s מתבניות הפקודה?</string>
@@ -388,43 +403,4 @@
     <string name="download_archive_desc">שמור מזהי וידאו שהורדו בארכיון כדי למנוע הורדות כפולות</string>
     <string name="auto_translated_subtitles_msg">כתוביות מתורגמות אוטומטית לכל השפות יהיו זמינות בהורדות. כתוביות אלו עשויות להיות לא מדויקות וקשות להבנה.</string>
     <string name="download_archive_error">הסרטון הורד. אם התנהגות זו אינה צפויה, אנא בדוק את ארכיון ההורדות.</string>
-    <string name="all_languages">כל השפות</string>
-    <string name="proceed">המשך</string>
-    <string name="preset">הגדרה מראש</string>
-    <string name="prefer_placeholder">העדף %1$s</string>
-    <string name="custom_format_selection_desc">בחירה מפורמטים, כתוביות, והתאמות נוספות</string>
-    <string name="preset_format_selection_desc">הורדה אוטומטית עם שימוש בהעדפות הפורמט</string>
-    <string name="edit_preset">ערוך הגדרה מראש</string>
-    <string name="best_quality_desc">הורדת הפורמט הכי טוב שזמין</string>
-    <plurals name="video_count">
-        <item quantity="one">%d סרטון</item>
-        <item quantity="two">%d סרטונים</item>
-        <item quantity="other">%d סרטונים</item>
-    </plurals>
-    <string name="task_added">משימה הוספה לתור</string>
-    <string name="remux_container_mkv">שנה סוג קובץ הסרטון</string>
-    <string name="remux_container_mkv_desc">שנה סוג קובץ סרטונים לסוג-MKV בישביל תאימות טובה יותר</string>
-    <string name="playlist">פלייליסטים (רשימת שירים להשמעה)</string>
-    <plurals name="audio_count">
-        <item quantity="one">%d אודיו</item>
-        <item quantity="two">%d אודיוים</item>
-        <item quantity="other">%d אודיוים</item>
-    </plurals>
-    <string name="cookies_in_database">%1$d קבצי cookies מתוך %2$d אתרים בסך הכול</string>
-    <string name="every_day">כל יום</string>
-    <string name="every_week">כל שבוע</string>
-    <string name="every_month">כל חודש</string>
-    <string name="you_ll_find_your_downloads_here">תוכל למצוא את ההורדות שלך כאן</string>
-    <string name="download_hint">לחץ על כפתור ההורדה או שתף קישור לסרטון על האפליקציה כדי להתחיל הורדה</string>
-    <string name="status_downloaded">הורד</string>
-    <string name="all">הכל</string>
-    <string name="select_multiple_link">בחר מתוך %1$d קישורים</string>
-    <string name="download_queue">תור ההורדות</string>
-    <string name="trouble_shooting">פתרון בעיות</string>
-    <string name="issue_tracker">מעקב אחר בעיות</string>
-    <string name="trouble_shooting_desc">תקן שגיאות נפוצות וחפש בעיות ידועות</string>
-    <string name="show_navigation_drawer">הצג מגירת ניווט</string>
-    <string name="delete">מחק</string>
-    <string name="resume">להמשיך</string>
-    <string name="media_info">מידע על המדיה</string>
 </resources>

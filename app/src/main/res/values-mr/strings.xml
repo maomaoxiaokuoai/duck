@@ -46,10 +46,13 @@
     <string name="about">आमच्याबद्दल</string>
     <string name="credits">क्रेडिट्स</string>
     <string name="about_page">आवृत्ती, फीडबॅक, ऑटो अपडेट</string>
+    <string name="release_desc">चेंजलॉग आणि नवीन आवृत्त्या पहा</string>
+    <string name="readme_desc">GitHub रेपॉजिटरी आणि README तपासा</string>
     <string name="custom_command_desc">सानुकूल टेम्पलेटसह yt-dlp कमांड चालवा</string>
     <string name="custom_command_template">कमांड टेम्पलेट</string>
     <string name="print_details">तपशीलवार आउटपुट</string>
     <string name="settings_before_download_text">हे डाउनलोड समायोजित करा</string>
+    <string name="release">नवीनतम रिलीज</string>
     <string name="video">व्हिडिओ</string>
     <string name="cancel">रद्द करा</string>
     <string name="yt_dlp_docs">Yt-dlp वापर संदर्भ</string>

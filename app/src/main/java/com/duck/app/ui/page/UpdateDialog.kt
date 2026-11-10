@@ -33,21 +33,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun UpdateDialog(onDismissRequest: () -> Unit, release: UpdateUtil.Release) {
-    var currentDownloadStatus by remember {
-        mutableStateOf(UpdateUtil.DownloadStatus.NotYet as UpdateUtil.DownloadStatus)
-    }
+fun UpdateDialog(
+    onDismissRequest: () -> Unit,
+    latestRelease: UpdateUtil.LatestRelease,
+) {
+    var currentDownloadStatus by remember { mutableStateOf(UpdateUtil.DownloadStatus.NotYet as UpdateUtil.DownloadStatus) }
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
     UpdateDialogImpl(
         onDismissRequest = onDismissRequest,
-        title = release.name.toString(),
+        title = latestRelease.name.toString(),
         onConfirmUpdate = {
             scope.launch(Dispatchers.IO) {
                 runCatching {
-                        UpdateUtil.downloadApk(release = release).collect { downloadStatus ->
+                    UpdateUtil.downloadApk(latestRelease = latestRelease)
+                        .collect { downloadStatus ->
                             currentDownloadStatus = downloadStatus
                             if (downloadStatus is UpdateUtil.DownloadStatus.Finished) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -55,17 +58,16 @@ fun UpdateDialog(onDismissRequest: () -> Unit, release: UpdateUtil.Release) {
                                 }
                             }
                         }
-                    }
-                    .onFailure {
-                        it.printStackTrace()
-                        currentDownloadStatus = UpdateUtil.DownloadStatus.NotYet
-                        ToastUtil.makeToastSuspend(context.getString(R.string.app_update_failed))
-                        return@launch
-                    }
+                }.onFailure {
+                    it.printStackTrace()
+                    currentDownloadStatus = UpdateUtil.DownloadStatus.NotYet
+                    ToastUtil.makeToastSuspend(context.getString(R.string.app_update_failed))
+                    return@launch
+                }
             }
         },
-        releaseNote = release.body.toString(),
-        downloadStatus = currentDownloadStatus,
+        releaseNote = latestRelease.body.toString(),
+        downloadStatus = currentDownloadStatus
     )
 }
 
@@ -80,35 +82,33 @@ fun UpdateDialogImpl(
     AlertDialog(
         onDismissRequest = {},
         title = { Text(title) },
-        icon = { Icon(Icons.Outlined.NewReleases, null) },
-        confirmButton = {
+        icon = { Icon(Icons.Outlined.NewReleases, null) }, confirmButton = {
+
             Button(
-                onClick = {
-                    if (downloadStatus !is UpdateUtil.DownloadStatus.Progress) onConfirmUpdate()
-                }
-            ) {
+                onClick = { if (downloadStatus !is UpdateUtil.DownloadStatus.Progress) onConfirmUpdate() }) {
                 Text(
                     when (downloadStatus) {
                         is UpdateUtil.DownloadStatus.Progress -> "${downloadStatus.percent} %"
                         else -> stringResource(R.string.update)
                     },
                     modifier = Modifier.animateContentSize(),
-                )
+                    )
             }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismissRequest) {
-                Text(text = stringResource(id = R.string.dismiss))
+        }, dismissButton = {
+            OutlinedButton(onClick = onDismissRequest) { Text(text = stringResource(id = R.string.dismiss)) }
+        }, text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(releaseNote)
             }
-        },
-        text = { Column(Modifier.verticalScroll(rememberScrollState())) { Text(releaseNote) } },
-    )
+        })
 }
 
 @Preview
 @Composable
 private fun Preview() {
-    var b by remember { mutableStateOf(false) }
+    var b by remember {
+        mutableStateOf(false)
+    }
     val flow: MutableStateFlow<UpdateUtil.DownloadStatus> = remember {
         MutableStateFlow(UpdateUtil.DownloadStatus.NotYet)
     }
@@ -131,6 +131,6 @@ private fun Preview() {
         title = "v1.12.0",
         onConfirmUpdate = { b = true },
         releaseNote = "ReleaseNoteHTML",
-        downloadStatus = status,
+        downloadStatus = status
     )
 }

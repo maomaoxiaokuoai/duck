@@ -14,12 +14,15 @@
     <string name="download_start_msg">Scarica «%1$s»</string>
     <string name="fetch_info_error_msg">Impossibile recuperare le informazioni del video</string>
     <string name="task_running">Uno scaricamento è già in esecuzione</string>
-    <string name="paste_msg">Incolla URL</string>
+    <string name="paste_msg">Incolla l\'URL dagli appunti</string>
     <string name="paste_fail_msg">Impossibile confrontare l\'URL negli appunti</string>
     <string name="ytdlp_version">Versione yt-dlp</string>
     <string name="about_page">Versione, commenti, aggiornamento automatico</string>
     <string name="back">Indietro</string>
     <string name="version">Versione</string>
+    <string name="release_desc">Scopri i changelog e le nuove versioni</string>
+    <string name="release">Ultima versione</string>
+    <string name="readme_desc">Controlla la repository GitHub e il README</string>
     <string name="video">Video</string>
     <string name="checked">Controllato</string>
     <string name="credits">Crediti</string>
@@ -90,7 +93,7 @@
     <string name="from">Inizio</string>
     <string name="to">Fine</string>
     <string name="invalid_index_range">Range dell\'indice invalido</string>
-    <string name="playlist_indicator_text">Scaricando playlist (%1$d/%2$d)…</string>
+    <string name="playlist_indicator_text">Scaricando playlist (%1$d/%2$d), clicca per mettere in pausa.</string>
     <string name="channel_description">Notifica il processo di scaricamento e i file scaricati</string>
     <string name="close_never_show_again">Non mostrare più</string>
     <string name="convert_audio">Converti</string>
@@ -117,11 +120,13 @@
     <string name="share_fail_msg">Impossibile abbinare l\'URL al contenuto condiviso</string>
     <string name="subdirectory">Salva in una sottodirectory</string>
     <string name="battery_configuration">Configurazione della batteria</string>
-    <string name="service_title">duck sta scaricando…</string>
+    <string name="service_title">Seal sta scaricando…</string>
     <string name="subdirectory_desc">Salva i file in cartelle chiamate come i rispettivi siti web</string>
     <string name="permission_issue">Problema relativo all\'autorizzazione di archiviazione</string>
+    <string name="translate_desc">Contribuisci a tradurre questa applicazione su Hosted Weblate</string>
     <string name="unknown_error">Errore sconosciuto</string>
     <string name="battery_configuration_desc">Ignora l\'ottimizzazione della batteria per lo scaricamento dell\'app in sfondo</string>
+    <string name="translate">Traduci</string>
     <string name="permission_issue_desc">Le directory al di fuori di Download/ e Documenti/ non sono supportate</string>
     <string name="concurrent_download">Download multi-thread</string>
     <string name="concurrent_download_num">I thread %d sarebbero utilizzati per scaricare video nativi DASH/HLS in parallelo.</string>
@@ -134,19 +139,21 @@
     <string name="remove_template_desc">Rimuovere «%1$s» dai modelli dei comandi\?</string>
     <string name="template_selection">Selezione del modello</string>
     <string name="custom_command_template_desc">Modifica e gestisci i modelli di comando</string>
-    <string name="downloading_indicator_text">Download in corso…</string>
+    <string name="downloading_indicator_text">Download in corso</string>
     <string name="task_canceled">Scaricamento annullato</string>
     <string name="status_enqueued">In coda</string>
-    <string name="status_completed">Finito</string>
+    <string name="status_completed">Completato</string>
     <string name="status_downloading">Scaricamento</string>
     <string name="status_canceled">Annullato</string>
     <string name="status_fetching_video_info">Recupero delle informazioni</string>
     <string name="open_file">Apri il file</string>
     <string name="restart">Riavvia</string>
     <string name="info_copied">Informazioni copiate negli appunti</string>
+    <string name="github_issue_desc">Invia una segnalazione di bug o una richiesta per nuove funzioni</string>
+    <string name="github_issue">Segnala un problema su GitHub</string>
     <string name="copy_link">Copia il collegamento</string>
     <string name="status_error">Errore</string>
-    <string name="copy_error_report">Copia il rapporto</string>
+    <string name="copy_error_report">Rapporto di errore</string>
     <string name="video_resolution">Risoluzione video</string>
     <string name="video_file_size">Dimensione del file video</string>
     <string name="export_to_clipboard">Esporta negli appunti</string>
@@ -160,9 +167,7 @@
     <string name="aria2_desc">Usa aria2c come downloader esterno</string>
     <string name="check_for_updates">Controlla gli aggiornamenti</string>
     <string name="check_for_updates_desc">Verifica automatica la versione più recente su GitHub</string>
-    <string name="clear_temp_files_info">I file temporanei possono essere utilizzati per riprendere i download annullati. Sei sicuro/a di eliminare tutti questi file?
-\n
-\nPuoi accedere a questi file in %1$s</string>
+    <string name="clear_temp_files_info">I file temporanei possono essere utilizzati per riprendere i download annullati. Sei sicuro/a di eliminare tutti questi file?</string>
     <string name="app_up_to_date">La versione attuale è aggiornata</string>
     <string name="clear_temp_files">Cancella i file temporanei</string>
     <string name="clear_temp_files_desc">Elimina tutti i file temporanei dalla directory temporanea</string>
@@ -209,11 +214,13 @@
     <string name="suggested">Suggerito</string>
     <string name="format_selection">Selezione del formato</string>
     <string name="generate_new_cookies">Genera nuovi cookie</string>
+    <string name="matrix_space">Spazio Matrix</string>
     <string name="cookies">Cookie</string>
     <string name="use_cookies">Usa i cookie</string>
     <string name="remove_cookie_profile_desc">Rimuovere i cookie per «%1$s»? Nota che i cookie salvati per questo sito non saranno rimossi.</string>
     <string name="custom_command_enabled_hint">Alcune opzioni non sono disponibili quando si utilizza un comando personalizzato</string>
     <string name="how_does_it_work">Come funziona\?</string>
+    <string name="telegram_channel">Canale Telegram</string>
     <string name="cookies_usage_msg">La scaricamento da alcuni siti richiede le informazioni di autenticazione dell\'account. Clicca su „Genera nuovi cookie“, inserisci l\'URL del sito web e poi accedi con il tuo account nella pagina del browser: l\'applicazione lo genererà per te.</string>
     <string name="abs_hint">La maggior parte delle piattaforme di streaming video fornisce audio e video separatamente; è possibile selezionare e unire un formato solo audio con un formato solo video in un unico video.</string>
     <string name="add">Aggiungi</string>
@@ -268,18 +275,24 @@
     <string name="minute">minuto</string>
     <string name="clear_all_cookies">Cancella tutti i cookie</string>
     <string name="second">secondo</string>
+    <string name="sponsor">Sponsor</string>
     <string name="feedback">Commenti</string>
+    <string name="sponsors">Sponsor</string>
     <string name="clip_video_desc">Crea videoclip nella pagina di selezione del formato</string>
     <string name="discard">Scarta</string>
     <string name="apply">Applica</string>
     <string name="clip_video">Video clip</string>
+    <string name="sponsor_desc">Sostieni questa applicazione sponsorizzando su GitHub</string>
+    <string name="sponsor_msg">Seal sarà sempre libero e gratuito per tutti. Se ti piace, considera la possibilità di sponsorizzarmi su GitHub!</string>
     <string name="import_from_preferences">Importa</string>
     <string name="temporary_directory_desc">Salva file temporanei nella directory interna</string>
     <string name="msg_from_developer">Messaggio dello sviluppatore</string>
-    <string name="auto_update_disabled_msg">L\'aggiornamento automatico non è disponibile per le build %1$s. Se non hai installato %1$s sul dispositivo, o se vorresti provare in anteprima le nuove funzionalità di duck, considera %2$s.</string>
+    <string name="sponsor_msg2">Grazie mille!</string>
+    <string name="auto_update_disabled_msg">L\'aggiornamento automatico non è disponibile per le build %1$s. Se non hai installato %1$s sul dispositivo, o se vorresti provare in anteprima le nuove funzionalità di Seal, considera %2$s.</string>
     <string name="okay">Va bene</string>
     <string name="got_it">Ho capito</string>
     <string name="feature_unavailable">Funzione non disponibile</string>
+    <string name="switch_to_github_builds">passando alle build di GitHub</string>
     <string name="no_custom_command_tasks">Nessuna attività di comando personalizzata</string>
     <string name="convert_subtitle_desc">Convertisci i sottotitoli in un altro formato</string>
     <string name="split_video">Dividi il video</string>
@@ -295,9 +308,9 @@
     <string name="ytdlp_update_action">Aggiorna yt-dlp</string>
     <string name="proxy">Proxy</string>
     <string name="quality">Qualità</string>
-    <string name="custom_command_usage_msg">yt-dlp è uno strumento da riga di comando per scaricare i video. duck permette di usare facilmente yt-dlp provvedendo un\'intuitiva interfaccia grafica e altre funzionalità aggiuntive.
+    <string name="custom_command_usage_msg">yt-dlp è uno strumento da riga di comando per scaricare i video. Seal permette di usare facilmente yt-dlp provvedendo un\'intuitiva interfaccia grafica e altre funzionalità aggiuntive.
 \n
-\nPer un utilizzo avanzato di yt-dlp, duck permette la creazione, l\'esecuzione e il salvataggio di comandi personalizzati, come fosse un terminale.
+\nPer un utilizzo avanzato di yt-dlp, Seal permette la creazione, l\'esecuzione e il salvataggio di comandi personalizzati, come fosse un terminale.
 \n
 \nDurante l\'utilizzo di comandi personalizzati la maggior parte delle opzioni dell\'interfaccia grafica verranno disabilitate.</string>
     <string name="enable_notifications_desc">L\'app ha bisogno del tuo permesso per inviare le notifiche sullo stato e progresso del download.</string>
@@ -354,7 +367,7 @@
     <plurals name="item_count">
         <item quantity="one">%d oggetto</item>
         <item quantity="many">%d oggetti</item>
-        <item quantity="other">%d oggetti</item>
+        <item quantity="other"/>
     </plurals>
     <string name="clear_download_archive">Cancellare l\'archivio dei download?</string>
     <string name="download_archive_error">Il video è stato scaricato con successo. Se questo è stato un comportamento inaspettato, controllare l\'archivio dei download.</string>
@@ -391,40 +404,4 @@
     <string name="every_day">Ogni giorno</string>
     <string name="every_week">Ogni settimana</string>
     <string name="every_month">Ogni mese</string>
-    <string name="all_languages">Tutte le lingue</string>
-    <string name="proceed">Continua</string>
-    <string name="cookies_in_database">%1$d cookie da %2$d siti web in totale</string>
-    <plurals name="video_count">
-        <item quantity="one">%d video</item>
-        <item quantity="many">%d video</item>
-        <item quantity="other">%d video</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d audio</item>
-        <item quantity="many">%d audio</item>
-        <item quantity="other">%d audio</item>
-    </plurals>
-    <string name="playlist">Playlist</string>
-    <string name="prefer_placeholder">Preferire %1$s</string>
-    <string name="preset">Preimpostazione</string>
-    <string name="custom_format_selection_desc">Scegli tra i formati, i sottotitoli e le ulteriori personalizzazioni</string>
-    <string name="edit_preset">Modifica preset</string>
-    <string name="preset_format_selection_desc">Scarica automaticamente usando le tue preferenze di formattazione</string>
-    <string name="best_quality_desc">Scarica nel formato migliore</string>
-    <string name="task_added">Attività aggiunta alla coda</string>
-    <string name="remux_container_mkv">Contenitore video Remux</string>
-    <string name="remux_container_mkv_desc">Remux dei video in un contenitore MKV per una migliore compatibilità</string>
-    <string name="status_downloaded">Scaricato</string>
-    <string name="you_ll_find_your_downloads_here">Troverai qui i tuoi download</string>
-    <string name="all">Tutto</string>
-    <string name="select_multiple_link">Seleziona da %1$d link</string>
-    <string name="download_hint">Tocca il pulsante di download o condividi un link video a questa applicazione per avviare il download</string>
-    <string name="download_queue">Scarica coda</string>
-    <string name="show_navigation_drawer">Mostra il cassetto di navigazione</string>
-    <string name="resume">Continuare</string>
-    <string name="delete">Cancellare</string>
-    <string name="media_info">Info media</string>
-    <string name="trouble_shooting">Risoluzione dei problemi</string>
-    <string name="issue_tracker">Tracker dei problemi</string>
-    <string name="trouble_shooting_desc">Correggi gli errori comuni e verifica i problemi noti</string>
 </resources>

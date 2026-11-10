@@ -7,8 +7,24 @@
 
 1. 在 `## [Unreleased]` 下方补充本次改动
 2. 发布时把 `[Unreleased]` 改成新版本号并加上日期
-3. 同步修改 `buildSrc/src/main/kotlin/Version.kt` 里的版本号
+3. 同步修改 `app/build.gradle.kts` 里的 `currentVersion` 和 `versionCode`
 4. 打 tag 推送，CI 会自动构建全部架构并写入 Release 说明
+
+---
+
+## [2.0.0] - 2026-11-10
+
+### 变更
+- 基线切换为上游 Seal 1.13.1（此前基于 2.0.0-alpha.5 的测试版界面）
+- 首页恢复为「标题 + 视频链接输入框」的经典布局
+- 设置页、导航抽屉、关于页与 1.13.1 完全一致
+- 版本号重置为 2.0.0 作为新基线（versionCode 20000000）
+- APK 文件名改为 duck-<版本>-<架构>-release.apk，去掉 flavor 段
+
+### 保持
+- 包名 com.duck.app、应用名 duck、鸭子图标
+- 所有作者信息与链接指向 maomaoxiaokuoai/duck
+- 云端构建、签名、全 ABI 分发
 
 ---
 

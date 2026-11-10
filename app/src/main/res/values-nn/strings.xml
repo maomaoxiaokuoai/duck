@@ -78,8 +78,10 @@
     <string name="permission_issue">Problem med gøymetilgjenget</string>
     <string name="battery_configuration">Batteri-innstilling</string>
     <string name="battery_configuration_desc">Hopp over batteriforlenging for denne appen, slik at han kan hente ting i bakgrunnen</string>
-    <string name="service_title">duck hentar…</string>
+    <string name="service_title">Seal hentar…</string>
     <string name="unknown_error">Ukjent mistak</string>
+    <string name="translate">Omsett</string>
+    <string name="translate_desc">Hjelp til med å omsetja denne appen hos Hosted Weblate</string>
     <string name="prefix">Stigmal</string>
     <string name="embed_subtitles">Bygg inn teksting</string>
     <string name="embed_subtitles_desc">Om tilgjengelege, bygg gjevne undertekster inn i videoar</string>
@@ -88,6 +90,7 @@
     <string name="template_selection">Malval</string>
     <string name="custom_command_template_desc">Brigd og handsam påbodmalar</string>
     <string name="task_canceled">Hentingsføreloga avbroten</string>
+    <string name="github_issue">Github-mistakrapport</string>
     <string name="info_copied">Opplysingar kopiert til utklippstavla</string>
     <string name="status_enqueued">Lagt til i venterekkja</string>
     <string name="status_completed">Utført</string>
@@ -154,6 +157,8 @@
     <string name="ytdlp_version">Yt-dlp-utgåve</string>
     <string name="ytdlp_update">Trykk for å leggja inn den nyaste utgåva av yt-dlp</string>
     <string name="version">Utgåve</string>
+    <string name="release">Nyaste utgåve</string>
+    <string name="readme_desc">Gransk GitHub-kodegøymet og LESMEG-fila</string>
     <string name="checked">Granska</string>
     <string name="settings_before_download">Sett opp før henting</string>
     <string name="settings_before_download_desc">Sett opp innstillingar før henting</string>
@@ -170,6 +175,7 @@
     <string name="channel_description">Varsle om henta filer og framdrift</string>
     <string name="video_url">Videolenke</string>
     <string name="about_page">Utgåve, tilbakemelding, sjølvoppdater</string>
+    <string name="release_desc">Sjå etter brigdelister og nye utgåver</string>
     <string name="download_history_desc">Gransk og handsam hentingar i appen, gjeld au videoar og ljodfiler.</string>
     <string name="download_finish_notification">Henta. Trykk for å opne.</string>
     <string name="execute_command_notification">Køyrer eigne påbod…</string>
@@ -184,6 +190,7 @@
     <string name="concurrent_download">Trådar i bruk ved henting</string>
     <string name="concurrent_download_num">%d tråd(ar) vil verte nytta til å hente DASH/HLS-innebygd video samstundes.</string>
     <string name="options">Val</string>
+    <string name="github_issue_desc">Send inn ein mistakrapport om problem eller ynskte funksjonar</string>
     <string name="general_settings_desc">Yt-dlp-utgåve, merknad, speleliste</string>
     <string name="concurrent_download_desc">Hent fleire delar av M3U8/MPD-videoar samstundes</string>
     <string name="invalid_index_range">Ugildt indeksområde</string>
@@ -202,6 +209,7 @@
     <string name="custom_command_enabled_hint">Nokre val er utilgjengelege når « bruk eigne påbod» er slegen på</string>
     <string name="how_does_it_work">Korleis verkar det\?</string>
     <string name="cookies_usage_msg">Henting ifrå somme nettstadar krev kontostadfestingsopplysingar. Trykk på «lag nye infokapslar», skriv inn nettadressa til nettstaden, og logg deg so inn i nettlesersida som appen fører deg til.</string>
+    <string name="telegram_channel">Telegram-sambandsline</string>
     <string name="generate_new_cookies">Lag nye informasjonskapslar</string>
     <string name="download_with_cellular_desc">Gje løyve til henting av media når sambunden til forbruksmålte nettverk</string>
     <string name="settings_before_download_text">Still inn denne hentinga</string>
@@ -210,6 +218,7 @@
     <string name="cookies">Informasjonskapslar</string>
     <string name="invalid_input">Ugild innmating</string>
     <string name="rate_limit_desc">Set ei grense for kvar kjapt hentingar kan gå</string>
+    <string name="matrix_space">Matriserom</string>
     <string name="rate_limit">Rateavgrensing</string>
     <string name="max_rate">Øvre rategrense</string>
     <string name="network_settings_desc">Rategrense, hentar, infokapslar</string>
@@ -254,15 +263,21 @@
     <string name="beta_features">Beta</string>
     <string name="enable_experimental_feature">Slå på røynd funksjon\?</string>
     <string name="msg_from_developer">Melding ifrå utviklaren</string>
+    <string name="sponsor_msg2">Mange takk!</string>
     <string name="auto_update_disabled_msg">Sjølvoppdatering er ikkje tilgjengeleg for %1$s-utgåver. Om du ikkje har %1$s lagt inn på eininga di, eller vil røyna komande funksjonar, tak ein titt på %2$s.</string>
+    <string name="switch_to_github_builds">bytt til GitHub-utgåver</string>
     <string name="okay">Greitt</string>
     <string name="got_it">Skjønar</string>
     <string name="feature_unavailable">Funksjonen er ikkje tilgjengeleg</string>
+    <string name="sponsor_msg">Seal vil for alltid vera kostnadsfri og ha ein open kjeldekode. Om du vil kan du stø meg på GitHub.</string>
     <string name="auto_update">Sjølvoppdater</string>
     <string name="enable_auto_update">Slå på sjølvoppdatering</string>
     <string name="audio_format_preference">Ynkst ljodformat</string>
     <string name="minute">Minutt</string>
     <string name="clear_all_cookies">Tøm alle infokapslar</string>
     <string name="clear_all_cookies_desc">Slett alle infokapslane gøymde i appen\?</string>
+    <string name="sponsor">Stø</string>
+    <string name="sponsor_desc">Stø appen ved å gje pengar gjennom GitHub</string>
     <string name="feedback">Tilbakemelding</string>
+    <string name="sponsors">Støarar</string>
 </resources>

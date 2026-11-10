@@ -1,7 +1,6 @@
 package com.duck.app.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -52,15 +51,15 @@ fun ButtonChip(
         colors = AssistChipDefaults.elevatedAssistChipColors(leadingIconContentColor = iconColor),
         enabled = enabled,
         leadingIcon = {
-            if (icon != null)
-                Icon(
-                    imageVector = icon,
-                    contentDescription = iconDescription,
-                    modifier = Modifier.size(AssistChipDefaults.IconSize),
-                )
-        },
+            if (icon != null) Icon(
+                imageVector = icon,
+                contentDescription = iconDescription,
+                modifier = Modifier.size(AssistChipDefaults.IconSize)
+            )
+        }
     )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,27 +69,24 @@ fun FlatButtonChip(
     label: String,
     iconColor: Color = MaterialTheme.colorScheme.primary,
     labelColor: Color = MaterialTheme.colorScheme.onSurface,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     AssistChip(
         modifier = modifier.padding(horizontal = 4.dp),
-        colors =
-            AssistChipDefaults.assistChipColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                labelColor = labelColor,
-                leadingIconContentColor = iconColor,
-            ),
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            labelColor = labelColor,
+            leadingIconContentColor = iconColor
+        ),
         border = null,
         onClick = onClick,
         leadingIcon = {
             Icon(
                 imageVector = icon,
-                contentDescription = null,
-                Modifier.size(AssistChipDefaults.IconSize),
+                contentDescription = null, Modifier.size(AssistChipDefaults.IconSize)
             )
         },
-        label = { Text(text = label) },
-    )
+        label = { Text(text = label) })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,33 +96,28 @@ fun OutlinedButtonChip(
     icon: ImageVector? = null,
     label: String,
     shape: Shape = AssistChipDefaults.shape,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
-    AssistChip(
-        modifier = modifier,
-        onClick = onClick,
-        leadingIcon = {
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    Modifier.size(AssistChipDefaults.IconSize),
-                )
-            }
-        },
-        label = { Text(text = label) },
-        shape = shape,
-    )
+    AssistChip(modifier = modifier, onClick = onClick, leadingIcon = {
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = null, Modifier.size(AssistChipDefaults.IconSize)
+            )
+        }
+    }, label = { Text(text = label) }, shape = shape)
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleChoiceChip(
     modifier: Modifier = Modifier,
     selected: Boolean,
     enabled: Boolean = true,
-    label: String,
-    leadingIcon: ImageVector = Icons.Outlined.Check,
     onClick: () -> Unit,
+    label: String,
+    leadingIcon: ImageVector = Icons.Outlined.Check
 ) {
     FilterChip(
         modifier = modifier.padding(horizontal = 4.dp),
@@ -134,14 +125,16 @@ fun SingleChoiceChip(
         onClick = onClick,
         enabled = enabled,
         shape = MaterialTheme.shapes.large,
-        label = { Text(text = label) },
+        label = {
+            Text(text = label)
+        },
         leadingIcon = {
             Row {
                 AnimatedVisibility(visible = selected) {
                     Icon(
                         imageVector = leadingIcon,
                         contentDescription = null,
-                        modifier = Modifier.size(FilterChipDefaults.IconSize),
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
                     )
                 }
             }
@@ -149,22 +142,24 @@ fun SingleChoiceChip(
     )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoFilterChip(
     modifier: Modifier = Modifier,
     selected: Boolean,
     enabled: Boolean = true,
     onClick: () -> Unit,
-    label: String,
-    leadingIcon: ImageVector? = null,
+    label: String, leadingIcon: ImageVector? = null
 ) {
     FilterChip(
         modifier = modifier.padding(horizontal = 4.dp),
-        selected = selected,
-        enabled = enabled,
+        selected = selected, enabled = enabled,
         onClick = onClick,
-        label = { Text(text = label) },
-        leadingIcon = { leadingIcon?.let { Icon(imageVector = it, contentDescription = null) } },
+        label = {
+            Text(text = label)
+        },
+        leadingIcon = { leadingIcon?.let { Icon(imageVector = it, contentDescription = null) } }
     )
 }
 
@@ -184,19 +179,19 @@ fun ShortcutChip(
             onRemove?.let {
                 IconButton(
                     onClick = onRemove,
-                    modifier = Modifier.size(InputChipDefaults.IconSize),
+                    modifier = Modifier.size(InputChipDefaults.IconSize)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Clear,
                         contentDescription = stringResource(id = R.string.remove),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(InputChipDefaults.IconSize),
+                        modifier = Modifier.size(InputChipDefaults.IconSize)
                     )
                 }
             }
-        },
-    )
+        })
 }
+
 
 @Composable
 fun SingleSelectChip(
@@ -206,19 +201,17 @@ fun SingleSelectChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null,
-    colors: SelectableChipColors =
-        FilterChipDefaults.filterChipColors(
-            selectedContainerColor = FixedAccentColors.secondaryFixed,
-            selectedLabelColor = FixedAccentColors.onSecondaryFixed,
-            selectedLeadingIconColor = FixedAccentColors.onSecondaryFixed,
-            selectedTrailingIconColor = FixedAccentColors.onSecondaryFixed,
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            iconColor = MaterialTheme.colorScheme.onSurface,
-            labelColor = MaterialTheme.colorScheme.onSurface,
-        ),
-    border: BorderStroke? = null,
+    colors: SelectableChipColors = FilterChipDefaults.filterChipColors(
+        selectedContainerColor = FixedAccentColors.primaryFixed,
+        selectedLabelColor = FixedAccentColors.onPrimaryFixed,
+        selectedLeadingIconColor = FixedAccentColors.onPrimaryFixed,
+        selectedTrailingIconColor = FixedAccentColors.onPrimaryFixed,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        iconColor = MaterialTheme.colorScheme.onSurface,
+        labelColor = MaterialTheme.colorScheme.onSurface
+    ),
     elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     FilterChip(
         selected = selected,
@@ -226,12 +219,22 @@ fun SingleSelectChip(
         label = label,
         modifier = modifier,
         enabled = enabled,
-        leadingIcon = {},
+        leadingIcon = {
+/*            Row {
+                AnimatedVisibility(visible = selected) {
+                    Icon(
+                        imageVector = Icons.Outlined.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
+            }*/
+        },
         trailingIcon = trailingIcon,
         shape = MaterialTheme.shapes.extraLarge,
         colors = colors,
         elevation = elevation,
-        border = border,
-        interactionSource = interactionSource,
+        border = null,
+        interactionSource = interactionSource
     )
 }

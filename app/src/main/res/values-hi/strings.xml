@@ -13,7 +13,7 @@
     <string name="general_settings">सामान्य</string>
     <string name="language">भाषा प्रदर्शित करें</string>
     <string name="language_settings">प्रदर्शन भाषा सेट करें</string>
-    <string name="paste_msg">URL पेस्ट करें</string>
+    <string name="paste_msg">क्लिपबोर्ड से URL पेस्ट करें</string>
     <string name="paste_fail_msg">क्लिपबोर्ड में URL से मेल नहीं खा सका</string>
     <string name="ytdlp_version">Yt-dlp संस्करण</string>
     <string name="delete_info">हटाएं\?</string>
@@ -28,6 +28,9 @@
     <string name="about_page">संस्करण, प्रतिक्रिया, ऑटो अपडेट</string>
     <string name="back">पीछे</string>
     <string name="version">संस्करण</string>
+    <string name="release_desc">चैंज और नए संस्करणों की तलाश करें</string>
+    <string name="release">नवीनतम रिलीज़</string>
+    <string name="readme_desc">GitHub रिपॉजिटरी और README की जाँच करें</string>
     <string name="video">वीडियो</string>
     <string name="edit">संपादित करें</string>
     <string name="start_execute">कमांड निष्पादित करना शुरू करें</string>
@@ -127,6 +130,7 @@
     <string name="battery_configuration">बैटरी संरचना</string>
     <string name="service_title">सील डाउनलोड कर रही है…</string>
     <string name="unknown_error">अज्ञात त्रुटि</string>
+    <string name="translate">अनुवाद करें</string>
     <string name="prefix">पथ टेम्पलेट</string>
     <string name="embed_subtitles">सबटाइटल एम्बेड करें</string>
     <string name="embed_subtitles_desc">यदि उपलब्ध हो तो वीडियोज में सॉफ्ट सबटाइटल एम्बेड करें</string>
@@ -138,6 +142,8 @@
     <string name="custom_command_template_desc">कमांड टेम्प्लेट संपादित और प्रबंधित करें</string>
     <string name="downloading_indicator_text">डाउनलोड प्रगति पर है…</string>
     <string name="task_canceled">डाउनलोड कार्य रद्द किया गया</string>
+    <string name="github_issue_desc">बग रिपोर्ट या सुविधा अनुरोध के लिए कोई समस्या सबमिट करें</string>
+    <string name="github_issue">गिटहब अनुरोध</string>
     <string name="info_copied">जानकारी क्लिपबोर्ड पर कॉपी की गई</string>
     <string name="status_enqueued">कतारबद्ध हुआ</string>
     <string name="status_completed">पूरा हुआ</string>
@@ -148,7 +154,7 @@
     <string name="restart">पुनर्प्रारंभ करें</string>
     <string name="status_error">त्रुटि संदेश</string>
     <string name="copy_link">लिंक को कॉपी करें</string>
-    <string name="copy_error_report">रिपोर्ट कापी करें</string>
+    <string name="copy_error_report">ख़ामी रिपोर्ट</string>
     <string name="video_resolution">वीडियो रेजोल्यूशन</string>
     <string name="video_file_size">वीडियो फ़ाइल आकार</string>
     <string name="export_to_clipboard">क्लिपबोर्ड पर निर्यात करें</string>
@@ -196,6 +202,7 @@
     <string name="concurrent_download_num">%d धाराओं का उपयोग DASH/HLS नेटिव वीडियो को समवर्ती रूप से डाउनलोड करने के लिए किया जाएगा।</string>
     <string name="download_directory_desc">चुनें कि वीडियो और ऑडियो फ़ाइलें कहाँ संग्रहित करनी हैं</string>
     <string name="battery_configuration_desc">इस ऐप को पृष्ठभूमि में डाउनलोड करने के लिए बैटरी ऑप्टिमाइज़ेशन को इग्नोर करें</string>
+    <string name="translate_desc">होस्ट किए गए वेबलेट पर इस ऐप का अनुवाद करने में सहायता करें</string>
     <string name="aria2_desc">बाहरी डाउनलोडर के रूप में aria2c का प्रयोग करें</string>
     <string name="private_mode_desc">डाउनलोड इतिहास अक्षम करें</string>
     <string name="dynamic_color_desc">वॉलपेपर से ऐप थीम पर रंग लागू करें</string>
@@ -212,9 +219,11 @@
     <string name="use_cookies">कुकीज़ का प्रयोग करें</string>
     <string name="custom_command_enabled_hint">कस्टम आदेश का उपयोग करते समय कुछ विकल्प अनुपलब्ध होते हैं</string>
     <string name="how_does_it_work">यह कैसे काम करता है\?</string>
+    <string name="telegram_channel">टेलीग्राम चैनल</string>
     <string name="cookies_usage_msg">कुछ साइटों से डाउनलोड करने के लिए खाता प्रमाणीकरण जानकारी की आवश्यकता होती है। \"नई कुकी जनरेट करें\" पर क्लिक करें, वेबसाइट का URL दर्ज करें और फिर ब्राउज़र पेज में अपने खाते से लॉग इन करें, ऐप इसे आपके लिए जनरेट कर देगा।</string>
     <string name="remove_cookie_profile_desc">\"%1$s\" के लिए यह एंट्री हटाएँ? कृपया ध्यान दें कि इस साइट के लिए संग्रहित कुकीज़ साफ़ नहीं की जाएंगी।</string>
     <string name="cookies">कुकीज़</string>
+    <string name="matrix_space">मैट्रिक्स स्पेस</string>
     <string name="add">जोड़ें</string>
     <string name="title_activity_share">शीघ्र डाउनलोड</string>
     <string name="video_creator_sample_text">वीडियो निर्माता नमूना पाठ</string>
@@ -272,15 +281,21 @@
     <string name="no_downloaded_media">कोई डाउनलोड मीडिया नहीं</string>
     <string name="enable_experimental_feature">प्रयोगात्मक सुविधा सक्षम करें\?</string>
     <string name="clip_video_desc">प्रारूप चयन पृष्ठ में वीडियो क्लिप बनाएं</string>
+    <string name="switch_to_github_builds">GitHub बिल्ड पर स्विच करना</string>
+    <string name="sponsor_msg">सील हमेशा सभी के लिए स्वतंत्र और खुला स्रोत होगा। यदि आप इसे पसंद करते हैं, तो कृपया मुझे GitHub पर प्रायोजित करने पर विचार करें!</string>
     <string name="got_it">समझ गया</string>
+    <string name="sponsors">प्रायोजक</string>
     <string name="auto_update_disabled_msg">%1$s बिल्ड के लिए ऑटो-अपडेट उपलब्ध नहीं है। यदि आपके डिवाइस पर %1$s स्थापित नहीं है, या सील में आने वाली नई सुविधाओं का पूर्वावलोकन करना चाहते हैं, तो कृपया %2$s पर विचार करें।</string>
     <string name="clip_video_dialog_msg">इस सुविधा का उपयोग करने वाले डाउनलोड वीडियो के चयनित अनुभागों को डाउनलोड करने के लिए FFmpeg को सौंपे जाएंगे, यह सुविधा अभी भी प्रायोगिक है और कटिंग पूरी तरह से सटीक नहीं होगी, सभी प्रारूप इस सुविधा का समर्थन नहीं करते हैं और आपको धीमी डाउनलोड गति का अनुभव हो सकता है।</string>
     <string name="okay">ठीक</string>
     <string name="feature_unavailable">सुविधा उपलब्ध नहीं है</string>
+    <string name="sponsor">प्रायोजक</string>
     <string name="beta_features">बीटा</string>
     <string name="no_custom_command_tasks">कोई कस्टम कमांड कार्य नहीं</string>
+    <string name="sponsor_desc">GitHub पर प्रायोजित करके इस ऐप का समर्थन करें</string>
     <string name="feedback">प्रतिक्रिया</string>
     <string name="msg_from_developer">डेवलपर से संदेश</string>
+    <string name="sponsor_msg2">आपका बहुत-बहुत धन्यवाद!</string>
     <string name="convert_subtitle">सबटाइटल बदलें</string>
     <string name="convert_subtitle_desc">सबटाइटल को किसी अन्य प्रारूप में बदलें</string>
     <string name="split_video">वीडियो विभाजित करें</string>
@@ -361,7 +376,7 @@
     <string name="auto_translated_subtitles">आटो अनुवादित सबटाइटल</string>
     <string name="auto_translated_subtitles_msg">सभी भाषाओं के लिए स्वतः-अनुवादित सबटाइटल डाउनलोड में उपलब्ध होंगे। ये सबटाइटल ग़लत और समझने में कठिन हो सकते हैं।</string>
     <string name="remember_for_next_download">अगले डाउनलोड के लिए याद रखें</string>
-    <string name="look_and_feel"><![CDATA[दिखावट और अनुभव]]></string>
+    <string name="look_and_feel">दिखावट और अनुभव</string>
     <string name="use_previous_selection">पिछले चयन का उपयोग करें</string>
     <string name="none">कोई नहीं</string>
     <string name="subtitle_language_desc">स्वचालित प्रारूप चयन में डाउनलोड करने के लिए सबटाइटल की भाषा, अल्पविराम (काॅमा) से अलग की गई है।</string>
@@ -372,7 +387,7 @@
     <string name="update_subtitle_languages">सबटाइटलों की भाषाएँ अपडेट करें?</string>
     <string name="export_backup">निर्यात करें</string>
     <string name="import_download_history_msg">डाउनलोड की गई फ़ाइलें आयात नहीं की जाएंगी। आपको उन्हें मैन्युअल रूप से वापस डाउनलोड करना होगा</string>
-    <string name="interface_and_interaction"><![CDATA[इंटरफ़ेस और इंटरैक्शन]]></string>
+    <string name="interface_and_interaction">इंटरफ़ेस और इंटरैक्शन</string>
     <string name="import_backup">आयात करें</string>
     <string name="full_backup">पूर्ण बैकअप</string>
     <string name="backup_type">बैकअप की किसम</string>
@@ -393,38 +408,4 @@
     <string name="every_day">हर दिन</string>
     <string name="every_week">हर हफ्ते</string>
     <string name="every_month">हर महीने</string>
-    <string name="all_languages">सभी भाषाएँ</string>
-    <string name="playlist">प्लेलिस्ट</string>
-    <string name="preset">प्रीसेट</string>
-    <string name="prefer_placeholder">%1$s को प्राथमिकता दें</string>
-    <string name="edit_preset">प्रीसेट संपादित करें</string>
-    <string name="best_quality_desc">सर्वोत्तम उपलब्ध फार्मेट डाउनलोड करें</string>
-    <plurals name="video_count">
-        <item quantity="one">%d वीडियो</item>
-        <item quantity="other">%d वीडियो</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d ऑडियो</item>
-        <item quantity="other">%d ऑडियो</item>
-    </plurals>
-    <string name="task_added">कार्य को कतार में जोड़ा गया</string>
-    <string name="proceed">जारी रखें</string>
-    <string name="custom_format_selection_desc">प्रारूपों, उपशीर्षकों में से चुनें और आगे अनुकूलित करें</string>
-    <string name="preset_format_selection_desc">अपनी फार्मेट प्राथमिकताओं का उपयोग करके स्वचालित रूप से डाउनलोड करें</string>
-    <string name="download_queue">डाउनलोड कतार</string>
-    <string name="status_downloaded">डाउनलोड किया गया</string>
-    <string name="download_hint">डाउनलोड बटन पर टैप करें या डाउनलोड शुरू करने के लिए इस ऐप को वीडियो लिंक शेयर करें</string>
-    <string name="all">सभी</string>
-    <string name="select_multiple_link">%1$d लिंक्स में से चयन करें</string>
-    <string name="you_ll_find_your_downloads_here">आपको अपने डाउनलोड यहां मिलेंगे</string>
-    <string name="show_navigation_drawer">नेविगेशन ड्रॉअर दिखाएँ</string>
-    <string name="delete">हटाएं</string>
-    <string name="resume">फिर से शुरू करें</string>
-    <string name="media_info">मीडिया जानकारी</string>
-    <string name="trouble_shooting_desc">सामान्य त्रुटियों को ठीक करें और ज्ञात समस्याओं की जाँच करें</string>
-    <string name="trouble_shooting">समस्या निवारण</string>
-    <string name="issue_tracker">समस्या ट्रैकर</string>
-    <string name="saved_urls">सहेजे गए लिंक</string>
-    <string name="add_new_url">नया लिंक शामिल करें</string>
-    <string name="add_to">%1$s में शामिल करें</string>
 </resources>

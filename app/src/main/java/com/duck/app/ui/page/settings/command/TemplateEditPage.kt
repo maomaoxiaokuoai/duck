@@ -1,10 +1,7 @@
 package com.duck.app.ui.page.settings.command
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +47,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.SizeMode
 import com.duck.app.R
 import com.duck.app.database.objects.CommandTemplate
 import com.duck.app.ui.component.AdjacentLabel
@@ -63,11 +62,7 @@ import com.duck.app.util.DatabaseUtil
 import com.duck.app.util.PreferenceUtil
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalComposeUiApi::class,
-    ExperimentalLayoutApi::class,
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TemplateEditPage(onDismissRequest: () -> Unit, templateId: Int) {
     val scope = rememberCoroutineScope()
@@ -83,78 +78,77 @@ fun TemplateEditPage(onDismissRequest: () -> Unit, templateId: Int) {
     val softwareKeyboardController = LocalSoftwareKeyboardController.current
     var isEditingShortcuts by remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text =
-                            stringResource(
-                                if (templateId <= 0) R.string.new_template else R.string.edit
-                            ),
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-                    )
-                },
-                navigationIcon = { BackButton { onDismissRequest() } },
-                actions = {
-                    TextButton(
-                        modifier = Modifier.padding(end = 8.dp),
-                        onClick = {
-                            scope.launch {
-                                commandTemplate
-                                    .copy(name = templateName, template = templateText)
-                                    .run {
-                                        if (id == 0) DatabaseUtil.insertTemplate(this)
-                                        else DatabaseUtil.updateTemplate(this)
-                                    }
-
-                                onDismissRequest()
+            TopAppBar(title = {
+                Text(
+                    text = stringResource(if (templateId <= 0) R.string.new_template else R.string.edit),
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp)
+                )
+            }, navigationIcon = {
+                BackButton { onDismissRequest() }
+            }, actions = {
+                TextButton(
+                    modifier = Modifier.padding(end = 8.dp), onClick = {
+                        scope.launch {
+                            commandTemplate.copy(name = templateName, template = templateText).run {
+                                if (id == 0) DatabaseUtil.insertTemplate(this)
+                                else DatabaseUtil.updateTemplate(this)
                             }
-                        },
-                        enabled = templateName.isNotEmpty(),
-                    ) {
-                        Text(
-                            text = stringResource(androidx.appcompat.R.string.abc_action_mode_done)
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
+
+                            onDismissRequest()
+                        }
+                    }, enabled = templateName.isNotEmpty()
+                ) {
+                    Text(text = stringResource(androidx.appcompat.R.string.abc_action_mode_done))
+                }
+            }, scrollBehavior = scrollBehavior
             )
-        },
-    ) { paddings ->
-        LazyColumn(modifier = Modifier.padding(paddings), contentPadding = PaddingValues()) {
+        }) { paddings ->
+        LazyColumn(
+            modifier = Modifier.padding(paddings), contentPadding = PaddingValues()
+        ) {
+
             item {
                 val description = stringResource(R.string.template_label)
 
                 Column(Modifier.padding(horizontal = 24.dp)) {
-                    AdjacentLabel(text = description, modifier = Modifier.padding(top = 12.dp))
+                    AdjacentLabel(
+                        text = description,
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                    )
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
                         value = templateName,
                         onValueChange = { templateName = it },
                         keyboardActions = KeyboardActions.Default,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     )
                 }
+
             }
             item {
                 Column(Modifier.padding(horizontal = 24.dp)) {
                     val description = stringResource(R.string.custom_command_template)
-                    AdjacentLabel(text = description, modifier = Modifier)
-                    ProvideTextStyle(
-                        value = LocalTextStyle.current.merge(fontFamily = FontFamily.Monospace)
-                    ) {
+                    AdjacentLabel(
+                        text = description,
+                        modifier = Modifier
+                    )
+                    ProvideTextStyle(value = LocalTextStyle.current.merge(fontFamily = FontFamily.Monospace)) {
                         OutlinedTextField(
-                            supportingText = {
-                                Text(text = stringResource(id = R.string.edit_template_desc))
-                            },
+                            supportingText = { Text(text = stringResource(id = R.string.edit_template_desc)) },
                             modifier = Modifier.fillMaxWidth(),
                             value = templateText,
                             onValueChange = { templateText = it },
                             trailingIcon = {
-                                if (templateText.isEmpty())
-                                    PasteFromClipBoardButton { templateText = it }
+                                if (templateText.isEmpty()) PasteFromClipBoardButton {
+                                    templateText = it
+                                }
                                 else ClearButton { templateText = "" }
                             },
                             maxLines = 12,
@@ -163,60 +157,68 @@ fun TemplateEditPage(onDismissRequest: () -> Unit, templateId: Int) {
                     }
                     LinkButton(modifier = Modifier.padding(vertical = 12.dp))
                     HorizontalDivider(
-                        Modifier.fillMaxWidth()
+                        Modifier
+                            .fillMaxWidth()
                             .padding(bottom = 24.dp)
                             .size(DividerDefaults.Thickness)
                             .clip(CircleShape),
-                        color = MaterialTheme.colorScheme.outlineVariant,
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                 }
             }
 
             item {
-                Row(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 16.dp)
+                ) {
                     Text(
                         text = stringResource(R.string.shortcuts),
-                        modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                     TextButtonWithIcon(
                         modifier = Modifier,
                         onClick = { isEditingShortcuts = true },
                         icon = Icons.Outlined.Edit,
                         text = stringResource(id = R.string.edit_shortcuts),
-                        contentColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.tertiary
                     )
                 }
             }
             item {
                 val shortcuts by DatabaseUtil.getShortcuts().collectAsState(emptyList())
                 Column(
-                    modifier = Modifier.fillParentMaxWidth().horizontalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .fillParentMaxWidth()
+                        .horizontalScroll(rememberScrollState())
                 ) {
                     FlowRow(
-                        modifier = Modifier.padding(horizontal = 8.dp).width(500.dp),
-                        //                        mainAxisSize = SizeMode.Expand,
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .width(500.dp),
+                        mainAxisSize = SizeMode.Expand,
+                        crossAxisSpacing = 2.dp,
                     ) {
                         shortcuts.forEach { item ->
-                            ShortcutChip(
-                                text = item.option,
-                                onClick = {
-                                    templateText =
-                                        templateText.run {
-                                            if (isEmpty()) item.option
-                                            else
-                                                this.removeSuffix(" ").removeSuffix("\n") +
-                                                    "\n${item.option}"
-                                        }
-                                },
-                            )
+                            ShortcutChip(text = item.option, onClick = {
+                                templateText = templateText.run {
+                                    if (isEmpty()) item.option
+                                    else this.removeSuffix(" ")
+                                        .removeSuffix("\n") + "\n${item.option}"
+                                }
+                            })
                         }
                     }
+
                 }
             }
         }
     }
     if (isEditingShortcuts) OptionChipsDialog { isEditingShortcuts = false }
 }
+

@@ -51,6 +51,7 @@ class Hct private constructor(argb: Int) {
         setInternalState(argb)
     }
 
+
     fun toInt(): Int {
         return argb
     }

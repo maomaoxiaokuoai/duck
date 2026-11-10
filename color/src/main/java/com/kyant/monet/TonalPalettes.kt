@@ -81,10 +81,12 @@ class TonalPalettes(
             neutral2 = tonalValues.associateWith { transform(it, style.neutral2Spec) }
         )
 
+
         private fun Color.toTonalPalette(
             tonalValues: DoubleArray = M3TonalValues
         ): TonalPalette =
             tonalValues.associateWith { transform(it, ColorSpec()) }
+
 
         /**
          * Convert an existing `ColorScheme` to an MD3 `TonalPalettes`

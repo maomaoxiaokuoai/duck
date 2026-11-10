@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,69 +35,74 @@ import com.duck.app.util.WELCOME_DIALOG
 
 @Composable
 fun WelcomeDialog(onClick: () -> Unit) {
-    var showWelcomeDialog by rememberSaveable { mutableIntStateOf(WELCOME_DIALOG.getInt()) }
+    var showWelcomeDialog by rememberSaveable {
+        mutableStateOf(WELCOME_DIALOG.getInt())
+    }
     var disableDialog by remember { mutableStateOf(false) }
     val onDismissRequest = {
-        PreferenceUtil.encodeInt(WELCOME_DIALOG, if (disableDialog) 0 else showWelcomeDialog + 1)
+        PreferenceUtil.encodeInt(
+            WELCOME_DIALOG,
+            if (disableDialog) 0 else showWelcomeDialog + 1
+        )
         showWelcomeDialog = 0
     }
     if (showWelcomeDialog > 0)
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            dismissButton = {
-                TextButton(onClick = onDismissRequest) { Text(stringResource(R.string.close)) }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onClick()
-                        onDismissRequest()
-                    }
-                ) {
-                    Text(stringResource(R.string.open_settings))
-                }
-            },
-            title = { Text(stringResource(R.string.user_guide)) },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    IconDescription(
-                        icon = Icons.Outlined.ContentPaste,
-                        description = stringResource(R.string.paste_desc),
-                    )
-                    IconDescription(
-                        icon = Icons.Outlined.FileDownload,
-                        description = stringResource(R.string.download_desc),
-                    )
-                    IconDescription(
-                        icon = Icons.Outlined.Subscriptions,
-                        description = stringResource(R.string.download_history_desc),
-                    )
-                    IconDescription(
-                        icon = Icons.Outlined.Downloading,
-                        description = stringResource(R.string.battery_settings_desc),
-                    )
-                    IconDescription(
-                        icon = Icons.Outlined.SettingsSuggest,
-                        description = stringResource(R.string.check_download_settings_desc),
-                    )
-                    if ((showWelcomeDialog > 1))
-                        CheckBoxItem(
-                            text = stringResource(id = R.string.close_never_show_again),
-                            checked = disableDialog,
-                            onValueChange = { disableDialog = !disableDialog },
-                        )
-                }
-            },
-        )
+        AlertDialog(onDismissRequest = onDismissRequest, dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.close))
+            }
+        }, confirmButton = {
+            TextButton(onClick = {
+                onClick()
+                onDismissRequest()
+            }) {
+                Text(stringResource(R.string.open_settings))
+            }
+        }, title = { Text(stringResource(R.string.user_guide)) }, text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                IconDescription(
+                    icon = Icons.Outlined.ContentPaste,
+                    description = stringResource(R.string.paste_desc)
+                )
+                IconDescription(
+                    icon = Icons.Outlined.FileDownload,
+                    description = stringResource(R.string.download_desc)
+                )
+                IconDescription(
+                    icon = Icons.Outlined.Subscriptions,
+                    description = stringResource(R.string.download_history_desc)
+                )
+                IconDescription(
+                    icon = Icons.Outlined.Downloading,
+                    description = stringResource(R.string.battery_settings_desc)
+                )
+                IconDescription(
+                    icon = Icons.Outlined.SettingsSuggest,
+                    description = stringResource(R.string.check_download_settings_desc)
+                )
+                if ((showWelcomeDialog > 1))
+                    CheckBoxItem(
+                        text = stringResource(id = R.string.close_never_show_again),
+                        checked = disableDialog, onValueChange = { disableDialog = !disableDialog })
+            }
+        })
 }
 
 @Composable
 fun IconDescription(modifier: Modifier = Modifier, icon: ImageVector, description: String) {
     Row(
         modifier = modifier.padding(top = 12.dp, bottom = 9.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(modifier = Modifier.size(24.dp), imageVector = icon, contentDescription = null)
-        Text(modifier = Modifier.padding(start = 12.dp), text = description)
+        Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = icon,
+            contentDescription = null
+        )
+        Text(
+            modifier = Modifier.padding(start = 12.dp),
+            text = description,
+        )
     }
 }
+

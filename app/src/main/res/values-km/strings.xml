@@ -43,6 +43,9 @@
     <string name="about_page">កំណែ, មតិកែលម្អ, ស្វ័យអាប់ដេត</string>
     <string name="back">ត្រឡប់</string>
     <string name="version">កំណែ</string>
+    <string name="release_desc">ឆែកកំណត់ហេតុផ្លាស់និងកំណែថ្មី</string>
+    <string name="release">ការចេញផ្សាយចុងក្រោយ</string>
+    <string name="readme_desc">ឆែកឃ្លាំងផ្ទុកនៃ GitHub និងអានខ្ញុំ</string>
     <string name="custom_command">ឃ្លាបញ្ជាផ្ទាល់ខ្លួន</string>
     <string name="custom_command_desc">រត់ឃ្លាបញ្ជ yt-dlp ជាមួយនឹងពុម្ពគំរូផ្ទាល់ខ្លួន</string>
     <string name="custom_command_template">ពុម្ពគំរូឃ្លាបញ្ជា</string>
@@ -131,8 +134,10 @@
     <string name="check_for_updates">ពិនិត្យបច្ចុប្បន្នភាព</string>
     <string name="battery_configuration">ការកំណត់រចនាសម្ព័ន្ធថ្ម</string>
     <string name="battery_configuration_desc">ពុំអើពើបង្កើនប្រសិទ្ធភាពថ្ម សម្រាប់កម្មវិធីនេះដើម្បីដោនឡូដនៅផ្ទៃខាងក្រោយ</string>
-    <string name="service_title">duck គឺកំពុងតែដោនឡូដ…</string>
+    <string name="service_title">Seal គឺកំពុងតែដោនឡូដ…</string>
     <string name="unknown_error">កំហុសមិនស្គាល់</string>
+    <string name="translate">បកប្រែ</string>
+    <string name="translate_desc">ជួយបកប្រែកម្មវិធីនេះលើ Hosted Weblate</string>
     <string name="prefix">បុព្វបទ</string>
     <string name="embed_subtitles">បង្កប់ចំណងជើងរង</string>
     <string name="status_downloading">កំពុងដោនឡូដ</string>

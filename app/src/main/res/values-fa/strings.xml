@@ -10,7 +10,7 @@
     <string name="language">نمایش زبان</string>
     <string name="language_settings">تنظیم زبان</string>
     <string name="task_running">یک عملیات بارگیری در حال انجام می باشد</string>
-    <string name="paste_msg">جای‌گذاری پیوند</string>
+    <string name="paste_msg">جای‌گذاری پیوند از کلیپ بورد</string>
     <string name="ytdlp_version">نسخه Yt-dlp</string>
     <string name="ytdlp_update">برای نصب آخرین نسخه yt-dlp کلیک کنید</string>
     <string name="delete_info">حذف ؟</string>
@@ -22,6 +22,8 @@
     <string name="about_page">نسخه ،بازخورد، بروزرسانی خودکار</string>
     <string name="back">برگشت</string>
     <string name="version">نسخه</string>
+    <string name="release">آخرین نسخه</string>
+    <string name="readme_desc">به مخزن برنامه در گیتهاب سر بزنید و دستورالعمل ها را مطالعه کنید</string>
     <string name="video">ویدئو</string>
     <string name="checked">بررسی شد</string>
     <string name="custom_command">دستور سفارشی</string>
@@ -57,6 +59,7 @@
     <string name="edit">ویرایش</string>
     <string name="off">خاموش</string>
     <string name="download_settings_desc">عمومی، فرمت، دستور سفارشی</string>
+    <string name="release_desc">مشاهده تغییرات و نسخه جدید</string>
     <string name="print_details">خروجی انتخابی</string>
     <string name="settings_before_download_text">تنظیم دانلود</string>
     <string name="error_copied">کپی گزارش خطا در کلیپ بورد</string>
@@ -94,7 +97,7 @@
     <string name="subdirectory_desc">فایل‌ها را در پوشه‌هایی با نام حیطه مربوطه ذخیره کنید</string>
     <string name="permission_issue">مشکل در مجوز ذخیره سازی</string>
     <string name="permission_issue_desc">دایرکتوری های خارج از Download/ و Documents/ پشتیبانی نمی شوند</string>
-    <string name="service_title">duck در حال دانلود است…</string>
+    <string name="service_title">Seal در حال دانلود است…</string>
     <string name="best_quality">بهترین کیفیت (پیش فرض)</string>
     <string name="settings_before_download">قبل از دانلود پیکربندی کنید</string>
     <string name="settings_before_download_desc">تنظیمات برگزیده را قبل از دانلود پیکربندی کنید</string>
@@ -105,12 +108,14 @@
     <string name="not_specified">مشخص نشده (پیش فرض)</string>
     <string name="convert_audio">تبدیل</string>
     <string name="battery_configuration_desc">بهینه سازی باتری را برای دانلود در پس زمینه این برنامه نادیده بگیرید</string>
+    <string name="translate">ترجمه</string>
     <string name="video_format">فرمت ویدئو</string>
     <string name="download_notification_desc">اطلاع از فایل های دانلود شده و پیشرفت</string>
     <string name="unknown_error">خطای ناشناخته</string>
     <string name="start_download">بارگیری</string>
     <string name="user_guide">راهنمای کاربر</string>
     <string name="share_fail_msg">مطابقت پیوند از محتوای مشترک ممکن نیست</string>
+    <string name="translate_desc">به ترجمه این برنامه در Weblate میزبانی شده کمک کنید</string>
     <string name="paste_desc">برای دریافت پیوند ویدیو از کلیپ‌بورد، روی \"جای‌گذاری\" کلیک کنید.</string>
     <string name="check_download_settings_desc">به تنظیمات دانلود نگاهی بیندازید و قبل از استفاده مطمئن شوید که آخرین نسخه yt-dlp را دارید.</string>
     <string name="channel_description">اطلاع از فایل های دانلود شده و پیشرفت دانلود</string>
@@ -155,7 +160,7 @@
     <string name="show_logs">نمایش گزارش</string>
     <string name="logs">گزارش</string>
     <string name="status_enqueued">در صف قرار گرفته است</string>
-    <string name="status_completed">به پایان رسید</string>
+    <string name="status_completed">تکمیل شد</string>
     <string name="multiselect_mode">حالت چند انتخابی</string>
     <string name="sponsorblock_desc">حذف یا علامت گذاری بخش‌های ویدئو با کمک سرویس SponsorBlock</string>
     <string name="cookies_desc">برای دانلود از کوکی های فرمت شده Netscape استفاده کنید</string>
@@ -184,6 +189,7 @@
     <string name="clip_end">پایان</string>
     <string name="check_for_updates">بررسی بروزرسانی</string>
     <string name="clear_temp_files">فایل های موقت را پاک کنید</string>
+    <string name="telegram_channel">کاناال تلگرام</string>
     <string name="task_canceled">عملیات دانلود لغو شد</string>
     <string name="dynamic_color_desc">رنگ ها را از والپیپرها به تم برنامه اعمال کنید</string>
     <string name="clear_temp_files_count">%1$d فایل(های) موقت حذف شد</string>
@@ -201,7 +207,7 @@
     <string name="select_all">انتخاب همه</string>
     <string name="restart">راه اندازی مجدد</string>
     <string name="status_error">خطا</string>
-    <string name="copy_error_report">کپی گزارش</string>
+    <string name="copy_error_report">گزارش خطا</string>
     <string name="video_resolution">کیفیت ویدیو</string>
     <string name="app_update_failed">به آخرین نسخه به روز رسانی نشد</string>
     <string name="update">بروزرسانی</string>
@@ -215,7 +221,9 @@
     <string name="remove_template_desc">برای همیشه \"%1$s\" از الگوهای خوب حذف شود؟</string>
     <string name="template_selection">انتخاب الگو</string>
     <string name="custom_command_template_desc">الگو های فرمان را ویرایش و مدیریت کنید</string>
+    <string name="github_issue_desc">یک درخواست برای گزارش اشکال یا درخواست ویژگی ارسال کنید</string>
     <string name="info_copied">اطلاعات در کلیپ بورد کپی شد</string>
+    <string name="github_issue">ارسال مشکل در گیتهاب</string>
     <string name="status_canceled">لغو شد</string>
     <string name="status_fetching_video_info">در حال دریافت اطلاعات</string>
     <string name="open_file">باز کردن فایل</string>
@@ -224,6 +232,7 @@
     <string name="use_cookies">انتخاب کوکی ها</string>
     <string name="remove_cookie_profile_desc">این ورودی به ازای «%1$s» حذف شود؟ لطفا بخاطر داشته باشید که کوکی‌های ذخیره شده در این سایت پاک نمی‌شوند.</string>
     <string name="how_does_it_work">چگونه کار می کند؟</string>
+    <string name="matrix_space">فضای ماتریس</string>
     <string name="recently_added">به تازگی اضافه شده</string>
     <string name="status_downloading">در حال دانلود</string>
     <string name="video_file_size">اندازه فایل ویدیویی</string>
@@ -269,17 +278,23 @@
     <string name="beta_features">آزمایشی</string>
     <string name="enable_experimental_feature">ویژگی آزمایشی فعال شود؟</string>
     <string name="clip_video_desc">در صفحه انتخاب فرمت کلیپ های ویدیویی بسازید</string>
+    <string name="sponsor_msg2">بسیار از شما متشکرم!</string>
     <string name="audio_format">فرمت صوتی</string>
     <string name="no_downloaded_media">رسانه دانلود شده ای وجود ندارد</string>
-    <string name="auto_update_disabled_msg">به‌روزرسانی خودکار برای ساخت‌های %1$s در دسترس نیست. اگر %1$s را روی دستگاه خود نصب نکرده‌اید، یا می‌خواهید ویژگی‌های جدید آینده را در duck پیش‌نمایش کنید، لطفاً %2$s را در نظر بگیرید.</string>
+    <string name="auto_update_disabled_msg">به‌روزرسانی خودکار برای ساخت‌های %1$s در دسترس نیست. اگر %1$s را روی دستگاه خود نصب نکرده‌اید، یا می‌خواهید ویژگی‌های جدید آینده را در Seal پیش‌نمایش کنید، لطفاً %2$s را در نظر بگیرید.</string>
     <string name="clip_video_dialog_msg">دانلودهایی که از این ویژگی استفاده می کنند به FFmpeg واگذار می شود تا بخش های انتخابی ویدیو را دانلود کند، این ویژگی همچنان آزمایشی است و برش کاملاً دقیق نخواهد بود، همه فرمت ها از این ویژگی پشتیبانی نمی کنند و ممکن است سرعت دانلود پایین تری را تجربه کنید.</string>
     <string name="msg_from_developer">پیام از طرف توسعه دهنده</string>
+    <string name="switch_to_github_builds">تغییر به نسخه گیتهاب</string>
     <string name="okay">بسیار خب</string>
     <string name="got_it">فهمیدم</string>
     <string name="feature_unavailable">ویژگی در دسترس نیست</string>
     <string name="prefix">پیشوند</string>
     <string name="no_custom_command_tasks">بدون وظایف دستوری سفارشی</string>
+    <string name="sponsor">حامی مالی</string>
+    <string name="sponsor_desc">با حمایت مالی در GitHub از این برنامه حمایت کنید</string>
+    <string name="sponsor_msg">Seal همیشه رایگان و منبع باز برای همه خواهد بود. اگر دوست دارید، لطفاً در GitHub از من حمایت کنید!</string>
     <string name="feedback">بازخورد</string>
+    <string name="sponsors">حامیان</string>
     <string name="temporary_directory_desc">دخیره فایل های موقت را در دایرکتوری داخلی</string>
     <string name="clear_download_archive">خالی کردن بایگانی دانلود؟</string>
     <string name="save">ذخیره</string>
@@ -329,9 +344,9 @@
     <string name="proxy">پروکسی</string>
     <string name="look_and_feel">بر و رو</string>
     <string name="interface_and_interaction">رابط و تعامل</string>
-    <string name="custom_command_usage_msg">yt-dlp یک ابزار دستور متنی برای دانلود ویدئو است. duck، استفاده از yt-dlp را با کمک محیط گرافیک قابل‌فهم، دستورات مرسوم پیش‌فرض، و قابلیت‌های اضافی آسان می‌کند.
+    <string name="custom_command_usage_msg">yt-dlp یک ابزار دستور متنی برای دانلود ویدئو است. Seal، استفاده از yt-dlp را با کمک محیط گرافیک قابل‌فهم، دستورات مرسوم پیش‌فرض، و قابلیت‌های اضافی آسان می‌کند.
 \n
-\nduck با کمک ساختن، ذخیره و اجرا قالب‌های دستوری مرسوم به صورت مستقیم، همانند ترمینال، به شما اجازه می‌دهد تا از قابلیت‌های پیشرفته بهره‌مند شوید.
+\nSeal با کمک ساختن، ذخیره و اجرا قالب‌های دستوری مرسوم به صورت مستقیم، همانند ترمینال، به شما اجازه می‌دهد تا از قابلیت‌های پیشرفته بهره‌مند شوید.
 \n
 \nهنگام استفاده از دستورات، اکثر تنظیمات و قابلیت‌ها غیرفعال می‌شوند.</string>
     <string name="commands">دستورات</string>
@@ -375,53 +390,4 @@
     <string name="refresh_cookies_desc">برای باز کردن صفحه وب برای تولید کوکی‌های جدید، ضربه بزنید:</string>
     <string name="custom_command_directory">پوشه دستورات سفارشی</string>
     <string name="custom_command_directory_desc">پوشه خروجی را هنگام استفاده از دستورات سفارشی را مشخص کن</string>
-    <string name="all_languages">همه زبان ها</string>
-    <string name="playlist">لیست پخش</string>
-    <string name="proceed">ادامه</string>
-    <string name="preset">تنظیمات پیش فرض</string>
-    <string name="prefer_placeholder">ترجیح دادن %1$s</string>
-    <string name="preset_format_selection_desc">دانلود اتوماتیک با استفاده از تنظیمات فرمت</string>
-    <string name="edit_preset">تغییر تنظیمات پیش فرض</string>
-    <string name="best_quality_desc">دانلود بهترین فرمت موجود</string>
-    <plurals name="audio_count">
-        <item quantity="one">%d صدا</item>
-        <item quantity="other">%d صدا</item>
-    </plurals>
-    <string name="task_added">عملیات به صف اضافه شد</string>
-    <string name="force_ipv4_desc">اتصال همه از طریق IPv4</string>
-    <string name="remove_multiple_templates_msg">برای همیشه %1$s از قالب های دستورات پاک شود؟</string>
-    <string name="custom_format_selection_desc">از فرمت ها و زیرنویس ها انتخاب کنید و به دلخواه تنظیم کنید</string>
-    <string name="search">جستجو</string>
-    <plurals name="video_count">
-        <item quantity="one">%d ویدئو</item>
-        <item quantity="other">%d ویدئو</item>
-    </plurals>
-    <string name="merge_audiostream">ترکیب چند صدا</string>
-    <string name="merge_audiostream_desc">اجازه برای ترکیب کردن چند صدا به یک فایل</string>
-    <string name="ua_header">سرصفحه کاربر</string>
-    <string name="remux_container_mkv">مخزن ویدئو ریموکس</string>
-    <string name="remux_container_mkv_desc">ورود ویدئو های ریموکس به مخزن MKV برای پشتیبانی بهتر</string>
-    <string name="download_archive_error">این ویدئو دانلود شد. اگر این غیر منتظره است، لطفا بایگانی دانلودتان را چک کنید.</string>
-    <string name="export_download_history_msg">در حال استخراج %1$s از تاریخچه دانلود. فایل های دانلود شده و تنظیمات نسخه پشتیبانی نخواهند داشت.</string>
-    <string name="cookies_in_database">%1$d کوکی از %2$d وبسایت در کل</string>
-    <string name="auto_translated_subtitles">ترجمه زیرنویس اتوماتیک</string>
-    <string name="auto_translated_subtitles_msg">زیرنویس با ترجمه اتوماتیک برای همه ی زبان ها در دسترس خواهند بود. این زیرنویس ها ممکن است اشتباه یا درک کردنشان دشوار باشد.</string>
-    <string name="subtitle_language_desc">زبان زیرنویس های فرمت اتوماتیک برای دانلود، جدا شده با ویرگول.</string>
-    <string name="download_archive_desc">برای تکراری نشدن دانلود ها، شناسه ویدئو های دانلود شده را درون بایگانی ضبط کنید</string>
-    <string name="force_ipv4">مجبور استفاده از IPv4</string>
-    <string name="download_history_imported">%1$s به تاریخچه دانلود وارد شد</string>
-    <string name="search_in_downloads">جستجو در دانلود ها</string>
-    <string name="you_ll_find_your_downloads_here">بارگذاری‌هایتان را اینجا پیدا خواهید کرد</string>
-    <string name="status_downloaded">بارگذاری شد</string>
-    <string name="download_hint">بر روی گزینه بارگذاری کلیک کنید یا لینک یک ویدئو را با این نرم‌افزار اشتراک گذاری فرمایید تا یک بارگذاری شروع شود</string>
-    <string name="all">همه</string>
-    <string name="select_multiple_link">از پیوندهای %1$d انتخاب فرمایید</string>
-    <string name="download_queue">صف بارگذاری</string>
-    <string name="trouble_shooting">رفع اشکال</string>
-    <string name="issue_tracker">ردیاب مشکل</string>
-    <string name="trouble_shooting_desc">خطاهای رایج را حل و مشکلات شناخته شده را بررسی کنید</string>
-    <string name="show_navigation_drawer">نمایش نوار ناوبری</string>
-    <string name="delete">پاک کن</string>
-    <string name="resume">ادامه بده</string>
-    <string name="media_info">اطلاعات رسانه</string>
 </resources>

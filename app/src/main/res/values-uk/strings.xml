@@ -39,6 +39,9 @@
     <string name="about_page">Версія, зворотний зв\'язок та оновлення</string>
     <string name="back">Назад</string>
     <string name="version">Версiя</string>
+    <string name="release_desc">Перегляньте історію змін та нові версії</string>
+    <string name="release">Остання версія</string>
+    <string name="readme_desc">Перевірте репозиторій на GitHub та README</string>
     <string name="video">Вiдео</string>
     <string name="checked">Перевірено</string>
     <string name="credits">Подяки</string>
@@ -123,8 +126,10 @@
     <string name="permission_issue_desc">Директорії за межами Documents/ й Download/ не пiдтримуються</string>
     <string name="battery_configuration">Налаштування батареї</string>
     <string name="battery_configuration_desc">Ігнорувати оптимізації батареї для фонових завантажень</string>
-    <string name="service_title">duck завантажує…</string>
+    <string name="service_title">Seal завантажує…</string>
     <string name="unknown_error">Невідома помилка</string>
+    <string name="translate">Перекласти</string>
+    <string name="translate_desc">Допоможіть перекласти Seal на Weblate</string>
     <string name="prefix">Шаблон шляху</string>
     <string name="embed_subtitles">Вбудовані субтитри</string>
     <string name="embed_subtitles_desc">Вставляти м\'які субтитри у відео, якщо вони доступні</string>
@@ -136,17 +141,19 @@
     <string name="custom_command_template_desc">Керувати шаблонами команд</string>
     <string name="downloading_indicator_text">Завантаження в процесі…</string>
     <string name="task_canceled">Завантаження скасовано</string>
+    <string name="github_issue">Повідомити про проблему (GitHub)</string>
+    <string name="github_issue_desc">Надіслати звіт про помилку або запропонувати нову функцію</string>
     <string name="info_copied">Інформація скопійована в буфер обміну</string>
     <string name="open_file">Відкрити файл</string>
     <string name="status_enqueued">Поставлено в чергу</string>
-    <string name="status_completed">Завершено</string>
+    <string name="status_completed">Виконано</string>
     <string name="status_downloading">Завантаження</string>
     <string name="status_canceled">Cкасовано</string>
     <string name="status_fetching_video_info">Отримання інформації</string>
     <string name="restart">Перезавантажити</string>
     <string name="status_error">Помилка</string>
     <string name="copy_link">Скопіювати посилання</string>
-    <string name="copy_error_report">Скопіювати помилку</string>
+    <string name="copy_error_report">Повідомити про помилку</string>
     <string name="video_file_size">Розмір відео</string>
     <string name="video_resolution">Роздільна здатність</string>
     <string name="clear_temp_files_desc">Видалити усі тимчасові файли з тимчасової теки</string>
@@ -209,11 +216,13 @@
     <string name="unavailable">Недоступно</string>
     <string name="format_settings_desc">Формат файлу, якість відео та субтитри</string>
     <string name="disable_preview">Вимкнути попередній перегляд</string>
+    <string name="telegram_channel">Telegram канал</string>
     <string name="how_does_it_work">Як це працює\?</string>
     <string name="use_cookies">Використовувати cookies</string>
     <string name="remove_cookie_profile_desc">Видалити цей запис для \"%1$s\"? Зверніть увагу, що файли cookies, збережені для цього сайту, не будуть видалені.</string>
     <string name="custom_command_enabled_hint">Деякі параметри недоступні при використанні користувацької команди</string>
     <string name="cookies_usage_msg">Завантаження з деяких сайтів вимагає інформації про автентифікацію облікового запису. Натисніть «Згенерувати нові cookies», введіть URL-адресу вебсайту, а потім увійдіть за допомогою свого облікового запису на сторінці браузера, застосунок згенерує його для вас.</string>
+    <string name="matrix_space">Кімната Matrix</string>
     <string name="cookies">Cookies</string>
     <string name="abs_hint">Більшість платформ надають аудіо та відео окремо, але ви можете об\'єднати формати \"лише відео\" та \"лише аудіо\" у єдине відео.</string>
     <string name="video_creator_sample_text">Приклад автора відео</string>
@@ -268,19 +277,25 @@
     <string name="unlimited">Без обмежень</string>
     <string name="clear_all_cookies_desc">Назавжди видалити всі файли cookie, які зберігаються у застосунку\?</string>
     <string name="temporary_directory_desc">Зберігати тимчасові файли у внутрішній теці</string>
+    <string name="sponsor">Спонсорувати</string>
     <string name="feedback">Зворотний зв\'язок</string>
+    <string name="sponsors">Спонсори</string>
+    <string name="sponsor_desc">Підтримайте цей застосунок, спонсоруючи нас на GitHub</string>
+    <string name="sponsor_msg">Seal завжди буде безплатним і відкритим для всіх. Якщо вам це подобається, подумайте про те, щоб стати моїм спонсором на GitHub!</string>
     <string name="no_downloaded_media">Немає завантажених медіа</string>
     <string name="beta_features">Бета</string>
     <string name="clip_video_desc">Створюйте відеокліпи на сторінці вибору формату</string>
     <string name="audio_format">Аудіо формат</string>
     <string name="enable_experimental_feature">Увімкнути експериментальну функцію\?</string>
     <string name="clip_video_dialog_msg">Завантаження за допомогою цієї функції буде делеговано FFmpeg для завантаження вибраних фрагментів відео, ця функція все ще експериментальна і розрізання не буде повністю точним, не всі формати підтримують цю функцію, і ви можете відчути повільну швидкість завантаження.</string>
-    <string name="auto_update_disabled_msg">Автоматичне оновлення недоступне для %1$s збірок. Якщо на вашому пристрої не встановлено %1$s або ви хочете переглянути майбутні нові функції в duck, розгляньте %2$s.</string>
+    <string name="auto_update_disabled_msg">Автоматичне оновлення недоступне для %1$s збірок. Якщо на вашому пристрої не встановлено %1$s або ви хочете переглянути майбутні нові функції в Seal, розгляньте %2$s.</string>
+    <string name="switch_to_github_builds">перехід на збірки GitHub</string>
     <string name="okay">Ок</string>
     <string name="got_it">Зрозумів</string>
     <string name="feature_unavailable">Функція недоступна</string>
     <string name="no_custom_command_tasks">Немає спеціальних командних завдань</string>
     <string name="msg_from_developer">Допис від розробника</string>
+    <string name="sponsor_msg2">Велике спасибі!</string>
     <string name="download_video_desc">Завантажити відео з URL-адреси</string>
     <string name="convert_subtitle">Конвертувати субтитри</string>
     <string name="convert_subtitle_desc">Конвертуйте субтитри в інший формат</string>
@@ -324,9 +339,9 @@
     </plurals>
     <string name="ua_header">Заголовок User-Agent</string>
     <string name="export_to_file">Експорт у файл</string>
-    <string name="custom_command_usage_msg">yt-dlp – це потужний інструмент командного рядка для завантаження відео. duck полегшує використання yt-dlp, надаючи інтуїтивно зрозумілий графічний інтерфейс, пресети для поширених команд та інші додаткові можливості.
+    <string name="custom_command_usage_msg">yt-dlp – це потужний інструмент командного рядка для завантаження відео. Seal полегшує використання yt-dlp, надаючи інтуїтивно зрозумілий графічний інтерфейс, пресети для поширених команд та інші додаткові можливості.
 \n
-\nДля розширеного використання yt-dlp, duck дозволяє створювати, зберігати й виконувати власні шаблони команд безпосередньо, як у терміналі.
+\nДля розширеного використання yt-dlp, Seal дозволяє створювати, зберігати й виконувати власні шаблони команд безпосередньо, як у терміналі.
 \n
 \nПід час використання власних команд більшість опцій та можливостей графічного інтерфейсу буде вимкнено.</string>
     <string name="presets">Пресети</string>
@@ -363,7 +378,7 @@
     <string name="auto_translated_subtitles_msg">У завантаженнях можна буде вибрати субтитри, створені автоматично для кожної мови. Вони можуть бути неточними та важкими для розуміння.</string>
     <string name="auto_translated_subtitles">Субтитри з автоперекладом</string>
     <string name="remember_for_next_download">Запам\'ятати для майбутнього завантаження</string>
-    <string name="look_and_feel"><![CDATA[Вигляд та відчуття]]></string>
+    <string name="look_and_feel">Вигляд та відчуття</string>
     <string name="subtitle_language_desc">Мова субтитрів для завантаження в автоматичному виборі формату, розділених комами.</string>
     <string name="backup_type">Тип резервного копіювання</string>
     <string name="export_backup">Експортувати</string>
@@ -372,7 +387,7 @@
     <string name="import_download_history_msg">Завантажені файли не будуть імпортовані. Вам потрібно завантажити їх вручну</string>
     <string name="use_previous_selection">Використовувати попередньо вибране</string>
     <string name="none">Нічого</string>
-    <string name="interface_and_interaction"><![CDATA[Інтерфейс та взаємодія]]></string>
+    <string name="interface_and_interaction">Інтерфейс та взаємодія</string>
     <string name="reset">Скинути</string>
     <string name="search_in_subtitles">Пошук в субтитрах</string>
     <string name="no_thanks">Ні, дякую</string>
@@ -395,42 +410,4 @@
     <string name="remux_container_mkv_desc">Remux відео в контейнер MKV для кращої сумісності</string>
     <string name="cookies_in_database">Всього %1$d файлів cookie з %2$d вебсайтів</string>
     <string name="every_day">Щодня</string>
-    <string name="all_languages">Всі мови</string>
-    <string name="playlist">Список відтворення</string>
-    <string name="prefer_placeholder">Надаю перевагу %1$s</string>
-    <plurals name="video_count">
-        <item quantity="one">%d відео</item>
-        <item quantity="few">%d відео</item>
-        <item quantity="many">%d відео</item>
-        <item quantity="other">%d відео</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d аудіо</item>
-        <item quantity="few">%d аудіо</item>
-        <item quantity="many">%d аудіо</item>
-        <item quantity="other">%d аудіо</item>
-    </plurals>
-    <string name="proceed">Продовжити</string>
-    <string name="preset">Передустановка</string>
-    <string name="custom_format_selection_desc">Вибирайте формати, субтитри та налаштовуйте далі</string>
-    <string name="preset_format_selection_desc">Завантажуйте автоматично відповідно до ваших налаштувань формату</string>
-    <string name="edit_preset">Редагувати передустановку</string>
-    <string name="best_quality_desc">Завантажте найкращий доступний формат</string>
-    <string name="task_added">Задачу додано до черги</string>
-    <string name="you_ll_find_your_downloads_here">Ви знайдете свої завантаження тут</string>
-    <string name="download_hint">Натисніть на кнопку завантаження або поділіться відео посиланням на цей застосунок, щоби почати завантаження</string>
-    <string name="status_downloaded">Завантажено</string>
-    <string name="all">Все</string>
-    <string name="download_queue">Завантаження у черзі</string>
-    <string name="select_multiple_link">Виберіть з %1$d посилань</string>
-    <string name="show_navigation_drawer">Показати панель навігації</string>
-    <string name="resume">Відновити</string>
-    <string name="delete">Видалити</string>
-    <string name="media_info">Інформація про медіа</string>
-    <string name="trouble_shooting_desc">Усунення поширених помилок і перевірка на наявність відомих помилок</string>
-    <string name="trouble_shooting">Усунення несправностей</string>
-    <string name="issue_tracker">Відстежування проблем</string>
-    <string name="saved_urls">Збережені посилання</string>
-    <string name="add_new_url">Додати нове посилання</string>
-    <string name="add_to">Додати до %1$s</string>
 </resources>

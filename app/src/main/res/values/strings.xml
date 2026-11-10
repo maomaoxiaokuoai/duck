@@ -1,5 +1,5 @@
 <resources>
-<string name="app_name">duck</string>
+    <string name="app_name" translatable="false">duck</string>
     <string name="video_directory">Video folder</string>
     <string name="extract_audio">Save as audio</string>
     <string name="create_thumbnail">Save thumbnail</string>
@@ -21,7 +21,7 @@
     <string name="language">Display language</string>
     <string name="language_settings">Set display language</string>
     <string name="task_running">An existing download task is already running</string>
-    <string name="paste_msg">Paste URL</string>
+    <string name="paste_msg">Paste URL from clipboard</string>
     <string name="paste_fail_msg">Could not match the URL in the clipboard</string>
     <string name="ytdlp_version">Yt-dlp version</string>
     <string name="ytdlp_update">Click to install the latest yt-dlp version</string>
@@ -41,6 +41,10 @@
     <string name="about_page">Version, feedback, auto update</string>
     <string name="back">Back</string>
     <string name="version">Version</string>
+    <string name="release_desc">Look for changelogs and new versions</string>
+    <string name="release">Latest release</string>
+    <string name="readme_desc">Check the GitHub repository and the README</string>
+    <string name="readme" translatable="false">README</string>
     <string name="video">Video</string>
     <string name="checked">Checked</string>
     <string name="credits">Credits</string>
@@ -129,8 +133,10 @@
     <string name="permission_issue_desc">Directories outside Download/ and Documents/ are not supported</string>
     <string name="battery_configuration">Battery configuration</string>
     <string name="battery_configuration_desc">Ignore battery optimization for this app to download in the background</string>
-    <string name="service_title">duck is downloading…</string>
+    <string name="service_title">Seal is downloading…</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="translate">Translate</string>
+    <string name="translate_desc">Help translate this app on Hosted Weblate</string>
     <string name="prefix">Prefix</string>
     <string name="embed_subtitles">Embed subtitles</string>
     <string name="embed_subtitles_desc">Embed soft-subs into videos if available</string>
@@ -142,10 +148,51 @@
     <string name="custom_command_template_desc">Edit and manage command templates</string>
     <string name="downloading_indicator_text">Download in progress…</string>
     <string name="task_canceled">Download task canceled</string>
+    <string name="github_issue">GitHub issue</string>
+    <string name="github_issue_desc">Submit an issue for bug report or feature request</string>
     <string name="info_copied">Info copied to clipboard</string>
 
+    <string name="la_nb" translatable="false">Bokmål</string>
+    <string name="la_cs" translatable="false">Čeština</string>
+    <string name="la_de" translatable="false">Deutsch</string>
+    <string name="la_zh_CN" translatable="false">简体中文</string>
+    <string name="la_en_US" translatable="false">English</string>
+    <string name="la_fr" translatable="false">Français</string>
+    <string name="la_da" translatable="false">Dansk</string>
+    <string name="la_es" translatable="false">Español</string>
+    <string name="la_tr" translatable="false">Türkçe</string>
+    <string name="la_ru" translatable="false">Русский</string>
+    <string name="la_ar" translatable="false">العربية</string>
+    <string name="la_uk" translatable="false">Українська</string>
+    <string name="la_in" translatable="false">Indonesia</string>
+    <string name="la_fa" translatable="false">فارسی</string>
+    <string name="la_fil" translatable="false">Filipino</string>
+    <string name="la_it" translatable="false">Italiano</string>
+    <string name="la_nl" translatable="false">Nederlands</string>
+    <string name="la_pt_BR" translatable="false">Português Brasileiro</string>
+    <string name="la_ja" translatable="false">日本語</string>
+    <string name="la_pl" translatable="false">Polski</string>
+    <string name="la_hu" translatable="false">Magyar</string>
+    <string name="la_be" translatable="false">беларуская</string>
+    <string name="la_ms" translatable="false">Melayu</string>
+    <string name="la_zh_TW" translatable="false">繁體中文</string>
+    <string name="la_vi" translatable="false">Tiếng Việt</string>
+    <string name="la_hr" translatable="false">Hrvatski</string>
+    <string name="la_eu" translatable="false">Euskara</string>
+    <string name="la_hi" translatable="false">हिन्दी</string>
+    <string name="la_ml" translatable="false">മലയാളം</string>
+    <string name="la_si" translatable="false">සිංහල</string>
+    <string name="la_sr" translatable="false">Српски</string>
+    <string name="la_az" translatable="false">Azərbaycanca</string>
+    <string name="la_nn" translatable="false">Nynorsk</string>
+    <string name="la_pa" translatable="false">ਪੰਜਾਬੀ</string>
+    <string name="la_ta" translatable="false">தமிழ்</string>
+    <string name="la_ko" translatable="false">한국어</string>
+    <string name="la_sv" translatable="false">Svenska</string>
+    <string name="la_pt" translatable="false">Português</string>
+
     <string name="status_enqueued">Enqueued</string>
-    <string name="status_completed">Finished</string>
+    <string name="status_completed">Completed</string>
     <string name="status_downloading">Downloading</string>
     <string name="status_canceled">Canceled</string>
     <string name="status_fetching_video_info">Fetching info</string>
@@ -153,7 +200,7 @@
     <string name="restart">Restart</string>
     <string name="status_error">Error</string>
     <string name="copy_link">Copy link</string>
-    <string name="copy_error_report">Copy report</string>
+    <string name="copy_error_report">Error report</string>
     <string name="video_resolution">Video resolution</string>
     <string name="video_file_size">Video file size</string>
     <string name="export_to_clipboard">Export to clipboard</string>
@@ -169,7 +216,7 @@
     <string name="sponsorblock_categories_desc">Specify the SponsorBlock categories to remove or mark in the video file</string>
     <string name="sponsorblock_categories">SponsorBlock categories</string>
     <string name="check_for_updates">Check for updates</string>
-<string name="check_for_updates_desc">Refresh the bundled yt-dlp binary with the channel below</string>
+    <string name="check_for_updates_desc">Automatically check for the latest version on GitHub</string>
     <string name="app_up_to_date">The current version is up to date</string>
     <string name="app_update_failed">Failed to update to the latest version</string>
     <string name="update">Update</string>
@@ -198,7 +245,7 @@
     <string name="high_contrast">High contrast dark theme</string>
     <string name="invalid_input">Invalid input</string>
     <string name="lowest_quality">Lowest quality</string>
-    <string name="download_queue">Download queue</string>
+    <string name="download_queue" translatable="false">Download queue</string>
     <string name="unavailable">Unavailable</string>
     <string name="format_settings_desc">File format, video quality, subtitles</string>
     <string name="general_settings_desc">Yt-dlp version, notification, playlist</string>
@@ -224,7 +271,9 @@
     <string name="custom_command_enabled_hint">Some options are unavailable when using custom command</string>
     <string name="how_does_it_work">How does it work?</string>
     <string name="cookies_usage_msg">Downloading from some sites requires account authentication information. Click \"Generate new cookies\", enter the URL of the website and then log in with your account in the browser page, the app will generate it for you.</string>
-    <string name="custom_command_usage_msg">yt-dlp is a powerful command-line tool for downloading videos. duck makes it easier to use yt-dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, duck allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
+    <string name="custom_command_usage_msg">yt-dlp is a powerful command-line tool for downloading videos. Seal makes it easier to use yt-dlp by providing an intuitive GUI, presets for common commands, and other additional features.\n\nFor advanced usage of yt-dlp, Seal allows you to create, save and execute custom command templates directly, just like in a terminal.\n\nWhen using custom commands, most of the GUI options and features would be disabled.</string>
+    <string name="telegram_channel">Telegram channel</string>
+    <string name="matrix_space">Matrix space</string>
     <string name="sdcard_directory">SD card folder</string>
     <string name="auto_subtitle">Automatic captions</string>
     <string name="auto_subtitle_desc">Download auto-generated captions</string>
@@ -252,7 +301,7 @@
     <string name="share">Share</string>
     <string name="stable_channel">Stable</string>
     <string name="pre_release_channel">Preview</string>
-<string name="update_channel_desc">The stable channel is recommended. The nightly channel ships the newest yt-dlp builds, which may contain experimental extractor fixes.</string>
+    <string name="update_channel_desc">Install pre-release builds to preview new features and changes.\n\nThere will be some instability in these versions, so please don\'t hesitate to give us feedback if you experience any problems to help us improve the app for the future.</string>
     <string name="update_channel">Update channel</string>
     <string name="auto_update">Auto update</string>
     <string name="enable_auto_update">Enable auto update</string>
@@ -276,7 +325,11 @@
     <string name="clear_all_cookies">Clear all cookies</string>
     <string name="clear_all_cookies_desc">Delete all the cookies stored in the app for good?</string>
     <string name="temporary_directory_desc">Store temporary files in the internal directory</string>
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_desc">Support this app by sponsoring on GitHub</string>
+    <string name="sponsor_msg">Seal will be always free and open source for everyone. If you like it, please consider sponsoring me on GitHub!</string>
     <string name="feedback">Feedback</string>
+    <string name="sponsors">Sponsors</string>
     <string name="audio_format">Audio format</string>
     <string name="no_downloaded_media">No downloaded media</string>
     <string name="beta_features">Beta</string>
@@ -285,12 +338,14 @@
     <string name="clip_video_desc">Make video clips in the format selection page</string>
     <string name="embed_thumbnail" translatable="false">Embed thumbnail</string>
     <string name="embed_thumbnail_desc" translatable="false">Embed thumbnails into videos</string>
-<string name="auto_update_disabled_msg">Auto-update is not available in this build. Please install a new version from the place you downloaded the app.</string>
+    <string name="auto_update_disabled_msg">Auto-update is not available for %1$s builds. If you don\'t have %1$s installed on your device, or would like to preview upcoming new features in Seal, please consider %2$s.</string>
+    <string name="switch_to_github_builds">switching to GitHub builds</string>
     <string name="okay">Okay</string>
     <string name="got_it">Got it</string>
     <string name="feature_unavailable">Feature not available</string>
     <string name="no_custom_command_tasks">No custom command tasks</string>
     <string name="msg_from_developer">Message from developer</string>
+    <string name="sponsor_msg2">Thank you very much!</string>
     <string name="download_video_desc">Download videos from the URL</string>
     <string name="convert_subtitle">Convert subtitles</string>
     <string name="convert_subtitle_desc">Convert the subtitles to another format</string>
@@ -396,59 +451,8 @@
     <string name="every_day">Every day</string>
     <string name="every_week">Every week</string>
     <string name="every_month">Every month</string>
-    <string name="all_languages">All languages</string>
-    <string name="playlist">Playlist</string>
-    <string name="proceed">Continue</string>
-    <string name="preset">Preset</string>
-    <string name="prefer_placeholder">Prefer %1$s</string>
-    <string name="custom_format_selection_desc">Choose from formats, subtitles, and customize further</string>
-    <string name="preset_format_selection_desc">Download automatically using your format preferences</string>
-    <string name="edit_preset">Edit preset</string>
-    <string name="best_quality_desc">Download the best available format</string>
-    <string name="task_added">Task added to queue</string>
-    <string name="you_ll_find_your_downloads_here">You\'ll find your downloads here</string>
-    <string name="download_hint">Tap on the download button or share a video link to this app to start a download</string>
-    <string name="status_downloaded">Downloaded</string>
-    <string name="all">All</string>
-    <string name="select_multiple_link">Select from %1$d links</string>
-    <string name="show_navigation_drawer">Show navigation drawer</string>
-    <string name="resume">Resume</string>
-    <string name="delete">Delete</string>
-    <string name="media_info">Media info</string>
-    <string name="trouble_shooting">Troubleshooting</string>
-    <string name="issue_tracker">Issue tracker</string>
-    <string name="trouble_shooting_desc">Fix common errors and check for known issues</string>
-    <string name="saved_urls">Saved links</string>
-    <string name="add_new_url">Add new link</string>
-    <string name="add_to">Add to %1$s</string>
     <plurals name="item_count">
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>
     </plurals>
-    <plurals name="video_count">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
-    </plurals>
-    <plurals name="audio_count">
-        <item quantity="one">%d audio</item>
-        <item quantity="other">%d audios</item>
-    </plurals>
-<string name="ytdlp_update_done">yt-dlp has been updated</string>
-    <string name="github_issue">GitHub issue</string>
-    <string name="github_issue_desc">Submit an issue for bug report or feature request</string>
-    <string name="issue_tracker_hint">Encountered an error? Before reporting a new issue, please search our issue tracker. Many common problems have already been addressed and documented there.</string>
-    <string name="matrix_space">Matrix space</string>
-    <string name="readme" translatable="false">README</string>
-    <string name="readme_desc">Check the GitHub repository and the README</string>
-    <string name="release">Latest release</string>
-    <string name="release_desc">Look for changelogs and new versions</string>
-    <string name="sponsor">Sponsor</string>
-    <string name="sponsor_desc">Support this app by sponsoring on GitHub</string>
-    <string name="sponsor_msg">Seal will be always free and open source for everyone. If you like it, please consider sponsoring me on GitHub!</string>
-    <string name="sponsor_msg2">Thank you very much!</string>
-    <string name="sponsors">Sponsors</string>
-    <string name="switch_to_github_builds">switching to GitHub builds</string>
-    <string name="telegram_channel">Telegram channel</string>
-    <string name="translate">Translate</string>
-    <string name="translate_desc">Help translate this app on Hosted Weblate</string>
 </resources>

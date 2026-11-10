@@ -69,7 +69,7 @@ git clone <this-repo> duck
 cd duck
 
 echo "sdk.dir=/path/to/Android/Sdk" > local.properties
-./gradlew :app:assembleGenericDebug
+./gradlew :app:assembleRelease
 ```
 
 如需签名，在根目录放 `keystore.properties`：

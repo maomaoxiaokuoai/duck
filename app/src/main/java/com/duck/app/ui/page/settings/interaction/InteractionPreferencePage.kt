@@ -1,8 +1,8 @@
 package com.duck.app.ui.page.settings.interaction
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -17,6 +17,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import com.duck.app.R
 import com.duck.app.ui.component.BackButton
+import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.PreferenceItem
 import com.duck.app.ui.component.PreferenceSubtitle
 import com.duck.app.util.DOWNLOAD_TYPE_INITIALIZATION
@@ -30,22 +31,27 @@ fun InteractionPreferencePage(modifier: Modifier = Modifier, onBack: () -> Unit)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     var showDownloadTypeDialog by remember { mutableStateOf(false) }
-    val initialType by
-        remember(showDownloadTypeDialog) {
-            mutableIntStateOf(DOWNLOAD_TYPE_INITIALIZATION.getInt())
-        }
+    val initialType by remember(showDownloadTypeDialog) {
+        mutableIntStateOf(
+            DOWNLOAD_TYPE_INITIALIZATION.getInt()
+        )
+    }
 
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = { Text(text = stringResource(id = R.string.interface_and_interaction)) },
-                scrollBehavior = scrollBehavior,
-                navigationIcon = { BackButton(onClick = onBack) },
-            )
-        },
-    ) {
-        LazyColumn(modifier = Modifier, contentPadding = it) {
+
+    Scaffold(modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+        LargeTopAppBar(
+            title = {
+                Text(
+                    text = stringResource(
+                        id = R.string.interface_and_interaction
+                    )
+                )
+            }, scrollBehavior = scrollBehavior, navigationIcon = {
+                BackButton(onClick = onBack)
+            }
+        )
+    }) {
+        LazyColumn(modifier = Modifier.padding(it)) {
             item {
                 PreferenceSubtitle(text = stringResource(id = R.string.settings_before_download))
             }
@@ -53,12 +59,10 @@ fun InteractionPreferencePage(modifier: Modifier = Modifier, onBack: () -> Unit)
             item {
                 PreferenceItem(
                     title = stringResource(id = R.string.download_type),
-                    description =
-                        when (initialType) {
-                            USE_PREVIOUS_SELECTION ->
-                                stringResource(id = R.string.use_previous_selection)
-                            else -> stringResource(id = R.string.none)
-                        },
+                    description = when (initialType) {
+                        USE_PREVIOUS_SELECTION -> stringResource(id = R.string.use_previous_selection)
+                        else -> stringResource(id = R.string.none)
+                    }
                 ) {
                     showDownloadTypeDialog = true
                 }
@@ -69,10 +73,11 @@ fun InteractionPreferencePage(modifier: Modifier = Modifier, onBack: () -> Unit)
     if (showDownloadTypeDialog) {
         DownloadTypeCustomizationDialog(
             onDismissRequest = { showDownloadTypeDialog = false },
-            selectedItem = initialType,
+            selectedItem = initialType
         ) {
             DOWNLOAD_TYPE_INITIALIZATION.updateInt(it)
             showDownloadTypeDialog = false
         }
     }
+
 }

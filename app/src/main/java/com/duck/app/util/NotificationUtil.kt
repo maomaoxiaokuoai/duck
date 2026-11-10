@@ -22,7 +22,6 @@ import com.duck.app.NotificationActionReceiver.Companion.ERROR_REPORT_KEY
 import com.duck.app.NotificationActionReceiver.Companion.NOTIFICATION_ID_KEY
 import com.duck.app.NotificationActionReceiver.Companion.TASK_ID_KEY
 import com.duck.app.R
-import com.duck.app.util.PreferenceUtil.getBoolean
 
 private const val TAG = "NotificationUtil"
 
@@ -40,9 +39,9 @@ object NotificationUtil {
     private lateinit var serviceNotification: Notification
 
     //    private var builder =
-    //        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+//        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_duck)
     private val commandNotificationBuilder =
-        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_duck)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNotificationChannel() {
@@ -51,16 +50,14 @@ object NotificationUtil {
         val importance = NotificationManager.IMPORTANCE_LOW
         val channelGroup =
             NotificationChannelGroup(NOTIFICATION_GROUP_ID, context.getString(R.string.download))
-        val channel =
-            NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-                group = NOTIFICATION_GROUP_ID
-            }
-        val serviceChannel =
-            NotificationChannel(SERVICE_CHANNEL_ID, name, importance).apply {
-                description = context.getString(R.string.service_title)
-                group = NOTIFICATION_GROUP_ID
-            }
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            description = descriptionText
+            group = NOTIFICATION_GROUP_ID
+        }
+        val serviceChannel = NotificationChannel(SERVICE_CHANNEL_ID, name, importance).apply {
+            description = context.getString(R.string.service_title)
+            group = NOTIFICATION_GROUP_ID
+        }
         notificationManager.createNotificationChannelGroup(channelGroup)
         notificationManager.createNotificationChannel(channel)
         notificationManager.createNotificationChannel(serviceChannel)
@@ -71,27 +68,24 @@ object NotificationUtil {
         notificationId: Int = DEFAULT_NOTIFICATION_ID,
         progress: Int = PROGRESS_INITIAL,
         taskId: String? = null,
-        text: String? = null,
+        text: String? = null
     ) {
-        if (!NOTIFICATION.getBoolean()) return
-        val pendingIntent =
-            taskId?.let {
-                Intent(context.applicationContext, NotificationActionReceiver::class.java)
-                    .putExtra(TASK_ID_KEY, taskId)
-                    .putExtra(NOTIFICATION_ID_KEY, notificationId)
-                    .putExtra(ACTION_KEY, ACTION_CANCEL_TASK)
-                    .run {
-                        PendingIntent.getBroadcast(
-                            context.applicationContext,
-                            notificationId,
-                            this,
-                            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
-                        )
-                    }
-            }
+        if (!PreferenceUtil.getValue(NOTIFICATION)) return
+        val pendingIntent = taskId?.let {
+            Intent(context.applicationContext, NotificationActionReceiver::class.java)
+                .putExtra(TASK_ID_KEY, taskId)
+                .putExtra(NOTIFICATION_ID_KEY, notificationId)
+                .putExtra(ACTION_KEY, ACTION_CANCEL_TASK).run {
+                    PendingIntent.getBroadcast(
+                        context.applicationContext,
+                        notificationId,
+                        this,
+                        PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                }
+        }
 
-        NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_stat_seal)
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_duck)
             .setContentTitle(title)
             .setProgress(PROGRESS_MAX, progress, progress <= 0)
             .setOngoing(true)
@@ -99,7 +93,11 @@ object NotificationUtil {
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .run {
                 pendingIntent?.let {
-                    addAction(R.drawable.outline_cancel_24, context.getString(R.string.cancel), it)
+                    addAction(
+                        R.drawable.outline_cancel_24,
+                        context.getString(R.string.cancel),
+                        it
+                    )
                 }
                 notificationManager.notify(notificationId, build())
             }
@@ -113,11 +111,11 @@ object NotificationUtil {
     ) {
         Log.d(TAG, "finishNotification: ")
         notificationManager.cancel(notificationId)
-        if (!NOTIFICATION.getBoolean()) return
+        if (!PreferenceUtil.getValue(NOTIFICATION)) return
 
         val builder =
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_seal)
+                .setSmallIcon(R.drawable.ic_stat_duck)
                 .setContentText(text)
                 .setOngoing(false)
                 .setAutoCancel(true)
@@ -131,10 +129,10 @@ object NotificationUtil {
         title: String? = null,
         text: String? = null,
     ) {
-        //        notificationManager.cancel(notificationId)
+//        notificationManager.cancel(notificationId)
         val builder =
             NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_seal)
+                .setSmallIcon(R.drawable.ic_stat_duck)
                 .setContentText(text)
                 .setProgress(0, 0, false)
                 .setAutoCancel(true)
@@ -146,23 +144,21 @@ object NotificationUtil {
     }
 
     fun makeServiceNotification(intent: PendingIntent, text: String? = null): Notification {
-        serviceNotification =
-            NotificationCompat.Builder(context, SERVICE_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_seal)
-                .setContentTitle(context.getString(R.string.service_title))
-                .setContentText(text)
-                .setOngoing(true)
-                .setContentIntent(intent)
-                .setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)
-                .build()
+        serviceNotification = NotificationCompat.Builder(context, SERVICE_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_stat_duck)
+            .setContentTitle(context.getString(R.string.service_title))
+            .setContentText(text)
+            .setOngoing(true)
+            .setContentIntent(intent)
+            .setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)
+            .build()
         return serviceNotification
     }
 
     fun updateServiceNotificationForPlaylist(index: Int, itemCount: Int) {
-        serviceNotification =
-            NotificationCompat.Builder(context, serviceNotification)
-                .setContentTitle(context.getString(R.string.service_title) + " ($index/$itemCount)")
-                .build()
+        serviceNotification = NotificationCompat.Builder(context, serviceNotification)
+            .setContentTitle(context.getString(R.string.service_title) + " ($index/$itemCount)")
+            .build()
         notificationManager.notify(SERVICE_NOTIFICATION_ID, serviceNotification)
     }
 
@@ -170,41 +166,34 @@ object NotificationUtil {
         notificationManager.cancel(notificationId)
     }
 
-    fun notifyError(
-        title: String,
-        textId: Int = R.string.download_error_msg,
+    fun makeErrorReportNotification(
+        title: String = context.getString(R.string.download_error_msg),
         notificationId: Int,
-        report: String,
+        error: String,
     ) {
-        if (!NOTIFICATION.getBoolean()) return
+        if (!PreferenceUtil.getValue(NOTIFICATION)) return
 
-        val intent =
-            Intent()
-                .setClass(context, NotificationActionReceiver::class.java)
-                .putExtra(NOTIFICATION_ID_KEY, notificationId)
-                .putExtra(ERROR_REPORT_KEY, report)
-                .putExtra(ACTION_KEY, ACTION_ERROR_REPORT)
+        val intent = Intent()
+            .setClass(context, NotificationActionReceiver::class.java)
+            .putExtra(NOTIFICATION_ID_KEY, notificationId)
+            .putExtra(ERROR_REPORT_KEY, error)
+            .putExtra(ACTION_KEY, ACTION_ERROR_REPORT)
 
-        val pendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                notificationId,
-                intent,
-                PendingIntent.FLAG_ONE_SHOT or
-                    PendingIntent.FLAG_IMMUTABLE or
-                    PendingIntent.FLAG_UPDATE_CURRENT,
-            )
-        NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_stat_seal)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_duck)
             .setContentTitle(title)
-            .setContentText(context.getString(textId))
+            .setContentText(error)
             .setOngoing(false)
             .addAction(
                 R.drawable.outline_content_copy_24,
                 context.getString(R.string.copy_error_report),
-                pendingIntent,
-            )
-            .run {
+                pendingIntent
+            ).run {
                 notificationManager.cancel(notificationId)
                 notificationManager.notify(notificationId, build())
             }
@@ -216,39 +205,35 @@ object NotificationUtil {
         progress: Int,
         text: String? = null,
         templateName: String,
-        taskUrl: String,
+        taskUrl: String
     ) {
-        if (!NOTIFICATION.getBoolean()) return
+        if (!PreferenceUtil.getValue(NOTIFICATION)) return
 
-        val intent =
-            Intent(context.applicationContext, NotificationActionReceiver::class.java)
-                .putExtra(TASK_ID_KEY, taskId)
-                .putExtra(NOTIFICATION_ID_KEY, notificationId)
-                .putExtra(ACTION_KEY, ACTION_CANCEL_TASK)
+        val intent = Intent(context.applicationContext, NotificationActionReceiver::class.java)
+            .putExtra(TASK_ID_KEY, taskId)
+            .putExtra(NOTIFICATION_ID_KEY, notificationId)
+            .putExtra(ACTION_KEY, ACTION_CANCEL_TASK)
 
-        val pendingIntent =
-            PendingIntent.getBroadcast(
-                context.applicationContext,
-                notificationId,
-                intent,
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
-            )
+        val pendingIntent = PendingIntent.getBroadcast(
+            context.applicationContext,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_stat_seal)
-            .setContentTitle(
-                "[${templateName}_${taskUrl}] " +
-                    context.getString(R.string.execute_command_notification)
-            )
+        NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.ic_stat_duck)
+            .setContentTitle("[${templateName}_${taskUrl}] " + context.getString(R.string.execute_command_notification))
             .setContentText(text)
             .setOngoing(true)
             .setProgress(PROGRESS_MAX, progress, progress == -1)
             .addAction(
                 R.drawable.outline_cancel_24,
                 context.getString(R.string.cancel),
-                pendingIntent,
+                pendingIntent
             )
-            .run { notificationManager.notify(notificationId, build()) }
+            .run {
+                notificationManager.notify(notificationId, build())
+            }
     }
 
     fun cancelAllNotifications() {
@@ -256,7 +241,6 @@ object NotificationUtil {
     }
 
     fun areNotificationsEnabled(): Boolean {
-        return if (Build.VERSION.SDK_INT <= 24) true
-        else notificationManager.areNotificationsEnabled()
+        return if (Build.VERSION.SDK_INT <= 24) true else notificationManager.areNotificationsEnabled()
     }
 }

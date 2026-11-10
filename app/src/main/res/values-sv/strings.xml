@@ -18,7 +18,7 @@
     <string name="language">Gränssnittsspråk</string>
     <string name="language_settings">Ange gränssnittets språk</string>
     <string name="task_running">En befintlig nedladdningsuppgift är redan igång</string>
-    <string name="paste_msg">Klistra in URL</string>
+    <string name="paste_msg">Klistra in URL från Urklipp</string>
     <string name="paste_fail_msg">Kunde inte matcha URL:en i Urklipp</string>
     <string name="ytdlp_version">Yt-dlp version</string>
     <string name="delete_info">Ta bort\?</string>
@@ -30,9 +30,11 @@
     <string name="link_copied">Länk kopierad till urklipp</string>
     <string name="open_url">Öppna länken</string>
     <string name="remove">Ta bort</string>
-    <string name="delete_file">Radera fil</string>
+    <string name="delete_file">Radera</string>
     <string name="about_page">Version, feedback, automatisk uppdatering</string>
     <string name="version">Version</string>
+    <string name="release_desc">Leta efter ändringsloggar och nya versioner</string>
+    <string name="release">Senaste utgåvan</string>
     <string name="video">Video</string>
     <string name="checked">Kontrollerat</string>
     <string name="credits">Krediter</string>
@@ -100,6 +102,7 @@
     <string name="about">Om</string>
     <string name="ytdlp_update">Klicka här för att installera den senaste yt-dlp versionen</string>
     <string name="back">Tillbaka</string>
+    <string name="readme_desc">Kontrollera GitHub-arkivet och README</string>
     <string name="custom_command_desc">Kör kommandot yt-dlp med anpassad mall</string>
     <string name="settings_before_download">Konfigurera före nedladdning</string>
     <string name="edit_template_desc">Utmatningssökväg och URL kommer att läggas till av appen.</string>
@@ -111,7 +114,7 @@
     <string name="additional_settings">Ytterligare inställningar</string>
     <string name="download_notification">Nedladdningsanmälan</string>
     <string name="download_range_selection">Urval av spellista</string>
-    <string name="playlist_indicator_text">Hämtar spellista (%1$d/%2$d)…</string>
+    <string name="playlist_indicator_text">Hämtar spellista (%1$d/%2$d), tryck för att stoppa.</string>
     <string name="audio_directory">Ljudmapp</string>
     <string name="to">Sluta</string>
     <string name="download_range_desc">Ange hur många videor som ska hämtas från spellistan \"%3$s\" (från %1$d till %2$d).</string>
@@ -123,5 +126,4 @@
     <string name="permission_issue_desc">Kataloger annat än Nedladdade filer/ och Dokument/ stödjs inte</string>
     <string name="battery_configuration">Batterikonfiguration</string>
     <string name="battery_configuration_desc">Avaktivera appens batterioptimering för att aktivera bakgrundsnedladdning</string>
-    <string name="ytdlp_update_action">Uppdatera yt-dlp</string>
 </resources>

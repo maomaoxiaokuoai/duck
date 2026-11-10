@@ -1,5 +1,6 @@
 package com.duck.app.ui.page.videolist
 
+import VideoStreamSVG
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,7 +9,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -26,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DriveFileMove
@@ -41,7 +41,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -65,7 +64,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -78,7 +76,6 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duck.app.App
 import com.duck.app.R
 import com.duck.app.database.backup.BackupUtil
@@ -89,16 +86,16 @@ import com.duck.app.database.backup.BackupUtil.toURLListString
 import com.duck.app.database.objects.DownloadedVideoInfo
 import com.duck.app.ui.common.HapticFeedback.slightHapticFeedback
 import com.duck.app.ui.common.LocalWindowWidthState
+import com.duck.app.ui.common.SVGImage
 import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.CheckBoxItem
 import com.duck.app.ui.component.ConfirmButton
 import com.duck.app.ui.component.DismissButton
+import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.MediaListItem
 import com.duck.app.ui.component.DuckDialog
 import com.duck.app.ui.component.DuckSearchBar
 import com.duck.app.ui.component.VideoFilterChip
-import com.duck.app.ui.svg.DynamicColorImageVectors
-import com.duck.app.ui.svg.drawablevectors.videoSteaming
 import com.duck.app.util.AUDIO_REGEX
 import com.duck.app.util.FileUtil
 import com.duck.app.util.ToastUtil
@@ -107,23 +104,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.androidx.compose.koinViewModel
 
 fun DownloadedVideoInfo.filterByType(
     videoFilter: Boolean = false,
-    audioFilter: Boolean = true,
+    audioFilter: Boolean = true
 ): Boolean {
-    return if (!(videoFilter || audioFilter)) true
-    else if (audioFilter) this.videoPath.contains(Regex(AUDIO_REGEX))
+    return if (!(videoFilter || audioFilter))
+        true
+    else if (audioFilter)
+        this.videoPath.contains(Regex(AUDIO_REGEX))
     else !this.videoPath.contains(Regex(AUDIO_REGEX))
 }
 
 fun DownloadedVideoInfo.filterSort(
     viewState: VideoListViewModel.VideoListViewState,
-    filterSet: Set<String>,
+    filterSet: Set<String>
 ): Boolean {
-    return filterByType(videoFilter = viewState.videoFilter, audioFilter = viewState.audioFilter) &&
-        filterByExtractor(filterSet.elementAtOrNull(viewState.activeFilterIndex))
+    return filterByType(
+        videoFilter = viewState.videoFilter,
+        audioFilter = viewState.audioFilter
+    ) && filterByExtractor(
+        filterSet.elementAtOrNull(viewState.activeFilterIndex)
+    )
 }
 
 fun DownloadedVideoInfo.filterByExtractor(extractor: String?): Boolean {
@@ -132,24 +134,26 @@ fun DownloadedVideoInfo.filterByExtractor(extractor: String?): Boolean {
 
 private const val TAG = "VideoListPage"
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBack: () -> Unit) {
+fun VideoListPage(
+    viewModel: VideoListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    onNavigateBack: () -> Unit
+) {
     val viewState by viewModel.stateFlow.collectAsStateWithLifecycle()
     val fullVideoList by viewModel.videoListFlow.collectAsStateWithLifecycle(emptyList())
-    val searchedVideoList by
-        viewModel.searchedVideoListFlow.collectAsStateWithLifecycle(emptyList())
+    val searchedVideoList by viewModel.searchedVideoListFlow.collectAsStateWithLifecycle(
+        emptyList()
+    )
 
     val videoList = if (viewState.isSearching) searchedVideoList else fullVideoList
     val filterSet by viewModel.filterSetFlow.collectAsState(mutableSetOf())
 
     val scrollBehavior =
-        if (fullVideoList.isNotEmpty())
-            TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-                rememberTopAppBarState(),
-                canScroll = { true },
-            )
-        else TopAppBarDefaults.pinnedScrollBehavior()
+        if (fullVideoList.isNotEmpty()) TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+            rememberTopAppBarState(),
+            canScroll = { true }
+        ) else TopAppBarDefaults.pinnedScrollBehavior()
 
     val scope = rememberCoroutineScope()
     val softKeyboardController = LocalSoftwareKeyboardController.current
@@ -157,12 +161,14 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
 
-    val fileSizeMap by
-        viewModel.fileSizeMapFlow.collectAsStateWithLifecycle(initialValue = emptyMap())
+    val fileSizeMap by viewModel.fileSizeMapFlow.collectAsStateWithLifecycle(initialValue = emptyMap())
     val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val hostState = remember { SnackbarHostState() }
 
-    var currentVideoInfo by remember { mutableStateOf(DownloadedVideoInfo()) }
+
+    var currentVideoInfo by remember {
+        mutableStateOf(DownloadedVideoInfo())
+    }
 
     var isSelectEnabled by remember { mutableStateOf(false) }
     var showRemoveMultipleItemsDialog by remember { mutableStateOf(false) }
@@ -174,7 +180,11 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
 
     @Composable
     fun FilterChips(modifier: Modifier = Modifier) {
-        Row(modifier.horizontalScroll(rememberScrollState()).selectableGroup()) {
+        Row(
+            modifier
+                .horizontalScroll(rememberScrollState())
+                .selectableGroup(),
+        ) {
             Row(modifier = Modifier.padding(horizontal = 8.dp)) {
                 VideoFilterChip(
                     selected = viewState.audioFilter,
@@ -189,18 +199,18 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                 )
                 if (filterSet.size > 1) {
                     VerticalDivider(
-                        modifier =
-                            Modifier.padding(horizontal = 6.dp)
-                                .height(24.dp)
-                                .width(1f.dp)
-                                .align(Alignment.CenterVertically),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                            .height(24.dp)
+                            .width(1f.dp)
+                            .align(Alignment.CenterVertically),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     )
                     for (i in 0 until filterSet.size) {
                         VideoFilterChip(
                             selected = viewState.activeFilterIndex == i,
                             onClick = { viewModel.clickExtractorFilter(i) },
-                            label = filterSet.elementAt(i),
+                            label = filterSet.elementAt(i)
                         )
                     }
                 }
@@ -208,7 +218,8 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
         }
     }
 
-    val selectedItemIds = remember(videoList, viewState) { mutableStateListOf<Int>() }
+    val selectedItemIds =
+        remember(videoList, viewState) { mutableStateListOf<Int>() }
 
     LaunchedEffect(isSelectEnabled) {
         if (!isSelectEnabled) {
@@ -217,51 +228,48 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
         }
     }
 
-    val selectedVideoCount =
-        remember(selectedItemIds.size) {
-            mutableIntStateOf(
-                videoList.count { info ->
-                    selectedItemIds.contains(info.id) &&
-                        info.filterByType(videoFilter = true, audioFilter = false)
-                }
-            )
-        }
-    val selectedAudioCount =
-        remember(selectedItemIds.size) {
-            mutableIntStateOf(
-                videoList.count { info ->
-                    selectedItemIds.contains(info.id) &&
-                        info.filterByType(videoFilter = false, audioFilter = true)
-                }
-            )
-        }
 
-    val selectedFileSizeSum by
-        remember(selectedItemIds.size) {
-            derivedStateOf {
-                selectedItemIds.fold(0L) { acc: Long, id: Int ->
-                    acc + fileSizeMap.getOrElse(id) { 0L }
-                }
-            }
-        }
-
-    val visibleItemCount =
-        remember(videoList, viewState) {
-            mutableIntStateOf(videoList.count { it.filterSort(viewState, filterSet) })
-        }
-
-    val checkBoxState by
-        remember(selectedItemIds, visibleItemCount) {
-            derivedStateOf {
-                if (selectedItemIds.isEmpty()) ToggleableState.Off
-                else if (
-                    selectedItemIds.size == visibleItemCount.intValue &&
-                        selectedItemIds.isNotEmpty()
+    val selectedVideoCount = remember(selectedItemIds.size) {
+        mutableIntStateOf(
+            videoList.count { info ->
+                selectedItemIds.contains(info.id) && info.filterByType(
+                    videoFilter = true,
+                    audioFilter = false
                 )
-                    ToggleableState.On
-                else ToggleableState.Indeterminate
+            })
+    }
+    val selectedAudioCount = remember(selectedItemIds.size) {
+        mutableIntStateOf(
+            videoList.count { info ->
+                selectedItemIds.contains(info.id) && info.filterByType(
+                    videoFilter = false,
+                    audioFilter = true
+                )
+            })
+    }
+
+    val selectedFileSizeSum by remember(selectedItemIds.size) {
+        derivedStateOf {
+            selectedItemIds.fold(0L) { acc: Long, id: Int ->
+                acc + fileSizeMap.getOrElse(id) { 0L }
             }
         }
+    }
+
+    val visibleItemCount = remember(
+        videoList, viewState
+    ) { mutableIntStateOf(videoList.count { it.filterSort(viewState, filterSet) }) }
+
+    val checkBoxState by remember(selectedItemIds, visibleItemCount) {
+        derivedStateOf {
+            if (selectedItemIds.isEmpty())
+                ToggleableState.Off
+            else if (selectedItemIds.size == visibleItemCount.intValue && selectedItemIds.isNotEmpty())
+                ToggleableState.On
+            else
+                ToggleableState.Indeterminate
+        }
+    }
 
     var showRemoveDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -274,6 +282,7 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
         }
     }
 
+
     LaunchedEffect(sheetState.targetValue, isSelectEnabled) {
         if (showBottomSheet || isSelectEnabled) {
             softKeyboardController?.hide()
@@ -285,10 +294,16 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
         topBar = {
             LargeTopAppBar(
                 title = {
-                    Text(modifier = Modifier, text = stringResource(R.string.downloads_history))
+                    Text(
+                        modifier = Modifier,
+                        text = stringResource(R.string.downloads_history)
+                    )
                 },
-                navigationIcon = { BackButton { onNavigateBack() } },
-                actions = {
+                navigationIcon = {
+                    BackButton {
+                        onNavigateBack()
+                    }
+                }, actions = {
                     Row {
                         if (fullVideoList.isNotEmpty()) {
                             IconToggleButton(
@@ -303,77 +318,75 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                                         }
                                     }
                                 },
-                                checked = viewState.isSearching,
+                                checked = viewState.isSearching
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Search,
-                                    contentDescription = stringResource(R.string.search),
+                                    contentDescription = stringResource(R.string.search)
                                 )
                             }
                         }
                         var expanded by remember { mutableStateOf(false) }
-                        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+                        Box(
+                            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+                        ) {
                             IconButton(onClick = { expanded = true }) {
                                 Icon(
                                     imageVector = Icons.Outlined.MoreVert,
-                                    contentDescription =
-                                        stringResource(id = R.string.show_more_actions),
+                                    contentDescription = stringResource(
+                                        id = R.string.show_more_actions
+                                    )
                                 )
                             }
                             DropdownMenu(
                                 expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
+                                onDismissRequest = { expanded = false }) {
                                 if (visibleItemCount.intValue > 0) {
                                     DropdownMenuItem(
                                         leadingIcon = {
                                             Icon(
-                                                imageVector =
-                                                    Icons.AutoMirrored.Outlined.DriveFileMove,
-                                                contentDescription = null,
+                                                imageVector = Icons.AutoMirrored.Outlined.DriveFileMove,
+                                                contentDescription = null
                                             )
                                         },
-                                        text = {
-                                            Text(text = stringResource(id = R.string.export_backup))
-                                        },
+                                        text = { Text(text = stringResource(id = R.string.export_backup)) },
                                         onClick = {
                                             showExportDialog = true
                                             expanded = false
-                                        },
-                                    )
+                                        })
                                 }
                                 DropdownMenuItem(
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Outlined.Restore,
-                                            contentDescription = null,
+                                            contentDescription = null
                                         )
                                     },
-                                    text = {
-                                        Text(text = stringResource(id = R.string.import_backup))
-                                    },
+                                    text = { Text(text = stringResource(id = R.string.import_backup)) },
                                     onClick = {
                                         showImportDialog = true
                                         expanded = false
-                                    },
-                                )
+                                    })
                             }
+
                         }
                     }
-                },
-                scrollBehavior = scrollBehavior,
+                }, scrollBehavior = scrollBehavior
             )
-        },
-        bottomBar = {
+        }, bottomBar = {
             AnimatedVisibility(
                 isSelectEnabled,
-                enter = expandVertically(),
-                exit = shrinkVertically(),
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
-                BottomAppBar(modifier = Modifier) {
+                BottomAppBar(
+                    modifier = Modifier
+                ) {
                     val selectAllText = stringResource(R.string.select_all)
                     TriStateCheckbox(
-                        modifier = Modifier.semantics { this.contentDescription = selectAllText },
+                        modifier = Modifier.semantics {
+                            this.contentDescription = selectAllText
+                        },
                         state = checkBoxState,
                         onClick = {
                             view.slightHapticFeedback()
@@ -381,9 +394,8 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                                 ToggleableState.On -> selectedItemIds.clear()
                                 else -> {
                                     for (item in videoList) {
-                                        if (
-                                            !selectedItemIds.contains(item.id) &&
-                                                item.filterSort(viewState, filterSet)
+                                        if (!selectedItemIds.contains(item.id)
+                                            && item.filterSort(viewState, filterSet)
                                         ) {
                                             selectedItemIds.add(item.id)
                                         }
@@ -394,84 +406,93 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                     )
                     Text(
                         modifier = Modifier.weight(1f),
-                        text =
-                            stringResource(R.string.multiselect_item_count)
-                                .format(selectedVideoCount.intValue, selectedAudioCount.intValue),
-                        style = MaterialTheme.typography.labelLarge,
+                        text = stringResource(R.string.multiselect_item_count).format(
+                            selectedVideoCount.intValue,
+                            selectedAudioCount.intValue
+                        ),
+                        style = MaterialTheme.typography.labelLarge
                     )
                     IconButton(
                         onClick = {
                             view.slightHapticFeedback()
                             showRemoveMultipleItemsDialog = true
                         },
-                        enabled = selectedItemIds.isNotEmpty(),
+                        enabled = selectedItemIds.isNotEmpty()
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.DeleteSweep,
-                            contentDescription = stringResource(id = R.string.remove),
+                            contentDescription = stringResource(id = R.string.remove)
                         )
                     }
                 }
             }
         },
-        snackbarHost = { SnackbarHost(hostState = hostState) },
+        snackbarHost = {
+            SnackbarHost(hostState = hostState)
+        }
     ) { innerPadding ->
         if (fullVideoList.isEmpty())
-            Box(modifier = Modifier.fillMaxSize()) {
-                val painter =
-                    rememberVectorPainter(image = DynamicColorImageVectors.videoSteaming())
+            Box(
+                modifier = Modifier.fillMaxSize(),
+            ) {
                 Column(
-                    modifier = Modifier.align(Alignment.Center).widthIn(max = 360.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painter,
+                    SVGImage(
+                        SVGString = VideoStreamSVG,
                         contentDescription = null,
-                        modifier =
-                            Modifier.padding(vertical = 20.dp)
-                                .fillMaxWidth(0.5f)
-                                .widthIn(max = 240.dp),
+                        modifier = Modifier.padding(horizontal = 72.dp, vertical = 20.dp)
                     )
                     Text(
                         text = stringResource(R.string.no_downloaded_media),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-        val cellCount =
-            when (LocalWindowWidthState.current) {
-                WindowWidthSizeClass.Expanded -> 2
-                else -> 1
-            }
+        val cellCount = when (LocalWindowWidthState.current) {
+            WindowWidthSizeClass.Expanded -> 2
+            else -> 1
+        }
         val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(cellCount) }
-        LazyColumn(modifier = Modifier, state = lazyListState, contentPadding = innerPadding) {
+        LazyColumn(
+            modifier = Modifier.padding(innerPadding),
+            state = lazyListState
+        ) {
             if (fullVideoList.isNotEmpty()) {
                 item {
                     Column {
                         AnimatedVisibility(visible = viewState.isSearching) {
                             DuckSearchBar(
-                                modifier =
-                                    Modifier.padding(horizontal = 12.dp).padding(vertical = 8.dp),
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .padding(vertical = 8.dp),
                                 text = viewState.searchText,
                                 placeholderText = stringResource(R.string.search_in_downloads),
-                                onValueChange = viewModel::updateSearchText,
+                                onValueChange = viewModel::updateSearchText
                             )
                         }
-                        FilterChips(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+                        FilterChips(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        )
                     }
                 }
             }
             for (info in videoList) {
 
-                item(key = info.id, contentType = { info.videoPath.contains(AUDIO_REGEX) }) {
+                item(
+                    key = info.id,
+                    contentType = { info.videoPath.contains(AUDIO_REGEX) }) {
                     with(info) {
                         AnimatedVisibility(
                             modifier = Modifier,
                             visible = info.filterSort(viewState, filterSet),
                             exit = shrinkVertically() + fadeOut(),
-                            enter = expandVertically() + fadeIn(),
+                            enter = expandVertically() + fadeIn()
                         ) {
                             MediaListItem(
                                 modifier = Modifier,
@@ -484,17 +505,16 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                                 isSelectEnabled = { isSelectEnabled },
                                 isSelected = { selectedItemIds.contains(id) },
                                 onSelect = {
-                                    if (selectedItemIds.contains(id)) selectedItemIds.remove(id)
+                                    if (selectedItemIds.contains(id)) selectedItemIds.remove(
+                                        id
+                                    )
                                     else selectedItemIds.add(id)
                                 },
                                 onClick = {
                                     FileUtil.openFile(path = videoPath) {
-                                        ToastUtil.makeToastSuspend(
-                                            App.context.getString(R.string.file_unavailable)
-                                        )
+                                        ToastUtil.makeToastSuspend(App.context.getString(R.string.file_unavailable))
                                     }
-                                },
-                                onLongClick = {
+                                }, onLongClick = {
                                     isSelectEnabled = true
                                     selectedItemIds.add(id)
                                 },
@@ -506,14 +526,18 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
                                         delay(50)
                                         sheetState.show()
                                     }
-                                },
+                                }
                             )
                         }
                     }
                 }
             }
+
         }
+
+
     }
+
 
     if (showBottomSheet) {
         val isFileAvailable = fileSizeMap[currentVideoInfo.id] != 0L
@@ -522,10 +546,11 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
             info = currentVideoInfo,
             isFileAvailable = isFileAvailable,
             onDismissRequest = {
-                scope.launch { sheetState.hide() }.invokeOnCompletion { showBottomSheet = false }
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    showBottomSheet = false
+                }
             },
-            onDelete = { showRemoveDialog = true },
-        )
+            onDelete = { showRemoveDialog = true })
     }
 
     var deleteFile by remember { mutableStateOf(false) }
@@ -536,85 +561,88 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
             deleteFile = deleteFile,
             onDeleteFileToggled = { deleteFile = it },
             onRemoveConfirm = {
-                viewModel.deleteDownloadHistory(listOf(currentVideoInfo), deleteFile = deleteFile)
-            },
-            onDismissRequest = { showRemoveDialog = false },
-        )
+                viewModel.deleteDownloadHistory(
+                    listOf(currentVideoInfo),
+                    deleteFile = deleteFile
+                )
+            }, onDismissRequest = {
+                showRemoveDialog = false
+            })
     }
 
     if (showRemoveMultipleItemsDialog) {
         DuckDialog(
             onDismissRequest = { showRemoveMultipleItemsDialog = false },
             icon = { Icon(Icons.Outlined.DeleteSweep, null) },
-            title = { Text(stringResource(R.string.delete_info)) },
-            text = {
+            title = { Text(stringResource(R.string.delete_info)) }, text = {
                 Column {
                     Text(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                        text =
-                            stringResource(R.string.delete_multiple_items_msg)
-                                .format(selectedItemIds.size),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        text = stringResource(R.string.delete_multiple_items_msg).format(
+                            selectedItemIds.size
+                        )
                     )
                     CheckBoxItem(
                         modifier = Modifier.padding(horizontal = 12.dp),
-                        text =
-                            stringResource(R.string.delete_file) +
-                                " (${selectedFileSizeSum.toFileSizeText()})",
-                        checked = deleteFile,
-                    ) {
-                        deleteFile = !deleteFile
-                    }
+                        text = stringResource(R.string.delete_file) + " (${selectedFileSizeSum.toFileSizeText()})",
+                        checked = deleteFile
+                    ) { deleteFile = !deleteFile }
                 }
-            },
-            confirmButton = {
+            }, confirmButton = {
                 ConfirmButton {
-                    viewModel.deleteDownloadHistory(
-                        infoList = videoList.filter { selectedItemIds.contains(it.id) },
-                        deleteFile = deleteFile,
-                    )
+                    viewModel.deleteDownloadHistory(infoList = videoList.filter {
+                        selectedItemIds.contains(
+                            it.id
+                        )
+                    }, deleteFile = deleteFile)
                     showRemoveMultipleItemsDialog = false
                     isSelectEnabled = false
+
                 }
-            },
-            dismissButton = { DismissButton { showRemoveMultipleItemsDialog = false } },
+            }, dismissButton = {
+                DismissButton {
+                    showRemoveMultipleItemsDialog = false
+                }
+            }
         )
     }
 
     var backupString by remember { mutableStateOf("") }
 
     val exportLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.CreateDocument("text/plain")
-        ) { uri ->
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument("text/plain")) { uri ->
             uri?.let {
                 scope.launch(Dispatchers.IO) {
                     context.contentResolver.openOutputStream(uri)?.use {
                         it.write(backupString.toByteArray())
                     }
-                    withContext(Dispatchers.Main) { showExportDialog = false }
+                    withContext(Dispatchers.Main) {
+                        showExportDialog = false
+                    }
                 }
             }
         }
 
-    if (showExportDialog) {
-        val list =
-            if (selectedItemIds.isNotEmpty()) {
-                videoList.filter { selectedItemIds.contains(it.id) }
-            } else {
-                videoList.filter { it.filterSort(viewState, filterSet) }
-            }
 
-        ExportDialog(onDismissRequest = { showExportDialog = false }, itemCount = list.size) {
-            type,
-            destination ->
+    if (showExportDialog) {
+        val list = if (selectedItemIds.isNotEmpty()) {
+            videoList.filter { selectedItemIds.contains(it.id) }
+        } else {
+            videoList.filter { it.filterSort(viewState, filterSet) }
+        }
+
+        ExportDialog(
+            onDismissRequest = { showExportDialog = false },
+            itemCount = list.size
+        ) { type, destination ->
             list.backupToString(type).let {
                 when (destination) {
                     Clipboard -> clipboardManager.setText(AnnotatedString(it))
                     File -> {
                         backupString = it
-                        exportLauncher.launch(
-                            BackupUtil.getDownloadHistoryExportFilename(context = context)
-                        )
+                        exportLauncher.launch(BackupUtil.getDownloadHistoryExportFilename(context = context))
                     }
                 }
                 view.slightHapticFeedback()
@@ -624,7 +652,9 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
     }
 
     val importLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri ->
             uri?.let {
                 viewModel.importBackupFromUri(context, uri) {
                     viewModel.showImportedSnackbar(hostState, context, it)
@@ -656,10 +686,16 @@ fun VideoListPage(viewModel: VideoListViewModel = koinViewModel(), onNavigateBac
     }
 }
 
-private fun List<DownloadedVideoInfo>.backupToString(type: BackupUtil.BackupType): String {
+private fun List<DownloadedVideoInfo>.backupToString(
+    type: BackupUtil.BackupType,
+): String {
     return when (type) {
         BackupUtil.BackupType.DownloadHistory -> reversed().toJsonString()
         BackupUtil.BackupType.URLList -> toURLListString()
         else -> throw IllegalArgumentException()
     }
 }
+
+
+
+

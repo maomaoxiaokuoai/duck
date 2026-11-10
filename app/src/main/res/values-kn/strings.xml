@@ -6,6 +6,7 @@
     <string name="print_details">ಡೀಟೈಲ್ಡ್ ಔಟ್ಪುಟ್</string>
     <string name="link_copied">ಲಿಂಕ್ ಕೋಪಿಎಡ್ ಟು ಕ್ಲಿಪ್ಬೋರ್ಡ್</string>
     <string name="credits_desc">ಕ್ರೆಡಿಟ್ಸ್ ಅಂಡ್ ಲಿಬ್ರೆ ಸಾಫ್ಟ್ವೇರ್</string>
+    <string name="readme_desc">ಚೆಕ್ ದಿ ಗಿತುಬ್ ರೆಪೊಸಿಟರಿ ಅಂಡ್ ದಿ ರೆಡ್ಮ್</string>
     <string name="remove">ರಿಮೋವ್</string>
     <string name="custom_command_desc">ರನ್ yt-dlp ಕಮಾಂಡ್ ವಿಥ್ ಕಸ್ಟಮ್ ಟೆಂಪ್ಲೆಟ್</string>
     <string name="ytdlp_update">ಕ್ಲಿಕ್ ಟು ಇನ್ಸ್ಟಾಲ್ ದಿ ಲೇಟೆಸ್ಟ್ yt-dlp ವರ್ಷನ್</string>
@@ -19,12 +20,14 @@
     <string name="video_quality">ವಿಡಿಯೋ ಕ್ವಾಲಿಟಿ</string>
     <string name="display_settings">ಡಾರ್ಕ್ ಥೀಮ್, ಡೈನಾಮಿಕ್ ಕಲರ್,ಲ್ಯಾಂಗುವೇಜಸ್</string>
     <string name="settings_before_download_desc">ಕಾನ್ಫಿಗರ್ ಬಿಫೋರ್ ಡೌನ್ಲೋಡ್</string>
+    <string name="release_desc">ಲುಕ್ ಫಾರ್ ಛಂಗೆಲೊಗ್ಸ್ ಅಂಡ್ ನ್ಯೂ ವೆರಿಸಿಯೋನ್ಸ್</string>
     <string name="ytdlp_version">Yt-dlp ವರ್ಷನ್</string>
     <string name="display">ಡಿಸ್ಪ್ಲೇ</string>
     <string name="off">ಆಫ್</string>
     <string name="error_copied">ಎರರ್ ರಿಪೋರ್ಟ್ ಕಪಿಡ್ ಟು ಕ್ಲಿಪ್ಬೋರ್ಡ್</string>
     <string name="back">ಬ್ಯಾಕ್</string>
     <string name="downloads_history">ಡೌನ್ಲೋಡ್ಸ್</string>
+    <string name="release">ಲೇಟೆಸ್ಟ್ ರಿಲೀಸ್</string>
     <string name="version">ವರ್ಷನ್</string>
     <string name="yt_dlp_update_fail">ಕುಡ್ ನಾಟ್ ಇನ್ಸ್ಟಾಲ್ ದಿ ಲೇಟೆಸ್ಟ್ yt-dlp ವರ್ಷನ್. ಪ್ಲೀಸ್ ಮೇಕ್ ಸುರೆ ಯು ಆರ್ ಕನೆಕ್ಟೆಡ್ ಟು ದಿ ಇಂಟರ್ನೆಟ್.</string>
     <string name="general_settings">ಜನರಲ್</string>

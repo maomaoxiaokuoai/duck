@@ -4,82 +4,85 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import com.duck.app.ui.common.LocalDarkTheme
+import com.duck.app.ui.common.LocalDynamicColorSwitch
+import com.duck.app.ui.common.LocalWindowWidthState
 import com.duck.app.ui.common.SettingsProvider
-import com.duck.app.ui.page.downloadv2.configure.Config
-import com.duck.app.ui.page.downloadv2.configure.DownloadDialog
-import com.duck.app.ui.page.downloadv2.configure.DownloadDialogViewModel
-import com.duck.app.ui.page.downloadv2.configure.DownloadDialogViewModel.Action
-import com.duck.app.ui.page.downloadv2.configure.DownloadDialogViewModel.SelectionState
-import com.duck.app.ui.page.downloadv2.configure.FormatPage
-import com.duck.app.ui.page.downloadv2.configure.PlaylistSelectionPage
+import com.duck.app.ui.page.download.DownloadSettingDialog
 import com.duck.app.ui.theme.DuckTheme
-import com.duck.app.util.DownloadUtil
+import com.duck.app.util.CONFIGURE
+import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.PreferenceUtil
+import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.matchUrlFromSharedText
 import com.duck.app.util.setLanguage
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 
-private const val TAG = "QuickDownloadActivity"
+private const val TAG = "ShareActivity"
 
 class QuickDownloadActivity : ComponentActivity() {
-    private var sharedUrlCached: String = ""
-
-    private fun Intent.getSharedURL(): String? {
-        val intent = this
-
-        return when (intent.action) {
+    private var url: String = ""
+    private fun handleShareIntent(intent: Intent) {
+        Log.d(TAG, "handleShareIntent: $intent")
+        when (intent.action) {
             Intent.ACTION_VIEW -> {
-                intent.dataString
-            }
-
-            Intent.ACTION_SEND -> {
-                intent.getStringExtra(Intent.EXTRA_TEXT)?.let { sharedContent ->
-                    intent.removeExtra(Intent.EXTRA_TEXT)
-                    matchUrlFromSharedText(sharedContent)
+                intent.dataString?.let {
+                    url = it
                 }
             }
 
-            else -> {
-                null
+            Intent.ACTION_SEND -> {
+                intent.getStringExtra(Intent.EXTRA_TEXT)
+                    ?.let { sharedContent ->
+                        intent.removeExtra(Intent.EXTRA_TEXT)
+                        matchUrlFromSharedText(sharedContent)
+                            .let { matchedUrl ->
+                                url = matchedUrl
+                            }
+                    }
             }
         }
     }
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+    private fun onDownloadStarted(customCommand: Boolean) {
+        if (customCommand)
+            Downloader.executeCommandWithUrl(url)
+        else
+            Downloader.quickDownload(url = url)
+    }
+
+    @OptIn(
+        ExperimentalMaterial3WindowSizeClassApi::class,
+        ExperimentalMaterial3Api::class
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        intent.getSharedURL()?.let { sharedUrlCached = it }
-
-        if (sharedUrlCached.isEmpty()) {
-            finish()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { v, insets ->
+            v.setPadding(0, 0, 0, 0)
+            insets
         }
-
-        App.startService()
-
-        enableEdgeToEdge()
 
         window.run {
             setBackgroundDrawable(ColorDrawable(0))
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
@@ -87,83 +90,57 @@ class QuickDownloadActivity : ComponentActivity() {
                 setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT)
             }
         }
+        handleShareIntent(intent)
+        runBlocking {
+            if (Build.VERSION.SDK_INT < 33) {
+                setLanguage(PreferenceUtil.getLocaleFromPreference())
+            }
+        }
+        val isDialogEnabled = CONFIGURE.getBoolean()
 
-        if (Build.VERSION.SDK_INT < 33) {
-            runBlocking { setLanguage(PreferenceUtil.getLocaleFromPreference()) }
+        if (url.isEmpty()) {
+            finish()
         }
 
-        val viewModel: DownloadDialogViewModel = getViewModel()
-        viewModel.postAction(Action.ShowSheet(listOf(sharedUrlCached)))
+        if (!isDialogEnabled) {
+            onDownloadStarted(CUSTOM_COMMAND.getBoolean())
+            this.finish()
+        }
 
         setContent {
-            SettingsProvider(calculateWindowSizeClass(this).widthSizeClass) {
+            val scope = rememberCoroutineScope()
+            SettingsProvider(
+                windowWidthSizeClass = calculateWindowSizeClass(this).widthSizeClass
+            ) {
                 DuckTheme(
                     darkTheme = LocalDarkTheme.current.isDarkTheme(),
                     isHighContrastModeEnabled = LocalDarkTheme.current.isHighContrastModeEnabled,
+                    isDynamicColorEnabled = LocalDynamicColorSwitch.current,
                 ) {
-                    var preferences by remember {
-                        mutableStateOf(DownloadUtil.DownloadPreferences.createFromPreferences())
-                    }
 
-                    val sheetValue = viewModel.sheetValueFlow.collectAsStateWithLifecycle().value
 
-                    val state = viewModel.sheetStateFlow.collectAsStateWithLifecycle().value
+                    var showDialog by remember { mutableStateOf(true) }
 
-                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-                    val selectionState =
-                        viewModel.selectionStateFlow.collectAsStateWithLifecycle().value
-
-                    var showDialog by remember { mutableStateOf(false) }
-
-                    LaunchedEffect(sheetValue, selectionState) {
-                        if (sheetValue == DownloadDialogViewModel.SheetValue.Expanded) {
-                            showDialog = true
-                        } else if (sheetValue == DownloadDialogViewModel.SheetValue.Hidden) {
-                            launch { sheetState.hide() }
-                                .invokeOnCompletion {
-                                    showDialog = false
-                                    if (selectionState == SelectionState.Idle) {
-                                        this@QuickDownloadActivity.finish()
-                                    }
-                                }
-                        }
-                    }
-
-                    if (showDialog) {
-                        DownloadDialog(
-                            state = state,
-                            sheetState = sheetState,
-                            config = Config(),
-                            preferences = preferences,
-                            onPreferencesUpdate = { preferences = it },
-                            onActionPost = { viewModel.postAction(it) },
-                        )
-                    }
-
-                    when (selectionState) {
-                        is SelectionState.FormatSelection ->
-                            FormatPage(
-                                state = selectionState,
-                                onDismissRequest = {
-                                    viewModel.postAction(Action.Reset)
-                                    this.finish()
-                                },
-                            )
-
-                        SelectionState.Idle -> {}
-                        is SelectionState.PlaylistSelection -> {
-                            PlaylistSelectionPage(
-                                state = selectionState,
-                                onDismissRequest = {
-                                    viewModel.postAction(Action.Reset)
-                                    this.finish()
-                                },
-                            )
-                        }
-                    }
+                    val useDialog = LocalWindowWidthState.current != WindowWidthSizeClass.Compact
+                    DownloadSettingDialog(
+                        useDialog = useDialog,
+                        showDialog = showDialog,
+                        isQuickDownload = true,
+                        onDownloadConfirm = {
+                            onDownloadStarted(PreferenceUtil.getValue(CUSTOM_COMMAND))
+                        },
+                        onDismissRequest = {
+                            showDialog = false
+                            this@QuickDownloadActivity.finish()
+                        },
+                    )
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        intent?.let { handleShareIntent(it) }
+        super.onNewIntent(intent)
     }
 }

@@ -19,6 +19,7 @@
     <string name="open_url">Otwórz link</string>
     <string name="version">Wersja</string>
     <string name="video">Wideo</string>
+    <string name="release_desc">Sprawdź informacje o zmianach i nowych wersjach</string>
     <string name="advanced_settings">Zaawansowane</string>
     <string name="display">Wyświetlacz</string>
     <string name="display_settings">Ciemny motyw, kolor dynamiczny, język</string>
@@ -57,7 +58,9 @@
     <string name="remove">Usuń</string>
     <string name="audio">Audio</string>
     <string name="link_copied">Link skopiowany do schowka</string>
-    <string name="delete_file">Usuń plik</string>
+    <string name="delete_file">Usuń plik z pamięci telefonu</string>
+    <string name="readme_desc">Sprawdź repozytorium Github i README</string>
+    <string name="release">Najnowsze wydanie</string>
     <string name="about_page">Wersja, informacja zwrotna, automatyczna aktualizacja</string>
     <string name="credits_desc">Podziękowania i wolne oprogramowanie</string>
     <string name="custom_command">Niestandardowe polecenie</string>
@@ -90,6 +93,8 @@
     <string name="channel_description">Powiadamiaj o pobranych plikach i postępie</string>
     <string name="download_notification_desc">Powiadamiaj o pobranych plikach i postępie</string>
     <string name="execute_command_notification">Uruchamianie niestandardowego polecenia…</string>
+    <string name="translate">Przetłumacz</string>
+    <string name="translate_desc">Pomóż tłumaczyć tę aplikację na Hosted Weblate</string>
     <string name="unknown_error">Nieznany błąd</string>
     <string name="invalid_index_range">Nieprawidłowy zakres</string>
     <string name="download_desc">Następnie, po dostosowaniu opcji pobierania, naciśnij „Pobierz”.</string>
@@ -123,7 +128,7 @@
     <string name="permission_issue_desc">Foldery poza Download/ i Documents/ nie są wspierane</string>
     <string name="battery_configuration">Ustawienia baterii</string>
     <string name="battery_configuration_desc">Ignoruj optymalizację baterii dla tej aplikacji, aby pobierać w tle</string>
-    <string name="service_title">duck pobiera…</string>
+    <string name="service_title">Seal pobiera…</string>
     <string name="download_range_desc">Określ zakres filmów z playlisty „%3$s”, które chcesz pobrać (od %1$d do %2$d).</string>
     <string name="prefix">Szablon folderu wyjściowego</string>
     <string name="audio_format_preference">Preferowany format audio</string>
@@ -171,13 +176,16 @@
     <string name="status_fetching_video_info">Pobieranie informacji</string>
     <string name="status_downloading">Pobieranie</string>
     <string name="open_file">Otwórz plik</string>
-    <string name="copy_error_report">Kopia raportu</string>
+    <string name="copy_error_report">Raport błędu</string>
     <string name="sponsorblock_categories_desc">Określ kategorie SponsorBlock do usunięcia lub zaznaczenia w pliku wideo</string>
     <string name="multiselect_mode">Tryb wielokrotnego wyboru</string>
     <string name="private_mode">Tryb prywatny</string>
+    <string name="matrix_space">Kanał Matrix</string>
     <string name="abs_hint">Większość platform do strumieniowego przesyłania wideo dostarcza osobno audio i wideo, możesz wybrać i połączyć format audio z formatem wideo w jeden film.</string>
     <string name="msg_from_developer">Wiadomość od twórcy</string>
+    <string name="sponsor_msg2">Dziękuję bardzo!</string>
     <string name="status_error">Błąd</string>
+    <string name="switch_to_github_builds">przejście na kompilacje z GitHub</string>
     <string name="okay">Ok</string>
     <string name="got_it">Zrozumiano</string>
     <string name="download_with_cellular_desc">Zezwalaj na pobieranie multimediów po podłączeniu do sieci taryfowych</string>
@@ -192,23 +200,26 @@
     <string name="cookies">Ciasteczka</string>
     <string name="format_selection_desc">Wybierz format do pobrania przed rozpoczęciem pobierania</string>
     <string name="format_settings_desc">Format pliku, jakość wideo, napisy</string>
+    <string name="github_issue">Problemy z GitHub</string>
     <string name="high_contrast">Tryb ciemny o wysokim kontraście</string>
     <string name="new_template">Nowy szablon</string>
     <string name="format_selection">Wybór formatu</string>
     <string name="aria2_desc">Użyj aria2c jako zewnętrzny program do pobierania</string>
-    <string name="embed_subtitles_desc">Dołącz napisy do filmów, jeśli są dostępne</string>
+    <string name="embed_subtitles_desc">Osadź dostarczone napisy w filmach, jeśli są dostępne</string>
     <string name="status_canceled">Przerwane</string>
     <string name="disable_preview_desc">Brak wyświetlania miniatur podczas pobierania</string>
     <string name="unavailable">Niedostępne</string>
     <string name="selected_item_count">%1$d wybrane</string>
+    <string name="telegram_channel">Kanał Telegram</string>
     <string name="restart">Uruchom ponownie</string>
     <string name="info_copied">Informacja skopiowana do schowka</string>
     <string name="network_settings_desc">Limit szybkości, program do pobierania, ciasteczka</string>
     <string name="use_cookies">Użyj ciasteczek</string>
-    <string name="remove_cookie_profile_desc">Usunąć ten wpis dla \"%1$s\"? Należy pamiętać, że pliki cookie zapisane dla tej witryny nie zostaną usunięte.</string>
+    <string name="remove_cookie_profile_desc">Usuń ciasteczka dla \"%1$s\"?</string>
     <string name="generate_new_cookies">Wygeneruj nowe ciasteczka</string>
     <string name="disable_preview">Wyłącz podgląd</string>
     <string name="private_directory_desc">Przechowuj pobrane pliki w ukrytym katalogu</string>
+    <string name="github_issue_desc">Prześlij zgłoszenie błędu lub zaproponuj nową funkcję</string>
     <string name="dynamic_color">Dynamiczny kolor</string>
     <string name="clear_temp_files_info">Pliki tymczasowe mogą być użyte do wznowienia przerwanych pobrań. Czy na pewno chcesz usunąć wszystkie te pliki?
 \n
@@ -231,12 +242,14 @@
     <string name="enable_experimental_feature">Włączyć funkcje eksperymentalne\?</string>
     <string name="feature_unavailable">Funkcja niedostępna</string>
     <string name="clip_video_dialog_msg">Pobieranie przy użyciu tej funkcji będzie delegowane do FFmpeg w celu pobrania wybranych fragmentów wideo, ta funkcja jest nadal w fazie eksperymentalnej, a przycinanie nie będzie całkowicie dokładne, nie wszystkie formaty obsługują tę funkcję i możesz doświadczać wolniejszych prędkości pobierania.</string>
-    <string name="auto_update_disabled_msg">Automatyczna aktualizacja nie jest dostępna dla %1$s kompilacji. Jeżeli nie masz %1$s zainstalowanej na telefonie lub chciałbyś zobaczyć nadchodzące nowe funkcje w duck, rozważ %2$s.</string>
+    <string name="auto_update_disabled_msg">Automatyczna aktualizacja nie jest dostępna dla %1$s kompilacji. Jeżeli nie masz %1$s zainstalowanej na telefonie lub chciałbyś zobaczyć nadchodzące nowe funkcje w Seal, rozważ %2$s.</string>
     <string name="no_custom_command_tasks">Brak niestandardowych rozkazów poleceń</string>
     <string name="export_to_clipboard">Eksportuj do schowka</string>
     <string name="update">Aktualizacja</string>
     <string name="sponsorblock_desc">Usuń lub oznacz segmenty filmów za pomocą API SponsorBlock</string>
     <string name="dynamic_color_desc">Zastosuj kolory z tapety do motywu aplikacji</string>
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_desc">Wesprzyj aplikację poprzez wsparcie na GitHub</string>
     <string name="download_with_cellular">Pobierz przy pomocy sieci komórkowej</string>
     <string name="network">Sieć</string>
     <string name="rate_limit">Ograniczenie prędkości</string>
@@ -267,6 +280,8 @@
     <string name="temporary_directory_desc">Przechowuj pliki tymczasowe w katalogu wewnętrznym</string>
     <string name="running_tasks">Uruchomione zadania</string>
     <string name="show_logs">Pokaż logi</string>
+    <string name="sponsors">Sponsorzy</string>
+    <string name="sponsor_msg">Seal zawsze będzie darmowy i z otwartym kodem źródłowym. Jeśli Ci się spodoba, rozważ wsparcie mnie na GitHub!</string>
     <string name="feedback">Informacja zwrotna</string>
     <string name="subtitle_sponsorblock">Podczas usuwania segmentów SponsorBlock napisy mogą wyświetlać się w niewłaściwym czasie.</string>
     <string name="filesize_mb">%.2f MB</string>
@@ -346,9 +361,9 @@
     <string name="proxy_desc">Użyj serwer proxy do połączenia z internetem</string>
     <string name="enable_notifications_desc">Aplikacja potrzebuje Twojej zgody, by wyświetlać powiadomienia o statusie i postępie pobierania.</string>
     <string name="show_all_items">Pokaż wszystkie %1$d elementów</string>
-    <string name="custom_command_usage_msg">yt-dlp to potężne narzędzie wiersza poleceń do pobierania plików wideo. duck ułatwia korzystanie z yt-dlp, zapewniając intuicyjny graficzny interfejs użytkownika, gotowe presety dla często używanych poleceń i inne dodatkowe funkcje.
+    <string name="custom_command_usage_msg">yt-dlp to potężne narzędzie wiersza poleceń do pobierania plików wideo. Seal ułatwia korzystanie z yt-dlp, zapewniając intuicyjny graficzny interfejs użytkownika, gotowe presety dla często używanych poleceń i inne dodatkowe funkcje.
 \n
-\nW celu zaawansowanego korzystania z yt-dlp duck umożliwia tworzenie, zapisywanie i wykonywanie niestandardowych szablonów poleceń tak jak w terminalu.
+\nW celu zaawansowanego korzystania z yt-dlp Seal umożliwia tworzenie, zapisywanie i wykonywanie niestandardowych szablonów poleceń tak jak w terminalu.
 \n
 \nPodczas korzystania z niestandardowych poleceń większość opcji i funkcji GUI będzie wyłączona.</string>
     <string name="set_directory_desc">Kliknij, aby wybrać katalog</string>
@@ -394,15 +409,4 @@
     <string name="redownload">Pobierz ponownie</string>
     <string name="search_in_downloads">Szukaj w pobranych</string>
     <string name="search">Szukaj</string>
-    <string name="all_languages">Wszystkie języki</string>
-    <string name="playlist">Playlista</string>
-    <string name="proceed">Kontynuuj</string>
-    <string name="preset">Ustawienie wstępne</string>
-    <string name="prefer_placeholder">Preferuj %1$s</string>
-    <string name="preset_format_selection_desc">Pobierz automatyczne przy użyciu twoich preferencji</string>
-    <string name="edit_preset">Edytuj ustawienie wstępne</string>
-    <string name="best_quality_desc">Pobierz używając najlepszy dostępny format</string>
-    <string name="task_added">Zadanie dodane do kolejki</string>
-    <string name="reset">Reset</string>
-    <string name="custom_format_selection_desc">Wybieraj spośród formatów, napisów i dostosowuj dalej</string>
 </resources>

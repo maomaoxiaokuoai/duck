@@ -19,42 +19,44 @@ import com.duck.app.ui.component.DuckDialog
 
 @Composable
 fun RemoveItemDialog(
+
     deleteFile: Boolean = false,
     onDeleteFileToggled: (Boolean) -> Unit = {},
     info: DownloadedVideoInfo,
     onRemoveConfirm: (Boolean) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
-    DuckDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.delete_info)) },
-        icon = { Icon(Icons.Outlined.Delete, null) },
+    DuckDialog(onDismissRequest = onDismissRequest,
+        title = {
+            Text(text = stringResource(R.string.delete_info))
+        }, icon = { Icon(Icons.Outlined.Delete, null) },
         text = {
             Column {
                 Text(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                    text = stringResource(R.string.delete_info_msg).format(info.videoTitle),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    text = stringResource(R.string.delete_info_msg)
+                        .format(info.videoTitle),
                 )
                 CheckBoxItem(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     text = stringResource(R.string.delete_file),
                     checked = deleteFile,
-                    onValueChange = onDeleteFileToggled,
+                    onValueChange = onDeleteFileToggled
                 )
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                    onRemoveConfirm(deleteFile)
-                }
-            ) {
+
+        }, confirmButton = {
+            TextButton(onClick = {
+                onDismissRequest()
+                onRemoveConfirm(deleteFile)
+            }) {
                 Text(text = stringResource(R.string.confirm))
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) { Text(text = stringResource(R.string.dismiss)) }
-        },
-    )
+        }, dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.dismiss))
+            }
+        })
 }

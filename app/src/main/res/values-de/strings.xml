@@ -14,7 +14,7 @@
     <string name="general_settings">Allgemein</string>
     <string name="language_settings">Anzeigesprache festlegen</string>
     <string name="task_running">Eine bestehende Download-Aufgabe wird bereits ausgeführt</string>
-    <string name="paste_msg">Link einfügen</string>
+    <string name="paste_msg">Link aus der Zwischenablage einfügen</string>
     <string name="delete_info">Entfernen\?</string>
     <string name="delete_info_msg">„%1$s“ für immer aus deinem Downloadverlauf entfernen\?</string>
     <string name="confirm">Bestätigen</string>
@@ -27,6 +27,9 @@
     <string name="about_page">Version, Rückmeldung, Automatisches Update</string>
     <string name="back">Zurück</string>
     <string name="version">Version</string>
+    <string name="release_desc">Siehe Änderungsprotokolle und neue Versionen</string>
+    <string name="release">Neueste Version</string>
+    <string name="readme_desc">Prüfe das GitHub-Repository und die README</string>
     <string name="video">Video</string>
     <string name="checked">Geprüft</string>
     <string name="credits">Credits</string>
@@ -98,7 +101,7 @@
     <string name="permission_issue">Problem mit der Speicherberechtigung</string>
     <string name="battery_configuration">Akkukonfiguration</string>
     <string name="battery_configuration_desc">Akku-Optimierung für diese App ignorieren, um im Hintergrund herunterzuladen</string>
-    <string name="service_title">duck lädt herunter …</string>
+    <string name="service_title">Seal lädt herunter …</string>
     <string name="channel_description">Benachrichtigung über heruntergeladene Dateien und den Fortschritt</string>
     <string name="additional_settings">Zusätzliche Einstellungen</string>
     <string name="playlist_indicator_text">Herunterladen der Wiedergabeliste (%1$d/%2$d)…</string>
@@ -111,6 +114,8 @@
     <string name="download_directory">Downloadordner</string>
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="execute_command_notification">Benutzerdefinierte Befehlen ausführen …</string>
+    <string name="translate">Übersetzen</string>
+    <string name="translate_desc">Hilf bei der Übersetzung dieser App auf Weblate</string>
     <string name="edit_template_desc">Ausgabepfad und URL werden von der App hinzugefügt.</string>
     <string name="convert_audio">Konvertieren</string>
     <string name="paste_desc">Klicke auf „Einfügen“, um den Videolink aus der Zwischenablage zu holen.</string>
@@ -136,9 +141,11 @@
     <string name="custom_command_template_desc">Befehlsvorlagen bearbeiten und verwalten</string>
     <string name="downloading_indicator_text">Download läuft…</string>
     <string name="task_canceled">Download-Aufgabe wurde abgebrochen</string>
+    <string name="github_issue">GitHub-Problem</string>
     <string name="info_copied">Informationen in die Zwischenablage kopiert</string>
+    <string name="github_issue_desc">Einreichen eines Fehlerberichts oder einer Funktionsanfrage</string>
     <string name="status_enqueued">Eingereiht</string>
-    <string name="status_completed">Fertig</string>
+    <string name="status_completed">Abgeschlossen</string>
     <string name="status_downloading">Wird heruntergeladen</string>
     <string name="status_canceled">Abgebrochen</string>
     <string name="status_fetching_video_info">Informationen abrufen</string>
@@ -146,7 +153,7 @@
     <string name="restart">Neustarten</string>
     <string name="status_error">Fehler</string>
     <string name="copy_link">Link kopieren</string>
-    <string name="copy_error_report">Bericht kopieren</string>
+    <string name="copy_error_report">Fehlerbericht</string>
     <string name="video_resolution">Videoauflösung</string>
     <string name="video_file_size">Größe der Videodatei</string>
     <string name="export_to_clipboard">In Zwischenablage exportieren</string>
@@ -214,7 +221,9 @@
     <string name="custom_command_enabled_hint">Einige Optionen sind bei Verwendung des benutzerdefinierten Befehls nicht verfügbar</string>
     <string name="how_does_it_work">Wie funktioniert das\?</string>
     <string name="cookies_usage_msg">Für das Herunterladen von einigen Webseiten sind Informationen zur Kontoauthentifizierung erforderlich. Klicke auf „Neue Cookies generieren“, gib die URL der Webseite ein und melde dich dann mit deinem Konto auf der Browserseite an, damit die App sie für dich generieren kann.</string>
+    <string name="telegram_channel">Telegram-Kanal</string>
     <string name="cookies">Cookies</string>
+    <string name="matrix_space">Matrix-Raum</string>
     <string name="abs_hint">Die meisten Videostreaming-Plattformen liefern Audio und Video getrennt. Du kannst ein reines Audioformat auswählen und mit einem reinen Videoformat zu einem einzigen Video zusammenfügen.</string>
     <string name="edit_shortcuts_desc">Individuelle Verknüpfungen bearbeiten, die zur Erstellung von Befehlsvorlagen verwendet werden können.</string>
     <string name="running_tasks">Laufende Aufgaben</string>
@@ -268,7 +277,11 @@
     <string name="rename">Umbenennen</string>
     <string name="clear_all_cookies">Alle Cookies löschen</string>
     <string name="temporary_directory_desc">Temporäre Dateien im internen Ordner speichern</string>
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_desc">Unterstütze diese App durch Sponsoring auf GitHub</string>
+    <string name="sponsor_msg">Seal wird immer frei und kostenlos für alle sein. Wenn du es magst, bitte denke bitte darüber nach, mich auf GitHub zu sponsern!</string>
     <string name="feedback">Rückmeldung</string>
+    <string name="sponsors">Sponsoren</string>
     <string name="no_downloaded_media">Keine heruntergeladenen Medien</string>
     <string name="beta_features">Beta</string>
     <string name="enable_experimental_feature">Experimentelle Funktion aktivieren\?</string>
@@ -277,8 +290,10 @@
     <string name="clip_video_desc">Videoclips auf der Formatauswahlseite erstellen</string>
     <string name="okay">Okay</string>
     <string name="feature_unavailable">Funktion nicht verfügbar</string>
-    <string name="auto_update_disabled_msg">Automatische Updates sind für %1$s Builds nicht verfügbar. Wenn du %1$s nicht auf deinem Gerät installiert hast, oder eine Vorschau kommender Funktionen in duck möchtest, ziehe bitte %2$s in Erwägung.</string>
+    <string name="auto_update_disabled_msg">Automatische Updates sind für %1$s Builds nicht verfügbar. Wenn du %1$s nicht auf deinem Gerät installiert hast, oder eine Vorschau kommender Funktionen in Seal möchtest, ziehe bitte %2$s in Erwägung.</string>
     <string name="msg_from_developer">Nachricht vom Entwickler</string>
+    <string name="sponsor_msg2">Vielen Dank!</string>
+    <string name="switch_to_github_builds">Wechseln zu GitHub-Builds</string>
     <string name="no_custom_command_tasks">Keine benutzerdefinierten Befehlsaufgaben</string>
     <string name="got_it">Verstanden</string>
     <string name="download_video_desc">Videos von der URL herunterladen</string>
@@ -321,9 +336,9 @@
     <string name="refresh_cookies_desc">Tippen, um die Webseite für die Erstellung neuer Cookies zu öffnen:</string>
     <string name="custom">Benutzerdefiniert</string>
     <string name="remove_multiple_templates_msg">\"%1$s\" endgültig aus den Befehlsvorlagen entfernen\?</string>
-    <string name="custom_command_usage_msg">yt-dlp ist ein mächtiges Werkzeug um Videos herunterzuladen. duck macht es einfacher yt-dlp zu nutzten, indem es eine intuitive Benutzeroberfläche, Voreinstellungen für häufige Befehle und andere Funktionen bereitstellt.
+    <string name="custom_command_usage_msg">yt-dlp ist ein mächtiges Werkzeug um Videos herunterzuladen. Seal macht es einfacher yt-dlp zu nutzten, indem es eine intuitive Benutzeroberfläche, Voreinstellungen für häufige Befehle und andere Funktionen bereitstellt.
 \n
-\nFür erweiterte Nutzung von yt-dlp erlaubt duck es dir benutzerdefinierte Befehlsvorlagen zu erstellen, speichern und auszuführen, genau wie in einer Befehlszeile.
+\nFür erweiterte Nutzung von yt-dlp erlaubt Seal es dir benutzerdefinierte Befehlsvorlagen zu erstellen, speichern und auszuführen, genau wie in einer Befehlszeile.
 \n
 \nWenn benutzerdefinierte Befehle genutzt werden sind die meisten Optionen und Funktionen in der Benutzeroberfläche deaktiviert.</string>
     <string name="output_template">Ausgabemuster</string>
@@ -393,35 +408,4 @@
     <string name="every_day">Jeden Tag</string>
     <string name="every_week">Jede Woche</string>
     <string name="every_month">Jeder Monat</string>
-    <string name="all_languages">Alle Sprachen</string>
-    <string name="playlist">Playlist</string>
-    <string name="proceed">Weiter</string>
-    <string name="preset">Voreinstellung</string>
-    <string name="custom_format_selection_desc">Wähle aus Formaten und Untertiteln und passe sie weiter an</string>
-    <string name="preset_format_selection_desc">Automatischer Download unter Verwendung deiner Formateinstellungen</string>
-    <string name="edit_preset">Voreinstellung bearbeiten</string>
-    <string name="best_quality_desc">Bestes verfügbare Format herunterladen</string>
-    <string name="task_added">Aufgabe zur Warteschlange hinzugefügt</string>
-    <string name="prefer_placeholder">%1$s bevorzugen</string>
-    <string name="you_ll_find_your_downloads_here">Hier findest du deine Downloads</string>
-    <string name="status_downloaded">Heruntergeladen</string>
-    <plurals name="video_count">
-        <item quantity="one">%d Video</item>
-        <item quantity="other">%d Videos</item>
-    </plurals>
-    <string name="download_hint">Tippe auf den Download Button oder teile einen Video-Link zu dieser App, um einen Download zu starten</string>
-    <string name="all">Alle</string>
-    <string name="select_multiple_link">Wähle aus %1$d Links</string>
-    <plurals name="audio_count">
-        <item quantity="one">%d Audio</item>
-        <item quantity="other">%d Audios</item>
-    </plurals>
-    <string name="trouble_shooting">Problembehandlung</string>
-    <string name="issue_tracker">Problemverfolgung</string>
-    <string name="trouble_shooting_desc">Behebung häufiger Fehler und Überprüfung auf bekannte Probleme</string>
-    <string name="download_queue">Warteschlange herunterladen</string>
-    <string name="show_navigation_drawer">Navigationsschublade anzeigen</string>
-    <string name="resume">Fortsetzen</string>
-    <string name="delete">Löschen</string>
-    <string name="media_info">Medien Info</string>
 </resources>

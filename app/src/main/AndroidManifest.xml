@@ -18,6 +18,11 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        tools:overrideLibrary="com.yausername.youtubedl_android, com.yausername.aria2c, com.yausername.ffmpeg, com.yausername.youtubedl_common" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -83,7 +88,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="unspecified"
-            android:theme="@style/Theme.Duck">
+            android:theme="@style/Theme.Duck.Splashscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

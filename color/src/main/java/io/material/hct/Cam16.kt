@@ -105,6 +105,7 @@ class Cam16
     val bstar: Double
 ) {
 
+
     // Avoid allocations during conversion by pre-allocating an array.
     private val tempArray = doubleArrayOf(0.0, 0.0, 0.0)
 

@@ -18,7 +18,7 @@
     <string name="language">Мова праграмы</string>
     <string name="language_settings">Усталюйце мову адлюстравання</string>
     <string name="task_running">Існуючая задача спампоўкі ўжо запушчана</string>
-    <string name="paste_msg">Устаўлены URL-адрас</string>
+    <string name="paste_msg">Уставіць URL з буфера абмену</string>
     <string name="paste_fail_msg">Не атрымалася супаставіць URL у буферы абмену</string>
     <string name="ytdlp_version">Yt-dlp версія</string>
     <string name="ytdlp_update">Націсніце, каб усталяваць апошнюю версію yt-dlp</string>
@@ -30,7 +30,7 @@
     <string name="audio">Аўдыё</string>
     <string name="open_url">Адкрыць спасылку</string>
     <string name="remove">Выдаліць</string>
-    <string name="delete_file">Выдаліць файл</string>
+    <string name="delete_file">Выдаліць</string>
     <string name="about">Аб праграме</string>
     <string name="about_page">Версія, водгукі і абнаўленні</string>
     <string name="back">Назад</string>
@@ -42,6 +42,9 @@
     <string name="edit">Рэдагаваць</string>
     <string name="custom_command_template">Шаблон каманды</string>
     <string name="version">Версія</string>
+    <string name="release_desc">Азнаёмцеся са спісам змен і новых версій</string>
+    <string name="release">Апошні рэліз</string>
+    <string name="readme_desc">Праверце рэпазітар GitHub і README</string>
     <string name="video">Відэа</string>
     <string name="checked">Праверана</string>
     <string name="credits">Падзякі</string>
@@ -130,8 +133,10 @@
     <string name="subdirectory_desc">Захоўвайце файлы ў папках з адпаведнымі назвамі</string>
     <string name="permission_issue">Каталог не падтрымліваецца</string>
     <string name="battery_configuration_desc">Ігнаруйце аптымізацыю акумулятара, каб спампоўваць у фоне</string>
-    <string name="service_title">duck спампоўвае…</string>
+    <string name="service_title">Seal спампоўвае…</string>
     <string name="unknown_error">Невядомая памылка</string>
+    <string name="translate">Пераклад</string>
+    <string name="translate_desc">Дапамажыце з перакладам на Hosted Weblate</string>
     <string name="prefix">Шаблон шляху</string>
     <string name="embed_subtitles">Убудаваць субтытры</string>
     <string name="template_label">Загаловак</string>
@@ -140,16 +145,18 @@
     <string name="custom_command_template_desc">Рэдагаванне і кіраванне шаблонамі каманд</string>
     <string name="downloading_indicator_text">Ідзе спампоўка…</string>
     <string name="task_canceled">Спампоўка адменена</string>
+    <string name="github_issue">Паведаміць пра праблему (GitHub)</string>
+    <string name="github_issue_desc">Адправіць праблему для справаздачы аб памылцы або запыту функцыі</string>
     <string name="info_copied">Спасылка скапіявана ў буфер абмену</string>
     <string name="permission_issue_desc">Дырэкторыі па-за Download/ і Documents/ не падтрымліваюцца</string>
     <string name="battery_configuration">Канфігурацыя батарэі</string>
-    <string name="embed_subtitles_desc">Убудоўваць у відэафайл прэрэндэрныя субтытры, калі яны даступныя</string>
+    <string name="embed_subtitles_desc">Устаўляйце прадстаўленыя субтытры ў відэа, калі такія маюцца</string>
     <string name="new_template">Новы шаблон</string>
     <string name="template_selection">Выбар шаблону</string>
     <string name="high_contrast">Высокакантрасная цёмная тэма</string>
     <string name="invalid_input">Няправільны ўвод</string>
     <string name="lowest_quality">Самая нізкая якасць</string>
-    <string name="copy_error_report">Капіяваць справаздачу</string>
+    <string name="copy_error_report">Справаздача аб памылцы</string>
     <string name="video_resolution">Якасць відэа</string>
     <string name="video_file_size">Памер відэафайла</string>
     <string name="export_to_clipboard">Экспарт у буфер абмену</string>
@@ -183,7 +190,7 @@
     <string name="file_unavailable">Гэты файл больш не даступны</string>
     <string name="network">Сетка</string>
     <string name="rate_limit">Ліміт хуткасці</string>
-    <string name="rate_limit_desc">Абмежаваць максімальную хуткасць загрузкі</string>
+    <string name="rate_limit_desc">Абмяжуйце максімальную хуткасць загрузак</string>
     <string name="max_rate">Максімальная хуткасць</string>
     <string name="aria2_desc">Выкарыстоўвайце aria2c у якасці вонкавага загрузчыка</string>
     <string name="cookies_desc">Для загрузкі выкарыстоўвайце файлы cookie ў фармаце Netscape</string>
@@ -207,6 +214,8 @@
     <string name="disable_preview_desc">Не адлюстроўваюцца мініяцюры падчас загрузкі</string>
     <string name="private_directory_desc">Захоўвайце загрузкі ў схаваным каталогу</string>
     <string name="privacy">Прыватнасць</string>
+    <string name="telegram_channel">Telegram канал</string>
+    <string name="matrix_space">Матрычная прастора</string>
     <string name="network_settings_desc">Абмежаванне хуткасці, загрузнік, файлы cookie</string>
     <string name="use_custom_command">Выкарыстоўвайце карыстальніцкую каманду</string>
     <string name="crop_artwork">Абрэзаць мастацкі твор</string>
@@ -251,7 +260,8 @@
     <string name="update_channel">Абнавіць канал</string>
     <string name="auto_update">Аўтаматычнае абнаўленне</string>
     <string name="logs">Журнал</string>
-    <string name="auto_update_disabled_msg">Аўтаматычнае абнаўленне недаступна для зборак %1$s. Калі ў вас на прыладзе не ўсталявана %1$s, або вы хочаце папярэдне прагледзець будучыя новыя функцыі ў duck, звярніце ўвагу на %2$s.</string>
+    <string name="auto_update_disabled_msg">Аўтаматычнае абнаўленне недаступна для зборак %1$s. Калі ў вас на прыладзе не ўсталявана %1$s, або вы хочаце папярэдне прагледзець будучыя новыя функцыі ў Seal, звярніце ўвагу на %2$s.</string>
+    <string name="switch_to_github_builds">пераход на зборкі GitHub</string>
     <string name="okay">ОК</string>
     <string name="got_it">Зразумела</string>
     <string name="feature_unavailable">Функцыя недаступная</string>
@@ -277,10 +287,15 @@
     <string name="import_from_preferences">Імпарт</string>
     <string name="title">Назва</string>
     <string name="clear_all_cookies_desc">Назаўсёды выдаліць усе файлы cookie, якія захоўваюцца ў праграме\?</string>
+    <string name="sponsor">Спонсар</string>
+    <string name="sponsor_desc">Падтрымайце гэтую праграму, спансіруючы яго на GitHub</string>
+    <string name="sponsor_msg">Seal заўсёды будзе бясплатным і адкрытым для ўсіх. Калі вам гэта падабаецца, калі ласка, падумайце аб тым, каб стаць спонсарам мяне на GitHub!</string>
     <string name="feedback">Зваротная сувязь</string>
+    <string name="sponsors">Спонсары</string>
     <string name="temporary_directory_desc">Захоўвайце часовыя файлы ва ўнутраным каталогу</string>
     <string name="no_custom_command_tasks">Няма карыстацкіх камандных задач</string>
     <string name="msg_from_developer">Паведамленне ад распрацоўніка</string>
+    <string name="sponsor_msg2">Вялікі дзякуй!</string>
     <string name="download_video_desc">Спампаваць відэа з URL-адрасу</string>
     <string name="convert_subtitle">Канвертаваць субтытры</string>
     <string name="convert_subtitle_desc">Канвертаваць субтытры ў іншы фармат</string>
@@ -324,9 +339,9 @@
     </plurals>
     <string name="ua_header">Загаловак User-Agent</string>
     <string name="export_to_file">Экспарт у файл</string>
-    <string name="custom_command_usage_msg">yt-dlp - гэта магутны інструмент каманднага радка для спампоўкі відэа. duck палягчае выкарыстанне yt-dlp, забяспечваючы інтуітыўна зразумелы графічны інтэрфейс, прадусталяваныя налады для агульных каманд і іншыя дадатковыя функцыі.
+    <string name="custom_command_usage_msg">yt-dlp - гэта магутны інструмент каманднага радка для спампоўкі відэа. Seal палягчае выкарыстанне yt-dlp, забяспечваючы інтуітыўна зразумелы графічны інтэрфейс, прадусталяваныя налады для агульных каманд і іншыя дадатковыя функцыі.
 \n
-\nДля прасунутага выкарыстання yt-dlp duck дазваляе ствараць, захоўваць і выконваць карыстальніцкія шаблоны каманд непасрэдна, як у тэрмінале.
+\nДля прасунутага выкарыстання yt-dlp Seal дазваляе ствараць, захоўваць і выконваць карыстальніцкія шаблоны каманд непасрэдна, як у тэрмінале.
 \n
 \nПры выкарыстанні карыстальніцкіх каманд большасць опцый і функцый графічнага інтэрфейсу будуць адключаны.</string>
     <string name="presets">Прасэты</string>
@@ -370,22 +385,4 @@
     <string name="use_previous_selection">Выкарыстаць папярэдні выбар</string>
     <string name="no_thanks">Не, дзякуй</string>
     <string name="reset">Скід</string>
-    <string name="download_queue">Чарга загрузкі</string>
-    <plurals name="video_count">
-        <item quantity="one">адзін</item>
-        <item quantity="few">некалькі</item>
-        <item quantity="many">шмат</item>
-        <item quantity="other">шмат</item>
-    </plurals>
-    <string name="download_hint">Каб пачаць спампоўку, дакраніцеся да кнопкі спампоўкі або падзяліцеся спасылкай на відэа з гэтай праграмай</string>
-    <string name="all">Усе</string>
-    <string name="select_multiple_link">Выберыце з %1$d спасылак</string>
-    <string name="issue_tracker">Адсочванне праблем</string>
-    <string name="show_navigation_drawer">Паказаць панэль навігацыі</string>
-    <string name="resume">Рэзюмэ</string>
-    <string name="delete">Выдаліць</string>
-    <string name="media_info">Інфармацыя пра СМІ</string>
-    <string name="trouble_shooting">Ліквідацыю непаладак</string>
-    <string name="trouble_shooting_desc">Выпраўце распаўсюджаныя памылкі і праверце вядомыя праблемы</string>
-    <string name="status_downloaded">Спампавана</string>
 </resources>

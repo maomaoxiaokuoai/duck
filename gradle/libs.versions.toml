@@ -1,44 +1,45 @@
 [versions]
 accompanist = "0.34.0"
-androidGradlePlugin = "8.7.2"
-androidxComposeBom = "2025.03.01"
-androidxCore = "1.15.0"
-androidMaterial = "1.12.0"
-androidxAppCompat = "1.7.0"
-androidxActivity = "1.10.1"
-graphics = "1.0.1"
-constraintLayout = "1.1.0"
+androidGradlePlugin = "8.5.2"
+androidxComposeBom = "2024.04.00-alpha01"
+androidxComposeCompiler = "1.5.11"
+androidxCore = "1.12.0"
+androidMaterial = "1.11.0"
+androidxAppCompat = "1.7.0-alpha03"
+androidxActivity = "1.8.2"
+androidxSplashscreen = "1.0.1"
 
-androidxLifecycle = "2.8.7"
-androidxNavigation = "2.8.9"
+androidxLifecycle = "2.7.0"
+androidxNavigation = "2.7.7"
+androidxFoundation = "1.6.0-beta03"
+androidxComposeMaterial3 = "1.2.0-beta01"
+androidxComposeAnimation = "1.5.0-beta01"
 
 androidxEspresso = "3.5.0"
+androidxHiltNavigationCompose = "1.0.0"
+
+
 androidxTestExt = "1.1.4"
 
 
 coil = "2.5.0"
+hilt = "2.45"
+hiltExt = "1.0.0"
 
 junit4 = "4.13.2"
-
-kotlin = "2.0.20"
-
-coroutines = "1.9.0"
-datetime = "0.6.1"
-serialization = "1.7.2"
+kotlin = "1.9.23"
+kotlinxCoroutines = "1.7.1"
+kotlinxDatetime = "0.4.0"
+kotlinxSerializationJson = "1.6.2"
 okhttp = "5.0.0-alpha.10"
 
-room = "2.6.1"
-ksp = "2.0.20-1.0.25"
+room = "2.6.0"
+ksp = "1.9.23-1.0.19"
 
-youtubedlAndroid = "0.17.3"
+youtubedlAndroid = "0.17.1"
 
-mmkv = "1.3.12"
-# pin to v1.3.x for 32-bit support
-
-koin = "4.0.0"
-
-ktfmt = "0.20.1"
-
+mmkv = "1.3.2"
+androidSvg = "1.4"
 [libraries]
 
 
@@ -46,15 +47,21 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 android-material = { group = "com.google.android.material", name = "material", version.ref = "androidMaterial" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxSplashscreen" }
 
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 
+accompanist-navigation-animation = { group = "com.google.accompanist", name = "accompanist-navigation-animation", version.ref = "accompanist" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+accompanist-systemuicontroller = { group = "com.google.accompanist", name = "accompanist-systemuicontroller", version.ref = "accompanist" }
 accompanist-webview = { group = "com.google.accompanist", name = "accompanist-webview", version.ref = "accompanist" }
+accompanist-pager-layouts = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
 accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanist" }
+accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanist" }
 
 #androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "androidxComposeBom" }
+androidx-compose-bom = { group = "dev.chrisbanes.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -66,8 +73,6 @@ androidx-compose-material = { group = "androidx.compose.material", name = "mater
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 
-androidx-graphics-shapes = { group = "androidx.graphics", name = "graphics-shapes", version.ref = "graphics" }
-
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
@@ -75,7 +80,9 @@ androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-juni
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 
-androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayout" }
+caverock-androidsvg = { group = "com.caverock", name = "androidsvg-aar", version.ref = "androidSvg" }
+
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 
@@ -86,23 +93,24 @@ androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espres
 
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltExt" }
+
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetime" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
-
-koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
-koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
-#youtubedl-android-library = { group = "com.github.yausername.youtubedl_android", name = "library", version.ref = "youtubedlAndroid" }
-#youtubedl-android-ffmpeg = { group = "com.github.yausername.youtubedl_android", name = "ffmpeg", version.ref = "youtubedlAndroid" }
-#youtubedl-android-aria2c = { group = "com.github.yausername.youtubedl_android", name = "aria2c", version.ref = "youtubedlAndroid" }
+#youtubedl-android-library = { group = "com.github.yausername.youtubedl-android", name = "library", version.ref = "youtubedlAndroid" }
+#youtubedl-android-ffmpeg = { group = "com.github.yausername.youtubedl-android", name = "ffmpeg", version.ref = "youtubedlAndroid" }
+#youtubedl-android-aria2c = { group = "com.github.yausername.youtubedl-android", name = "aria2c", version.ref = "youtubedlAndroid" }
 
 youtubedl-android-library = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "youtubedlAndroid" }
 youtubedl-android-ffmpeg = { group = "io.github.junkfood02.youtubedl-android", name = "ffmpeg", version.ref = "youtubedlAndroid" }
@@ -114,30 +122,31 @@ mmkv = { group = "com.tencent", name = "mmkv", version.ref = "mmkv" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-room = { id = "androidx.room", version.ref = "room" }
-ktfmt-gradle = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
-
+kotlin-gradlePlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
 accompanist = [
+    #    "accompanist-navigation-animation",
     "accompanist-permissions",
+    "accompanist-systemuicontroller",
     "accompanist-webview",
+    "accompanist-pager-layouts",
     "accompanist-pager-indicators",
-]
+    "accompanist-flowlayout"]
 
 androidxCompose = ["androidx-compose-ui",
     "androidx-compose-ui-tooling-preview",
+    #    "androidx-compose-material",
     "androidx-compose-material-iconsExtended",
     "androidx-compose-material3",
     "androidx-compose-material3-windowSizeClass",
     "androidx-compose-foundation",
     "androidx-navigation-compose",
-    "androidx-compose-animation",
-    "androidx-constraintlayout-compose"
+    "androidx-compose-animation"
 ]
 
 youtubedlAndroid = ["youtubedl-android-library",
@@ -145,6 +154,7 @@ youtubedlAndroid = ["youtubedl-android-library",
     "youtubedl-android-aria2c"]
 
 core = ["androidx-activity-compose",
+    "androidx-splashscreen",
     "android-material",
     "androidx-appcompat",
     "androidx-core-ktx"]

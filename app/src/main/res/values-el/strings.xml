@@ -13,7 +13,7 @@
     <string name="general_settings">Γενικές ρυθμίσεις</string>
     <string name="language">Γλώσσα</string>
     <string name="task_running">Μια υπάρχουσα λήψης εκτελείται ήδη</string>
-    <string name="paste_msg">Επικόλληση συνδέσμου</string>
+    <string name="paste_msg">Επικολλήστε τον σύνδεσμο</string>
     <string name="ytdlp_version">Έκδοση yt-dlp</string>
     <string name="ytdlp_update_action">Αναβάθμιση yt-dlp</string>
     <string name="video_directory">Φάκελος Βίντεο</string>
@@ -38,10 +38,13 @@
     <string name="audio">Ήχος</string>
     <string name="link_copied">Ο υπερσύνδεσμος αντιγράφτηκε στο πρόχειρο</string>
     <string name="open_url">Άνοιγμα συνδέσμου</string>
-    <string name="delete_file">Διαγραφή αρχείου</string>
+    <string name="delete_file">Κατάργηση</string>
     <string name="about">Σχετικά με</string>
     <string name="about_page">Έκδοση, σχόλια, αυτόματη ενημέρωση</string>
     <string name="back">Πίσω</string>
+    <string name="release_desc">Προβολή αλλαγών και νέων εκδόσεων</string>
+    <string name="release">Νεότερη έκδοση</string>
+    <string name="readme_desc">Προβολή του κώδηκα Github και του README</string>
     <string name="video">Βίντεο</string>
     <string name="checked">Ελεχγμένο</string>
     <string name="custom_command">Προσαρμοσμένη εντολή</string>
@@ -102,9 +105,11 @@
     <string name="custom_command_template_desc">Επεξεργασία και διαχείριση προτύπων εντολών</string>
     <string name="downloading_indicator_text">Λήψη σε εξέλιξη…</string>
     <string name="task_canceled">Λήψη εργασίας που ακυρώθηκε</string>
+    <string name="github_issue">Θέμα GitHub</string>
+    <string name="github_issue_desc">Υποβάλετε ένα θέμα για αναφορά σφάλματος ή αίτημα λειτουργίας</string>
     <string name="info_copied">Αντιγραφή πληροφοριών στο πρόχειρο</string>
     <string name="status_enqueued">Σε αναμονή</string>
-    <string name="status_completed">Ολοκληρώθηκε</string>
+    <string name="status_completed">Ολοκληρωμένο</string>
     <string name="status_canceled">Ακυρώθηκε</string>
     <string name="status_downloading">Λήψη</string>
     <string name="status_fetching_video_info">Λήψη πληροφοριών</string>
@@ -112,7 +117,7 @@
     <string name="restart">Επανεκκίνηση</string>
     <string name="status_error">Σφάλμα</string>
     <string name="copy_link">Αντιγραφή συνδέσμου</string>
-    <string name="copy_error_report">Αντιγραφή αναφοράς</string>
+    <string name="copy_error_report">Αναφορά σφάλματος</string>
     <string name="video_resolution">Ανάλυση βίντεο</string>
     <string name="video_file_size">Μέγεθος αρχείου βίντεο</string>
     <string name="export_to_clipboard">Εξαγωγή στο πρόχειρο</string>
@@ -176,6 +181,8 @@
     <string name="custom_command_enabled_hint">Ορισμένες επιλογές δεν είναι διαθέσιμες όταν χρησιμοποιείτε προσαρμοσμένη εντολή</string>
     <string name="cookies_usage_msg">Η λήψη από ορισμένες τοποθεσίες απαιτεί πληροφορίες ελέγχου ταυτότητας λογαριασμού. Κάντε κλικ στην επιλογή \"Δημιουργία νέων cookies\", εισαγάγετε τη διεύθυνση URL του ιστότοπου και, στη συνέχεια, συνδεθείτε με το λογαριασμό σας στη σελίδα του προγράμματος περιήγησης, η εφαρμογή θα τα δημιουργήσει για εσάς.</string>
     <string name="how_does_it_work">Πώς λειτουργεί;</string>
+    <string name="telegram_channel">Κανάλι Telegram</string>
+    <string name="matrix_space">Χώρος μήτρας</string>
     <string name="sdcard_directory">Φάκελος κάρτας SD</string>
     <string name="auto_subtitle">Αυτόματες λεζάντες</string>
     <string name="auto_subtitle_desc">Λήψη αυτόματης δημιουργίας λεζάντες</string>
@@ -205,13 +212,18 @@
     <string name="rename">Μετονομασία</string>
     <string name="minute">λεπτό</string>
     <string name="temporary_directory_desc">Αποθήκευση προσωρινών αρχείων στον εσωτερικό κατάλογο</string>
+    <string name="sponsor">Χορηγός</string>
+    <string name="sponsor_desc">Υποστηρίξτε αυτή την εφαρμογή με χορηγία στο GitHub</string>
+    <string name="sponsor_msg">Η Seal θα είναι πάντα δωρεάν και ανοιχτού κώδικα για όλους. Αν σας αρέσει, παρακαλώ σκεφτείτε να με χρηματοδοτήσετε στο GitHub!</string>
     <string name="feedback">Ανατροφοδότηση</string>
     <string name="audio_format">Μορφή ήχου</string>
     <string name="beta_features">Beta</string>
     <string name="clip_video_desc">Δημιουργήστε βίντεο κλιπ στη σελίδα επιλογής μορφής</string>
+    <string name="switch_to_github_builds">μετάβαση σε GitHub builds</string>
     <string name="okay">Εντάξει</string>
     <string name="got_it">Το πήρα</string>
     <string name="msg_from_developer">Μήνυμα από τον προγραμματιστή</string>
+    <string name="sponsor_msg2">Σας ευχαριστώ πολύ!</string>
     <string name="convert_subtitle">Μετατροπή υποτίτλων</string>
     <string name="convert_subtitle_desc">Μετατροπή των υποτίτλων σε άλλη μορφή</string>
     <string name="split_video_msg">Το βίντεο θα χωριστεί σε %1$d κεφάλαια</string>
@@ -278,8 +290,10 @@
     <string name="concurrent_download">Λήψη με πολλαπλά νήματα</string>
     <string name="download_range_selection">Επιλογή λίστας αναπαραγωγής</string>
     <string name="permission_issue_desc">Δεν υποστηρίζονται κατάλογοι εκτός των Download/ και Documents/</string>
-    <string name="service_title">Η duck κατεβάζει…</string>
+    <string name="service_title">Η Seal κατεβάζει…</string>
     <string name="unknown_error">Άγνωστο σφάλμα</string>
+    <string name="translate">Μεταφράστε</string>
+    <string name="translate_desc">Βοήθεια για τη μετάφραση αυτής της εφαρμογής στο Hosted Weblate</string>
     <string name="prefix">Πρόθεμα</string>
     <string name="embed_subtitles">Ενσωματώστε υπότιτλους</string>
     <string name="remove_template">Αφαιρέστε;</string>
@@ -288,9 +302,9 @@
     <string name="clear_temp_files_info">”Τα προσωρινά αρχεία μπορούν να χρησιμοποιηθούν για την επανάληψη των ακυρωμένων λήψεων. Είστε σίγουροι ότι διαγράψατε όλα αυτά τα αρχεία;
 \n
 \nΜπορείτε να έχετε πρόσβαση σε αυτά τα αρχεία στο %1$s</string>
-    <string name="custom_command_usage_msg">Το yt-dlp είναι ένα ισχυρό εργαλείο γραμμής εντολών για τη λήψη βίντεο. Το duck διευκολύνει τη χρήση του yt-dlp παρέχοντας ένα διαισθητικό γραφικό περιβάλλον, προεπιλογές για κοινές εντολές και άλλα πρόσθετα χαρακτηριστικά.
+    <string name="custom_command_usage_msg">Το yt-dlp είναι ένα ισχυρό εργαλείο γραμμής εντολών για τη λήψη βίντεο. Το Seal διευκολύνει τη χρήση του yt-dlp παρέχοντας ένα διαισθητικό γραφικό περιβάλλον, προεπιλογές για κοινές εντολές και άλλα πρόσθετα χαρακτηριστικά.
 \n
-\nΓια προχωρημένη χρήση του yt-dlp, το duck σας επιτρέπει να δημιουργείτε, να αποθηκεύετε και να εκτελείτε προσαρμοσμένα πρότυπα εντολών απευθείας, ακριβώς όπως σε ένα τερματικό.
+\nΓια προχωρημένη χρήση του yt-dlp, το Seal σας επιτρέπει να δημιουργείτε, να αποθηκεύετε και να εκτελείτε προσαρμοσμένα πρότυπα εντολών απευθείας, ακριβώς όπως σε ένα τερματικό.
 \n
 \nΌταν χρησιμοποιείτε προσαρμοσμένες εντολές, οι περισσότερες επιλογές και δυνατότητες του GUI θα είναι απενεργοποιημένες.</string>
     <string name="video_title_sample_text">Δείγμα κειμένου τίτλου βίντεο</string>
@@ -315,10 +329,11 @@
     <string name="second">δεύτερο</string>
     <string name="clear_all_cookies">Διαγραφή όλων των cookies</string>
     <string name="clear_all_cookies_desc">Να διαγράψετε οριστικά όλα τα cookies που είναι αποθηκευμένα στην εφαρμογή;</string>
+    <string name="sponsors">Χορηγοί</string>
     <string name="no_downloaded_media">Δεν υπάρχουν κατεβασμένα πολυμέσα</string>
     <string name="enable_experimental_feature">Ενεργοποίηση πειραματικής λειτουργίας;</string>
     <string name="clip_video_dialog_msg">Οι λήψεις που χρησιμοποιούν αυτή τη λειτουργία θα ανατεθούν στο FFmpeg για να κατεβάσει επιλεγμένα τμήματα του βίντεο, αυτή η λειτουργία είναι ακόμα πειραματική και η κοπή δεν θα είναι απόλυτα ακριβής, δεν υποστηρίζουν όλες οι μορφές αυτή τη λειτουργία και ενδέχεται να έχετε χαμηλότερες ταχύτητες λήψης.</string>
-    <string name="auto_update_disabled_msg">Η αυτόματη ενημέρωση δεν είναι διαθέσιμη για %1$s builds. Αν δεν έχετε εγκαταστήσει το %1$s στη συσκευή σας ή αν θέλετε να κάνετε προεπισκόπηση των επερχόμενων νέων χαρακτηριστικών στο duck, παρακαλούμε εξετάστε το %2$s.</string>
+    <string name="auto_update_disabled_msg">Η αυτόματη ενημέρωση δεν είναι διαθέσιμη για %1$s builds. Αν δεν έχετε εγκαταστήσει το %1$s στη συσκευή σας ή αν θέλετε να κάνετε προεπισκόπηση των επερχόμενων νέων χαρακτηριστικών στο Seal, παρακαλούμε εξετάστε το %2$s.</string>
     <string name="feature_unavailable">Χαρακτηριστικό δεν είναι διαθέσιμο</string>
     <string name="no_custom_command_tasks">Δεν υπάρχουν προσαρμοσμένες εργασίες εντολών</string>
     <string name="download_video_desc">Λήψη βίντεο από τη διεύθυνση URL</string>

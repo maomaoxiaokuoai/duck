@@ -24,6 +24,7 @@
     <string name="open_url">Obre l\'enllaç</string>
     <string name="remove">Elimina</string>
     <string name="version">Versió</string>
+    <string name="release_desc">Cerca registres de canvis i noves versions</string>
     <string name="video">Vídeo</string>
     <string name="checked">Marcat</string>
     <string name="credits">Crèdits</string>
@@ -52,10 +53,10 @@
     <string name="video_format_preference">Format de vídeo preferit</string>
     <string name="preferred_format_desc">Format preferit quan se\'n proporciona més d\'un</string>
     <string name="create_thumbnail">Desa la miniatura</string>
-    <string name="settings">Paràmetres</string>
+    <string name="settings">Configuració</string>
     <string name="yt_dlp_up_to_date">S\'està fent servir l\'última versió de yt-dlp</string>
     <string name="permission_denied">Permís denegat</string>
-    <string name="delete_file">Suprimeix el fitxer</string>
+    <string name="delete_file">Suprimeix</string>
     <string name="download_success_msg">S\'ha finalitzat la baixada</string>
     <string name="download_error_msg">No s\'ha pogut baixar el fitxer</string>
     <string name="general_settings">General</string>
@@ -67,6 +68,8 @@
     <string name="audio">Àudio</string>
     <string name="dismiss">Cancel·la</string>
     <string name="link_copied">S\'ha copiat l\'enllaç al porta-retalls</string>
+    <string name="release">Últim llançament</string>
+    <string name="readme_desc">Comprova el repositori de GitHub i el README</string>
     <string name="display">Aspecte</string>
     <string name="edit">Edita</string>
     <string name="start_execute">Inicia l\'execució de l\'ordre</string>
@@ -105,6 +108,8 @@
     <string name="additional_settings">Configuració addicional</string>
     <string name="share_fail_msg">No s\'ha pogut obtenir l\'URL del contingut compartit</string>
     <string name="show_more_actions">Mostra més accions</string>
+    <string name="github_issue">Tiquet GitHub</string>
+    <string name="github_issue_desc">Creeu un tiquet per a un informe d\'error o per a una petició de nova funcionalitat</string>
     <string name="info_copied">S\'ha copiat la informació al porta-retalls</string>
     <string name="template_imported">S\'han importat %1$d plantilles</string>
     <string name="download_task_count">%1$d tasques de baixada</string>
@@ -119,7 +124,7 @@
     <string name="file_unavailable">Aquest fitxer ja no està disponible</string>
     <string name="network">Xarxa</string>
     <string name="rate_limit">Límit de la velocitat de baixada</string>
-    <string name="rate_limit_desc">Limita la velocitat màxima de baixada</string>
+    <string name="rate_limit_desc">Limita la velocitat màxima de les baixades</string>
     <string name="max_rate">Velocitat màxima</string>
     <string name="high_contrast">Tema fosc d\'alt contrast</string>
     <string name="unavailable">No disponible</string>
@@ -130,9 +135,10 @@
     <string name="crop_artwork">Escapça les cobertes</string>
     <string name="crop_artwork_desc">Escapça la imatge incrustada al quadrat</string>
     <string name="use_cookies">Utilitza galetes</string>
-    <string name="remove_cookie_profile_desc">Voleu eliminar aquesta entrada per a «%1$s»? No s’esborraran les galetes emmagatzemades del lloc.</string>
+    <string name="remove_cookie_profile_desc">Voleu eliminar les galetes de «%1$s»?</string>
     <string name="custom_command_enabled_hint">Algunes opcions no estan disponibles quan s\'utilitza una ordre personalitzada</string>
     <string name="how_does_it_work">Com funciona?</string>
+    <string name="telegram_channel">Canal Telegram</string>
     <string name="sdcard_directory">Carpeta de targetes SD</string>
     <string name="abs_hint">La majoria de plataformes de vídeo en streaming envien l\'àudio i el vídeo per separat, podeu seleccionar i fusionar els formats de només àudio i només vídeo a un sol fitxer de vídeo.</string>
     <string name="video_creator_sample_text">Text de mostra del creador de vídeo</string>
@@ -156,7 +162,9 @@
     <string name="permission_issue_desc">Els directoris que són fora de «Download» i «Documents» no estan suportats</string>
     <string name="battery_configuration">Configuració de la bateria</string>
     <string name="battery_configuration_desc">Ignora l\'optimització de la bateria perquè aquesta aplicació pugui baixar vídeos en segon pla</string>
-    <string name="service_title">duck està descarregant…</string>
+    <string name="service_title">Seal està descarregant…</string>
+    <string name="translate">Tradueix</string>
+    <string name="translate_desc">Ajudeu a traduir aquesta aplicació a Hosted Weblate</string>
     <string name="unknown_error">Error desconegut</string>
     <string name="prefix">Prefix</string>
     <string name="embed_subtitles">Incrusta els subtítols</string>
@@ -180,7 +188,7 @@
     <string name="import_from_clipboard">Importa des del porta-retalls</string>
     <string name="restart">Reinicia</string>
     <string name="status_error">Error</string>
-    <string name="copy_error_report">Copia l\'informe</string>
+    <string name="copy_error_report">Informe d\'error</string>
     <string name="video_resolution">Resolució del vídeo</string>
     <string name="export_to_clipboard">Exporta al porta-retalls</string>
     <string name="template_exported">S\'han exportat %1$d plantilles</string>
@@ -232,9 +240,9 @@
     <string name="clear">Neteja</string>
     <string name="add">Afegeix</string>
     <string name="shortcuts">Dreceres</string>
-    <string name="custom_command_usage_msg">yt-dlp és una potent eina de línia d\'ordres per baixar vídeos. duck facilita l\'ús de yt-dlp proporcionant una interfície gràfica intuïtiva, ordres predefinides s i altres funcions addicionals.
+    <string name="custom_command_usage_msg">yt-dlp és una potent eina de línia d\'ordres per baixar vídeos. Seal facilita l\'ús de yt-dlp proporcionant una interfície gràfica intuïtiva, ordres predefinides s i altres funcions addicionals.
 \n
-\nPer a un ús avançat de yt-dlp, duck permet crear, desar i executar plantilles d\'ordres personalitzades directament, com en un terminal.
+\nPer a un ús avançat de yt-dlp, Seal permet crear, desar i executar plantilles d\'ordres personalitzades directament, com en un terminal.
 \n
 \nQuan s\'utilitzen ordres personalitzades, la majoria de les opcions i funcions de la interfície gràfica es desactivaran.</string>
     <string name="edit_shortcuts_desc">Edita les dreceres personalitzades que es poden utilitzar per a compondre plantilles d\'ordres.</string>
@@ -255,7 +263,10 @@
     <string name="format_sorting">Ordenació per format</string>
     <string name="format_sorting_desc">Ordena els formats amb l\'opció -S de yt-dlp</string>
     <string name="temporary_directory_desc">Emmagatzema els fitxers temporals al directori intern</string>
+    <string name="sponsor">Patrocina</string>
+    <string name="sponsor_desc">Doneu suport a aquesta aplicació patrocinant-la a GitHub</string>
     <string name="feedback">Comentaris</string>
+    <string name="sponsors">Patrocinadors</string>
     <string name="no_downloaded_media">No s\'ha baixat cap fitxer multimèdia</string>
     <string name="beta_features">Beta</string>
     <string name="got_it">Entesos</string>
@@ -283,6 +294,7 @@
     <string name="lowest_bitrate">Taxa de bits més baixa</string>
     <string name="clear_all_cookies">Neteja totes les galetes</string>
     <string name="clear_all_cookies_desc">Voleu suprimir totes les galetes emmagatzemades a l\'app per sempre?</string>
+    <string name="matrix_space">Canal de Matrix</string>
     <string name="logs">Registre</string>
     <string name="update_channel">Actualitza el canal</string>
     <string name="subtitle_sponsorblock">Es poden malmetre els subtítols en eliminar els segments de SponsorBlock.</string>
@@ -306,6 +318,7 @@
     <string name="allow_always">Permet sempre</string>
     <string name="dont_allow">No permetis</string>
     <string name="copy_and_exit">Copia i surt</string>
+    <string name="sponsor_msg">El Seal serà sempre lliure i de codi obert per a tothom. Si us agrada, considereu patrocinar-me a GitHub!</string>
     <string name="audio_format">Format d\'àudio</string>
     <string name="enable_experimental_feature">Voleu habilitar la funcionalitat experimental?</string>
     <string name="clip_video_desc">Fes els videoclips a la pàgina de selecció de format</string>
@@ -321,7 +334,9 @@
     <string name="presets">Valors predefinits</string>
     <string name="required">Requerit</string>
     <string name="save">Desa</string>
+    <string name="switch_to_github_builds">s\'està canviant a les versions de GitHub</string>
     <string name="no_custom_command_tasks">No hi ha tasques d\'ordre personalitzades</string>
+    <string name="sponsor_msg2">Moltes gràcies!</string>
     <string name="download_video_desc">Baixa els vídeos de l\'URL</string>
     <string name="convert_subtitle_desc">Converteix els subtítols a un altre format</string>
     <string name="unknown_error_title">Vaja! Alguna cosa ha anat malament</string>
@@ -352,38 +367,9 @@
     <string name="force_ipv4_desc">Fes totes les connexions via IPv4</string>
     <string name="merge_audiostream_desc">Permet fusionar múltiples fluxos d\'àudio en un sol fitxer</string>
     <string name="merge_audiostream">Fusiona múltiples fluxos d\'àudio</string>
-    <string name="auto_update_disabled_msg">L\'actualització automàtica no està disponible per a les versions de %1$s. Si no teniu %1$s instal·lat al dispositiu, o voleu previsualitzar les futures funcionalitats del duck, considereu %2$s.</string>
+    <string name="auto_update_disabled_msg">L\'actualització automàtica no està disponible per a les versions de %1$s. Si no teniu %1$s instal·lat al dispositiu, o voleu previsualitzar les futures funcionalitats del Seal, considereu %2$s.</string>
     <string name="clip_video_dialog_msg">Les baixades que utilitzin aquesta funció es delegaran a FFmpeg per baixar les seccions seleccionades del vídeo. Aquesta funció encara és experimental i el tall no serà completament precís, i no tots els formats suporten aquesta característica. És possible que experimenteu velocitats de baixada més lentes.</string>
     <string name="output_template_desc">Especifiqueu la plantilla per als noms dels fitxers de sortida</string>
     <string name="remove_multiple_templates_msg">Voleu eliminar %1$s de les plantilles d\'ordres per sempre?</string>
     <string name="restrict_filenames_desc">Limita els noms de fitxer a caràcters específics per garantir la compatibilitat</string>
-    <string name="all_languages">Totes les llengües</string>
-    <string name="playlist">Llista de reproducció</string>
-    <string name="proceed">Continua</string>
-    <string name="task_added">S\'ha afegit la tasca a la cua</string>
-    <string name="best_quality_desc">Baixa el millor format disponible</string>
-    <string name="no_thanks">No, gràcies</string>
-    <string name="clipboard">Porta-retalls</string>
-    <string name="import_from">Importa des de</string>
-    <string name="export_download_history">Voleu exportar l\'historial de baixades?</string>
-    <string name="import_download_history">Voleu importar l\'historial de baixades?</string>
-    <string name="download_history">Baixa l\'historial</string>
-    <string name="update_subtitle_languages">Voleu actualitzar les llengües dels subtítols?</string>
-    <string name="import_backup">Importa</string>
-    <string name="file">Fitxer</string>
-    <string name="export_backup">Exporta</string>
-    <string name="auto_translated_subtitles">Subtítols traduïts automàticament</string>
-    <string name="remember_for_next_download">Recorda-ho per a la pròxima baixada</string>
-    <string name="interface_and_interaction">Interfície i interacció</string>
-    <string name="none">Cap</string>
-    <string name="reset">Reinicialitza</string>
-    <string name="search_in_subtitles">Cerca als subtítols</string>
-    <string name="look_and_feel">Aspecte</string>
-    <string name="use_previous_selection">Usa la selecció anterior</string>
-    <string name="every_day">Diàriament</string>
-    <string name="every_week">Setmanalment</string>
-    <string name="every_month">Mensualment</string>
-    <string name="redownload">Baixa novament</string>
-    <string name="search">Cerca</string>
-    <string name="search_in_downloads">Cerca a les baixades</string>
 </resources>
