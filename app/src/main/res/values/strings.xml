@@ -455,4 +455,5 @@
         <item quantity="one">%d item</item>
         <item quantity="other">%d items</item>
     </plurals>
+    <string name="repo_url">Project repository</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.ContactSupport
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Info
@@ -59,8 +60,6 @@ private const val releaseURL = "https://github.com/maomaoxiaokuoai/duck/releases
 private const val repoUrl = "https://github.com/maomaoxiaokuoai/duck"
 const val weblate = "https://github.com/maomaoxiaokuoai/duck"
 private const val githubIssueUrl = "https://github.com/maomaoxiaokuoai/duck/issues"
-private const val telegramChannelUrl = "https://github.com/maomaoxiaokuoai/duck"
-private const val matrixSpaceUrl = "https://github.com/maomaoxiaokuoai/duck"
 private const val githubSponsor = "https://github.com/maomaoxiaokuoai"
 private const val TAG = "AboutPage"
 
@@ -145,17 +144,10 @@ fun AboutPage(
             }
             item {
                 PreferenceItem(
-                    title = stringResource(R.string.telegram_channel),
-                    description = telegramChannelUrl,
-                    icon = painterResource(id = R.drawable.icons8_telegram_app)
-                ) { openUrl(telegramChannelUrl) }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.matrix_space),
-                    description = matrixSpaceUrl,
-                    icon = painterResource(id = R.drawable.icons8_matrix)
-                ) { openUrl(matrixSpaceUrl) }
+                    title = stringResource(R.string.repo_url),
+                    description = repoUrl,
+                    icon = Icons.Outlined.Code
+                ) { openUrl(repoUrl) }
             }
             item {
                 PreferenceItem(
