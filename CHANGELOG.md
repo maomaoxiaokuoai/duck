@@ -12,6 +12,13 @@
 
 ---
 
+## [2.0.3] - 2026-11-11
+
+### 修复
+- 启动画面图标带白底方块：移除 Splashscreen 主题（windowSplashScreenIconBackgroundColor），改为与上游 alpha 版一致，直接用 launcher 图标
+
+---
+
 ## [2.0.2] - 2026-11-10
 
 ### 修复
