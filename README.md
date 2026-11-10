@@ -33,6 +33,20 @@ duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，�
 打上 `v*` 标签（例如 `git tag v1.0.0 && git push origin v1.0.0`）会自动构建
 release 版并发布到 Releases 页面。
 
+### 让 CI 产出已签名的 release
+
+release 默认构建但**不签名**（未签名的 APK 装不上）。要拿到可安装的正式包，
+在仓库的 Settings → Secrets and variables → Actions 里加四个 secret：
+
+| Secret | 内容 |
+| --- | --- |
+| KEYSTORE_BASE64 | 你的 jks 文件 base64：base64 -w0 duck.jks |
+| KEYSTORE_PASSWORD | keystore 密码 |
+| KEY_ALIAS | 密钥别名 |
+| KEY_PASSWORD | 密钥密码 |
+
+没配这几个 secret 时流水线仍会跑通，只是产物未签名。
+
 ## 构建
 
 ### 推荐：云端构建
