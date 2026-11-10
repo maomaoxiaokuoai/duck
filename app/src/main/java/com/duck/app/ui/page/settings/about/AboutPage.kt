@@ -7,13 +7,11 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.ContactSupport
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material.icons.outlined.UpdateDisabled
-import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -124,30 +122,6 @@ fun AboutPage(
                     description = stringResource(R.string.release_desc),
                     icon = Icons.Outlined.NewReleases,
                 ) { openUrl(releaseURL) }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.github_issue),
-                    description = stringResource(R.string.github_issue_desc),
-                    icon = Icons.Outlined.ContactSupport,
-                ) { openUrl(githubIssueUrl) }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(id = R.string.sponsor),
-                    description = stringResource(id = R.string.sponsor_desc),
-                    icon = Icons.Outlined.VolunteerActivism
-                ) {
-//                    openUrl(githubSponsor)
-                    onNavigateToDonatePage()
-                }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.repo_url),
-                    description = repoUrl,
-                    icon = Icons.Outlined.Code
-                ) { openUrl(repoUrl) }
             }
             item {
                 PreferenceItem(

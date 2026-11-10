@@ -27,7 +27,6 @@ import androidx.compose.material.icons.rounded.SignalCellular4Bar
 import androidx.compose.material.icons.rounded.SignalWifi4Bar
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material.icons.rounded.VideoFile
-import androidx.compose.material.icons.rounded.ViewComfy
 import androidx.compose.material.icons.rounded.VolunteerActivism
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -208,17 +207,6 @@ fun SettingsPage(
                     icon = Icons.Rounded.Palette
                 ) {
                     onNavigateTo(Route.APPEARANCE)
-                }
-            }
-            item {
-                SettingItem(
-                    title = stringResource(id = R.string.interface_and_interaction),
-                    description = stringResource(
-                        id = R.string.settings_before_download
-                    ),
-                    icon = Icons.Rounded.ViewComfy
-                ) {
-                    onNavigateTo(Route.INTERACTION)
                 }
             }
             item {

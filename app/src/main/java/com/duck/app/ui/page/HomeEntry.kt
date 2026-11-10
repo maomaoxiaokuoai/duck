@@ -62,7 +62,6 @@ import com.duck.app.ui.page.settings.directory.DownloadDirectoryPreferences
 import com.duck.app.ui.page.settings.format.DownloadFormatPreferences
 import com.duck.app.ui.page.settings.format.SubtitlePreference
 import com.duck.app.ui.page.settings.general.GeneralDownloadPreferences
-import com.duck.app.ui.page.settings.interaction.InteractionPreferencePage
 import com.duck.app.ui.page.settings.network.CookieProfilePage
 import com.duck.app.ui.page.settings.network.CookiesViewModel
 import com.duck.app.ui.page.settings.network.NetworkPreferences
@@ -333,7 +332,6 @@ fun NavGraphBuilder.settingsGraph(
                 onNavigateTo = onNavigateTo
             )
         }
-        animatedComposable(Route.INTERACTION) { InteractionPreferencePage(onBack = onNavigateBack) }
         animatedComposable(Route.LANGUAGES) { LanguagePage { onNavigateBack() } }
         animatedComposable(Route.DOWNLOAD_DIRECTORY) {
             DownloadDirectoryPreferences { onNavigateBack() }
