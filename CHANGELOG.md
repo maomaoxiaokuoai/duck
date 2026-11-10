@@ -12,17 +12,19 @@
 
 ---
 
-## [Unreleased]
+## [1.1.0] - 2026-11-10
 
 ### 新增
-- 初始版本基于 yt-dlp 构建的 Android 下载器
+- 每个版本同时提供 5 个 APK：arm64-v8a / armeabi-v7a / x86 / x86_64 / universal
+- Release 说明自动从本文件提取对应版本的改动
+- CI 增加签名校验，未签名的包直接构建失败
 
 ### 变更
-- 项目更名为 duck，包名 `com.duck.app`
-- 全 ABI 构建：arm64-v8a / armeabi-v7a / x86 / x86_64 / universal
+- 取消 debug 构建，所有产物均为签名 release 版
+- 下载页按 CPU 架构分列，标明适用设备
 
 ### 修复
-- 修复 release 构建未签名导致无法安装的问题
+- 修复此前 release 只产出单一 universal 包、无法按架构选择的问题
 
 ---
 
