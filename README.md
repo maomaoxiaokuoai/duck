@@ -1,0 +1,115 @@
+# duck
+
+> 一个用 Kotlin + Jetpack Compose 写的 Android 视频/音频下载器：输入链接，选格式，下到本地。
+
+duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，底层调用 [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+完成实际解析与下载，界面、主题、图标和产品形态由本项目维护。
+
+<p align="center">
+  <img src="artwork/icon-512.png" width="128" alt="duck icon">
+</p>
+
+---
+
+## 功能
+
+- **一键下载**：粘贴链接即可解析，支持视频、纯音频、封面、字幕等多形态输出
+- **格式选择**：视频容器/编码/分辨率、音频编码/码率、字幕语言与嵌入方式全部可选
+- **下载队列**：多任务排队、暂停、重试、查看实时日志
+- **自定义命令**：把常用 yt-dlp 参数保存成模板，像终端一样直接执行
+- **Cookie 管理**：内置 WebView 抓取 Cookie，支持多站点配置，登录态内容可解析
+- **播放列表**：解析整张播放列表后按条目勾选
+- **Material You**：跟随系统取色的动态主题，支持深色模式与自定义配色
+- **多语言**：内置 60+ 语言的界面翻译资源
+
+## 截图
+
+> 首次构建后可在 `app/src/main/res/drawable-hdpi` 等目录看到占位图；本仓库不附带商店截图，请自行补充到 `artwork/`。
+
+## 构建
+
+### 环境要求
+
+| 组件 | 版本 |
+| --- | --- |
+| JDK | 21（Gradle 工具链） |
+| Android SDK | compileSdk 35 / minSdk 24 |
+| Gradle | 8.10.2（随 wrapper 提供） |
+
+### 步骤
+
+```bash
+git clone <this-repo> duck
+cd duck
+
+# 指向本机 Android SDK
+echo "sdk.dir=/path/to/Android/Sdk" > local.properties
+
+# 通用版本（默认 arm64-v8a 以外按需开启 split）
+./gradlew :app:assembleGenericDebug
+
+# 产物
+ls app/build/outputs/apk/generic/debug/
+```
+
+发布版默认开启 R8 代码压缩与资源裁剪；如需给 APK 签名，在项目根目录放一个
+`keystore.properties`：
+
+```properties
+storeFile=/absolute/path/to/release.jks
+storePassword=******
+keyAlias=duck
+keyPassword=******
+```
+
+### 变体
+
+| Flavor | applicationId | 说明 |
+| --- | --- | --- |
+| `generic` | `com.duck.app` | 默认分渠道 |
+| `githubPreview` | `com.duck.app.preview` | 可与正式版共存 |
+| `fdroid` | `com.duck.app` | 关闭应用内自更新入口 |
+
+## 项目结构
+
+```
+duck/
+├── app/                     # 主应用模块
+│   ├── src/main/java/com/duck/app/
+│   │   ├── ui/              # Compose 界面：下载页、设置、主题、组件
+│   │   ├── download/        # 下载执行器
+│   │   ├── database/        # Room 数据库与备份
+│   │   └── util/            # 偏好设置、文件、通知、yt-dlp 封装
+│   ├── src/main/res/        # 图标、字符串（60+ 语言）、主题
+│   └── schemas/             # Room 导出的数据库 schema
+├── color/                   # Material You 取色库（Monet / HCT）
+├── buildSrc/                # 版本号生成
+└── artwork/                 # 图标等设计源文件
+```
+
+## 技术栈
+
+Kotlin · Jetpack Compose · Material 3 · Room · Koin · OkHttp · MMKV · Coil ·
+[kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) · youtubedl-android
+
+## 开源说明
+
+- 本项目以 **GNU General Public License v3.0** 发布，完整条款见 [LICENSE](LICENSE)。
+- 你可以自由使用、修改、分发本项目，但分发衍生作品时**必须同样以 GPL-3.0 开源**，
+  并提供对应的完整源代码。
+- 第三方组件的版权与许可证（yt-dlp、FFmpeg、aria2、AndroidX、Kotlin 等）归各自作者所有，
+  完整清单见应用内「设置 → 关于 → Credits」以及 [NOTICE.md](NOTICE.md)。
+- `duck` 是本项目的名称与图标，代表本项目的构建与发布。
+
+## 致谢
+
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) — 实际的下载/解析引擎，Unlicense
+- [youtubedl-android](https://github.com/yausername/youtubedl-android) — yt-dlp 的 Android 封装，GPL-3.0
+- [FFmpeg](https://ffmpeg.org/) / [aria2](https://github.com/aria2/aria2) — 转码与外链下载
+- [AndroidX](https://github.com/androidx/androidx)、[Kotlin](https://kotlinlang.org/) — 基础框架
+- [Material color utilities](https://github.com/material-foundation/material-color-utilities)、[Monet](https://github.com/Kyant0/Monet) — 动态取色
+- [Termux](https://github.com/termux/termux-app) — 打包脚本参考
+
+## 许可证
+
+GPL-3.0 © duck contributors
