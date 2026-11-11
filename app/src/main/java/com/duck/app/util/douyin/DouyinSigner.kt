@@ -14,15 +14,18 @@ import kotlin.coroutines.resume
 /**
  * Computes the __ac_signature cookie Douyin requires.
  *
- * The signature is produced by an obfuscated JS VM (acrawler.js) that expects a handful of
- * browser globals. A headless WebView is the only JavaScript runtime available on Android,
- * so the bundle is loaded there and byted_acrawler.sign is called directly.
+ * The signature comes from an obfuscated JS VM (acrawler.js) that reads
+ * document.cookie to pick up the nonce. A headless WebView is the only
+ * JavaScript runtime on Android, but a WebView refuses cookie writes for
+ * about:blank ("SecurityError: Access is denied"), so cookie_shim.js replaces
+ * document.cookie with a plain in-memory jar before the VM loads.
  */
 object DouyinSigner {
 
     private const val TAG = "DouyinSigner"
     private const val TIMEOUT_MS = 15_000L
-    private const val ASSET_PATH = "douyin/acrawler.js"
+    private const val SHIM_PATH = "douyin/cookie_shim.js"
+    private const val VM_PATH = "douyin/acrawler.js"
 
     @Volatile private var webView: WebView? = null
     @Volatile private var bundleReady = false
@@ -37,8 +40,7 @@ object DouyinSigner {
             }
             val safeNonce = nonce.replace("'", "")
 
-            // Write the nonce into document.cookie, then sign. Both statements run in the
-            // same task so the VM observes the cookie we just set.
+            // Cookie write and sign happen in one task so the VM cannot observe a stale jar.
             val js =
                 "(function(){" +
                     "try{" +
@@ -59,7 +61,7 @@ object DouyinSigner {
                     }
                 } ?: ""
 
-            Log.d(TAG, "sign raw=" + result)
+            Log.d(TAG, "sign result=" + result)
             when {
                 result.startsWith("ERR:") || result == "NO_VM" || result == "EMPTY" -> {
                     Log.w(TAG, "sign failed: " + result)
@@ -70,36 +72,32 @@ object DouyinSigner {
             }
         }
 
-    /** Reads document.cookie from the headless view, for diagnostics. */
-    suspend fun readCookieJar(): String =
-        withContext(Dispatchers.Main) {
-            val view = webView ?: return@withContext ""
-            suspendCancellableCoroutine { cont ->
-                view.evaluateJavascript("(document.cookie||'')") { raw ->
-                    cont.resume(raw?.trim()?.trim('"') ?: "")
-                }
-            }
-        }
-
-    /** Loads the JSVMP bundle once. */
+    /** Loads the cookie shim and the JSVMP bundle once. */
     private suspend fun ensureWebView(context: Context): WebView? {
         webView?.let { return it }
         return try {
             val view = newWebView(context)
-            val src = context.assets.open(ASSET_PATH).bufferedReader().use { it.readText() }
-            view.evaluateJavascript(src) { }
+            val shim = readAsset(context, SHIM_PATH)
+            val vmSource = readAsset(context, VM_PATH)
+
+            // Shim first: the VM captures document.cookie on load.
+            view.evaluateJavascript(shim) { }
+            delay(150)
+            view.evaluateJavascript(vmSource) { }
 
             val deadline = System.currentTimeMillis() + 8_000
             var ready = false
             while (System.currentTimeMillis() < deadline) {
-                val has =
+                val state =
                     suspendCancellableCoroutine<String?> { c ->
-                        view.evaluateJavascript("(typeof window.byted_acrawler)") { r ->
-                            c.resume(r?.trim()?.trim('"'))
-                        }
+                        view.evaluateJavascript(
+                            "(JSON.stringify({vm:typeof window.byted_acrawler," +
+                                "shim:!!window.__duck_cookie_ok}))"
+                        ) { r -> c.resume(r?.trim()?.trim('"')) }
                     }
-                if (has == "object") {
+                if (state != null && state.contains("\"vm\":\"object\"")) {
                     ready = true
+                    Log.i(TAG, "bundle state: " + state)
                     break
                 }
                 delay(120)
@@ -113,6 +111,9 @@ object DouyinSigner {
             null
         }
     }
+
+    private fun readAsset(context: Context, path: String): String =
+        context.assets.open(path).bufferedReader().use { it.readText() }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun newWebView(context: Context): WebView =
