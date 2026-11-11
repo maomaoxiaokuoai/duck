@@ -348,36 +348,6 @@ fun DownloadPageImpl(
             }
 
         }, actions = {
-            BadgedBox(badge = {
-                if (processCount > 0)
-                    Badge(
-                        modifier = Modifier.offset(
-                            x = (-16).dp,
-                            y = (8).dp
-                        )
-                    ) { Text("$processCount") }
-            }) {
-                TooltipBox(state = rememberTooltipState(),
-                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                    tooltip = {
-                        PlainTooltip {
-                            Text(text = stringResource(id = R.string.running_tasks))
-                        }
-                    }) {
-                    IconButton(
-                        onClick = {
-                            view.slightHapticFeedback()
-                            onNavigateToTaskList()
-                        },
-                        modifier = Modifier
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Terminal,
-                            contentDescription = stringResource(id = R.string.running_tasks)
-                        )
-                    }
-                }
-            }
             TooltipBox(state = rememberTooltipState(),
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {

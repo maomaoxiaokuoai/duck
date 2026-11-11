@@ -71,8 +71,6 @@ import com.duck.app.ui.component.SegmentedButtonValues
 import com.duck.app.ui.component.SingleChoiceChip
 import com.duck.app.ui.component.SingleChoiceSegmentedButton
 import com.duck.app.ui.component.VideoFilterChip
-import com.duck.app.ui.page.command.TemplatePickerDialog
-import com.duck.app.ui.page.settings.command.CommandTemplateDialog
 import com.duck.app.ui.page.settings.format.AudioConversionQuickSettingsDialog
 import com.duck.app.ui.page.settings.format.AudioQuickSettingsDialog
 import com.duck.app.ui.page.settings.format.FormatSortingDialog
@@ -84,7 +82,6 @@ import com.duck.app.util.AUDIO_CONVERT
 import com.duck.app.util.CONVERT_M4A
 import com.duck.app.util.CONVERT_MP3
 import com.duck.app.util.COOKIES
-import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.DOWNLOAD_TYPE_INITIALIZATION
 import com.duck.app.util.DatabaseUtil
 import com.duck.app.util.DownloadUtil
@@ -105,7 +102,6 @@ import com.duck.app.util.PreferenceUtil.updateInt
 import com.duck.app.util.PreferenceUtil.updateString
 import com.duck.app.util.SORTING_FIELDS
 import com.duck.app.util.SUBTITLE
-import com.duck.app.util.TEMPLATE_ID
 import com.duck.app.util.THUMBNAIL
 import com.duck.app.util.USE_PREVIOUS_SELECTION
 import com.duck.app.util.VIDEO_FORMAT
@@ -116,7 +112,7 @@ import kotlinx.coroutines.withContext
 
 
 private enum class DownloadType {
-    Audio, Video, Command, None
+    Audio, Video, None
 }
 
 @OptIn(
@@ -146,9 +142,7 @@ fun DownloadSettingDialog(
         mutableStateOf(
             when (DOWNLOAD_TYPE_INITIALIZATION.getInt()) {
                 USE_PREVIOUS_SELECTION -> {
-                    if (CUSTOM_COMMAND.getBoolean()) {
-                        DownloadType.Command
-                    } else if (EXTRACT_AUDIO.getBoolean()) {
+                    if (EXTRACT_AUDIO.getBoolean()) {
                         DownloadType.Audio
                     } else {
                         DownloadType.Video
@@ -171,21 +165,9 @@ fun DownloadSettingDialog(
 
     var sortingFields by remember(showFormatSortingDialog) { mutableStateOf(SORTING_FIELDS.getString()) }
 
-    var showTemplateSelectionDialog by remember { mutableStateOf(false) }
-    var showTemplateCreatorDialog by remember { mutableStateOf(false) }
-    var showTemplateEditorDialog by remember { mutableStateOf(false) }
-
     var showCookiesDialog by rememberSaveable { mutableStateOf(false) }
 
     val cookiesProfiles by DatabaseUtil.getCookiesFlow().collectAsStateWithLifecycle(emptyList())
-
-    val template by remember(
-        showTemplateCreatorDialog,
-        showTemplateSelectionDialog,
-        showTemplateEditorDialog
-    ) {
-        mutableStateOf(PreferenceUtil.getTemplate())
-    }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -208,7 +190,6 @@ fun DownloadSettingDialog(
         scope.launch {
             PreferenceUtil.updateValue(EXTRACT_AUDIO, type == DownloadType.Audio)
             PreferenceUtil.updateValue(THUMBNAIL, thumbnail)
-            PreferenceUtil.updateValue(CUSTOM_COMMAND, type == DownloadType.Command)
             PreferenceUtil.updateValue(PLAYLIST, playlist)
             PreferenceUtil.updateValue(SUBTITLE, subtitle)
         }
@@ -249,17 +230,10 @@ fun DownloadSettingDialog(
                     }
                     SingleChoiceSegmentedButton(
                         text = stringResource(id = R.string.video),
-                        selected = type == DownloadType.Video
-                    ) {
-                        type = DownloadType.Video
-                        updatePreferences()
-                    }
-                    SingleChoiceSegmentedButton(
-                        text = stringResource(id = R.string.commands),
-                        selected = type == DownloadType.Command,
+                        selected = type == DownloadType.Video,
                         position = SegmentedButtonValues.END
                     ) {
-                        type = DownloadType.Command
+                        type = DownloadType.Video
                         updatePreferences()
                     }
                 }
@@ -271,7 +245,7 @@ fun DownloadSettingDialog(
                         selected = !formatSelection || playlist, onClick = {
                             formatSelection = false
                             FORMAT_SELECTION.updateBoolean(false)
-                        }, enabled = type != DownloadType.Command,
+                        }, 
                         label = stringResource(id = R.string.auto)
                     )
                     SingleChoiceChip(
@@ -280,50 +254,19 @@ fun DownloadSettingDialog(
                             formatSelection = true
                             FORMAT_SELECTION.updateBoolean(true)
                         },
-                        enabled = type != DownloadType.Command && !playlist,
+                        enabled = !playlist,
                         label = stringResource(id = R.string.custom)
                     )
                 }
             }
 
-            DrawerSheetSubtitle(text = stringResource(id = if (type == DownloadType.Command) R.string.template_selection else R.string.format_preference))
+            DrawerSheetSubtitle(text = stringResource(id = R.string.format_preference))
             AnimatedContent(targetState = type, label = "", transitionSpec = {
                 (materialSharedAxisYIn(initialOffsetX = { it / 4 })).togetherWith(
                     fadeOut(tween(durationMillis = 80))
                 )
             }) { type ->
                 when (type) {
-                    DownloadType.Command -> {
-                        LazyRow(
-                            modifier = Modifier,
-                        ) {
-                            item {
-                                ButtonChip(
-                                    icon = Icons.Outlined.Code,
-                                    label = template.name,
-                                    onClick = { showTemplateSelectionDialog = true }
-                                )
-                            }
-                            item {
-                                ButtonChip(
-                                    icon = Icons.Outlined.NewLabel,
-                                    label = stringResource(id = R.string.new_template),
-                                    onClick = { showTemplateCreatorDialog = true }
-                                )
-                            }
-                            item {
-                                ButtonChip(
-                                    icon = Icons.Outlined.Edit,
-                                    label = stringResource(
-                                        id = R.string.edit_template,
-                                        template.name
-                                    ),
-                                    onClick = { showTemplateEditorDialog = true }
-                                )
-                            }
-                        }
-                    }
-
                     else -> {
                         Row(
                             modifier = Modifier
@@ -394,11 +337,6 @@ fun DownloadSettingDialog(
 
             }
 
-            AnimatedVisibility(visible = type == DownloadType.Command) {
-
-
-            }
-
             DrawerSheetSubtitle(
                 text = stringResource(
                     R.string.additional_settings
@@ -424,7 +362,7 @@ fun DownloadSettingDialog(
                     FilterChip(
                         modifier = Modifier.padding(horizontal = 4.dp),
                         selected = formatSorting,
-                        enabled = type != DownloadType.Command,
+                        
                         onClick = { showFormatSortingDialog = true },
                         label = {
                             Text(text = stringResource(id = R.string.format_sorting))
@@ -433,7 +371,7 @@ fun DownloadSettingDialog(
                 }
                 if (!isQuickDownload) {
                     VideoFilterChip(
-                        selected = playlist, enabled = type != DownloadType.Command, onClick = {
+                        selected = playlist,  onClick = {
                             playlist = !playlist
                             formatSelection = false
                             updatePreferences()
@@ -441,13 +379,13 @@ fun DownloadSettingDialog(
                     )
                 }
                 VideoFilterChip(
-                    selected = subtitle, enabled = type != DownloadType.Command, onClick = {
+                    selected = subtitle,  onClick = {
                         subtitle = !subtitle
                         updatePreferences()
                     }, label = stringResource(id = R.string.download_subtitles)
                 )
                 VideoFilterChip(
-                    selected = thumbnail, enabled = type != DownloadType.Command, onClick = {
+                    selected = thumbnail,  onClick = {
                         thumbnail = !thumbnail
                         updatePreferences()
                     }, label = stringResource(R.string.create_thumbnail)
@@ -606,24 +544,6 @@ fun DownloadSettingDialog(
     }
 
 
-    if (showTemplateSelectionDialog) {
-        TemplatePickerDialog { showTemplateSelectionDialog = false }
-    }
-    if (showTemplateCreatorDialog) {
-        CommandTemplateDialog(
-            onDismissRequest = { showTemplateCreatorDialog = false },
-            confirmationCallback = {
-                scope.launch {
-                    TEMPLATE_ID.updateInt(it)
-                }
-            })
-    }
-    if (showTemplateEditorDialog) {
-        CommandTemplateDialog(
-            commandTemplate = template,
-            onDismissRequest = { showTemplateEditorDialog = false }
-        )
-    }
     if (showCookiesDialog && cookiesProfiles.isNotEmpty()) {
         CookiesQuickSettingsDialog(
             onDismissRequest = { showCookiesDialog = false },

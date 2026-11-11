@@ -207,54 +207,6 @@ fun GeneralDownloadPreferences(
                         PreferenceInfo(text = stringResource(id = R.string.custom_command_enabled_hint))
                     }
                 item {
-                    var ytdlpVersion by remember {
-                        mutableStateOf(
-                            YoutubeDL.getInstance().version(context.applicationContext)
-                                ?: context.getString(R.string.ytdlp_update)
-                        )
-                    }
-                    PreferenceItem(
-                        title = stringResource(id = R.string.ytdlp_update_action),
-                        description = ytdlpVersion,
-                        leadingIcon = {
-                            if (isUpdating) UpdateProgressIndicator() else {
-                                Icon(
-                                    imageVector = Icons.Outlined.Update,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(start = 8.dp, end = 16.dp)
-                                        .size(24.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }, onClick = {
-                            scope.launch {
-                                runCatching {
-                                    isUpdating = true
-                                    UpdateUtil.updateYtDlp()
-                                    ytdlpVersion = YT_DLP_VERSION.getString()
-                                }.onFailure { th ->
-                                    th.printStackTrace()
-                                    ToastUtil.makeToastSuspend(App.context.getString(R.string.yt_dlp_update_fail))
-                                }.onSuccess {
-                                    ToastUtil.makeToastSuspend(context.getString(R.string.yt_dlp_up_to_date) + " (${YT_DLP_VERSION.getString()})")
-                                }
-                                isUpdating = false
-                            }
-                        }, onClickLabel = stringResource(id = R.string.update),
-                        trailingIcon = {
-                            IconButton(onClick = { showYtdlpDialog = true }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Settings,
-                                    contentDescription = stringResource(
-                                        id = R.string.open_settings
-                                    )
-                                )
-                            }
-                        }
-                    )
-                }
-                item {
                     PreferenceSwitch(title = stringResource(id = R.string.download_notification),
                         description = stringResource(
                             id = if (isNotificationPermissionGranted) R.string.download_notification_desc

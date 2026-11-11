@@ -191,15 +191,6 @@ fun SettingsPage(
             }
             item {
                 SettingItem(
-                    title = stringResource(id = R.string.custom_command),
-                    description = stringResource(id = R.string.custom_command_desc),
-                    icon = Icons.Rounded.Terminal
-                ) {
-                    onNavigateTo(Route.TEMPLATE)
-                }
-            }
-            item {
-                SettingItem(
                     title = stringResource(id = R.string.look_and_feel),
                     description = stringResource(
                         id = R.string.display_settings
