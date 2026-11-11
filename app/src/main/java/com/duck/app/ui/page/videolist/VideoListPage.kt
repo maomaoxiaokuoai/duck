@@ -1,6 +1,5 @@
 package com.duck.app.ui.page.videolist
 
-import VideoStreamSVG
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -86,7 +85,6 @@ import com.duck.app.database.backup.BackupUtil.toURLListString
 import com.duck.app.database.objects.DownloadedVideoInfo
 import com.duck.app.ui.common.HapticFeedback.slightHapticFeedback
 import com.duck.app.ui.common.LocalWindowWidthState
-import com.duck.app.ui.common.SVGImage
 import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.CheckBoxItem
 import com.duck.app.ui.component.ConfirmButton
@@ -174,7 +172,6 @@ fun VideoListPage(
     var showRemoveMultipleItemsDialog by remember { mutableStateOf(false) }
 
     var showExportDialog by remember { mutableStateOf(false) }
-    var showImportDialog by remember { mutableStateOf(false) }
 
     val lazyListState = rememberLazyListState()
 
@@ -355,18 +352,6 @@ fun VideoListPage(
                                             expanded = false
                                         })
                                 }
-                                DropdownMenuItem(
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Restore,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    text = { Text(text = stringResource(id = R.string.import_backup)) },
-                                    onClick = {
-                                        showImportDialog = true
-                                        expanded = false
-                                    })
                             }
 
                         }
@@ -439,11 +424,6 @@ fun VideoListPage(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    SVGImage(
-                        SVGString = VideoStreamSVG,
-                        contentDescription = null,
-                        modifier = Modifier.padding(horizontal = 72.dp, vertical = 20.dp)
-                    )
                     Text(
                         text = stringResource(R.string.no_downloaded_media),
                         style = MaterialTheme.typography.labelLarge,
@@ -651,39 +631,6 @@ fun VideoListPage(
         }
     }
 
-    val importLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri ->
-            uri?.let {
-                viewModel.importBackupFromUri(context, uri) {
-                    viewModel.showImportedSnackbar(hostState, context, it)
-                }
-            }
-        }
-
-    if (showImportDialog) {
-
-        ImportDialog(onDismissRequest = { showImportDialog = false }) { destination ->
-            scope.launch {
-                when (destination) {
-                    Clipboard -> {
-                        clipboardManager.getText()?.text?.let { str ->
-                            viewModel.importBackupFromText(str) {
-                                viewModel.showImportedSnackbar(hostState, context, it)
-                            }
-                        }
-                    }
-
-                    File -> {
-                        importLauncher.launch("text/plain")
-                    }
-                }
-            }
-            view.slightHapticFeedback()
-            showImportDialog = false
-        }
-    }
 }
 
 private fun List<DownloadedVideoInfo>.backupToString(
