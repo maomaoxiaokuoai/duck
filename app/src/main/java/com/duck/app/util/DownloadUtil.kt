@@ -24,6 +24,16 @@ import com.duck.app.util.douyin.DouyinParser
  */
 object DownloadUtil {
 
+    object CookieScheme {
+        const val NAME = "name"
+        const val VALUE = "value"
+        const val SECURE = "is_secure"
+        const val EXPIRY = "expires_utc"
+        const val HOST = "host_key"
+        const val PATH = "path"
+    }
+
+
     private const val TAG = "DownloadUtil"
 
     const val BASENAME = "%(title).200B"
