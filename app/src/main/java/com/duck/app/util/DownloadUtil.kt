@@ -8,6 +8,7 @@ import com.duck.app.App
 import com.duck.app.R
 import com.duck.app.ui.page.settings.network.Cookie
 import com.duck.app.util.FileUtil
+import com.duck.app.util.FileUtil.getCookiesFile
 import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.PreferenceUtil.getInt
 import com.duck.app.util.PreferenceUtil.getLong
@@ -101,7 +102,7 @@ object DownloadUtil {
 
     @CheckResult
     fun getCookieListFromDatabase(): Result<List<Cookie>> = runCatching {
-        val cookiesFile = FileUtil.getCookiesFile()
+        val cookiesFile = App.context.getCookiesFile()
         if (!cookiesFile.exists()) return@runCatching emptyList()
         val db = SQLiteDatabase.openDatabase(
             cookiesFile.absolutePath, null, OPEN_READONLY
