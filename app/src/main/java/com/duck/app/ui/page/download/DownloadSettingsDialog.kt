@@ -344,20 +344,6 @@ fun DownloadSettingDialog(
             )
 
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                if (cookiesProfiles.isNotEmpty()) {
-                    VideoFilterChip(
-                        selected = cookies,
-                        onClick = {
-                            if (isQuickDownload) {
-                                cookies = !cookies
-                                COOKIES.updateBoolean(cookies)
-                            } else {
-                                showCookiesDialog = true
-                            }
-                        },
-                        label = stringResource(id = R.string.cookies)
-                    )
-                }
                 if (sortingFields.isNotEmpty()) {
                     FilterChip(
                         modifier = Modifier.padding(horizontal = 4.dp),

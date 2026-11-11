@@ -185,12 +185,6 @@ fun NetworkPreferences(
                         FORCE_IPV4.updateBoolean(forceIpv4)
                     }
                 }
-                item {
-                    PreferenceItem(title = stringResource(R.string.cookies),
-                        description = stringResource(R.string.cookies_desc),
-                        icon = Icons.Outlined.Cookie,
-                        onClick = { navigateToCookieProfilePage() })
-                }
 
             }
         })
