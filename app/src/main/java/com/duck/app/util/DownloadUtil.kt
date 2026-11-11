@@ -9,6 +9,7 @@ import android.webkit.CookieManager
 import androidx.annotation.CheckResult
 import com.duck.app.App
 import com.duck.app.util.douyin.DouyinAdapter
+import com.duck.app.util.douyin.DouyinDownloader
 import com.duck.app.util.douyin.DouyinParser
 import com.duck.app.App.Companion.audioDownloadDir
 import com.duck.app.App.Companion.context
@@ -535,6 +536,16 @@ object DownloadUtil {
         progressCallback: ((Float, Long, String) -> Unit)?
     ): Result<List<String>> {
         if (videoInfo == null) return Result.failure(Throwable(context.getString(R.string.fetch_info_error_msg)))
+
+        // Douyin exposes direct CDN URLs; yt-dlp needs cookies there, so download ourselves.
+        if (videoInfo.extractor == "douyin") {
+            return DouyinDownloader.download(
+                videoInfo = videoInfo,
+                preferences = downloadPreferences,
+                taskId = taskId,
+                progressCallback = progressCallback
+            )
+        }
 
         with(downloadPreferences) {
             val url = playlistUrl.ifEmpty {
