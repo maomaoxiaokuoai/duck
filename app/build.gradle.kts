@@ -54,7 +54,7 @@ sealed class Version(
 val currentVersion: Version = Version.Stable(
     versionMajor = 2,
     versionMinor = 0,
-    versionPatch = 3,
+    versionPatch = 4,
 )
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -104,7 +104,7 @@ android {
         applicationId = "com.duck.app"
         minSdk = 21
         targetSdk = 34
-        versionCode = 20000003
+        versionCode = 20000004
 
         if (splitApks) {
             splits {
