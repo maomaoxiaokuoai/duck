@@ -20,7 +20,7 @@ object DouyinAdapter {
                     Format(
                         formatId = "image-" + (index + 1),
                         url = url,
-                        ext = "jpg",
+                        ext = extOf(url),
                         formatNote = "图片 " + (index + 1),
                     )
                 }
@@ -77,5 +77,16 @@ object DouyinAdapter {
             ?: return post.id
         val cleaned = first.trimEnd(*TRAILING_PUNCT)
         return if (cleaned.length > 50) cleaned.take(50).trim() else cleaned
+    }
+    /** Douyin serves jpeg and webp; keep the real extension so files open correctly. */
+    private fun extOf(url: String): String {
+        val path = url.substringBefore('?').lowercase()
+        return when {
+            path.endsWith(".png") -> "png"
+            path.endsWith(".gif") -> "gif"
+            path.endsWith(".webp") -> "webp"
+            path.endsWith(".jpeg"), path.endsWith(".jpg") -> "jpg"
+            else -> "jpg"
+        }
     }
 }
