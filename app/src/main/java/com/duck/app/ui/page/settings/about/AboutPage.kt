@@ -5,15 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material.icons.outlined.UpdateDisabled
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -59,18 +56,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 
-private const val releaseURL = "https://github.com/maomaoxiaokuoai/duck/releases"
-private const val repoUrl = "https://github.com/maomaoxiaokuoai/duck"
-const val weblate = "https://github.com/maomaoxiaokuoai/duck"
-private const val githubIssueUrl = "https://github.com/maomaoxiaokuoai/duck/issues"
-private const val githubSponsor = "https://github.com/maomaoxiaokuoai"
 private const val TAG = "AboutPage"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutPage(
     onNavigateBack: () -> Unit,
-    onNavigateToCreditsPage: () -> Unit,
+    onNavigateToCreditsPage: () -> Unit = {},
     onNavigateToUpdatePage: () -> Unit,
     onNavigateToDonatePage: () -> Unit
 ) {
@@ -115,28 +107,7 @@ fun AboutPage(
     }, content = {
         LazyColumn(modifier = Modifier.padding(it)) {
             item {
-                AppHeader()
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.readme),
-                    description = stringResource(R.string.readme_desc),
-                    icon = Icons.Outlined.Description,
-                ) { openUrl(repoUrl) }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.release),
-                    description = stringResource(R.string.release_desc),
-                    icon = Icons.Outlined.NewReleases,
-                ) { openUrl(releaseURL) }
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(id = R.string.credits),
-                    description = stringResource(id = R.string.credits_desc),
-                    icon = Icons.Outlined.AutoAwesome,
-                ) { onNavigateToCreditsPage() }
+                AppHeader(versionName)
             }
             item {
                 PreferenceSwitchWithDivider(
@@ -225,22 +196,34 @@ fun AutoUpdateUnavailableDialog(onDismissRequest: () -> Unit = {}) {
 }
 
 @Composable
-private fun AppHeader() {
+private fun AppHeader(versionName: String) {
     Column(
         modifier =
             Modifier.fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .padding(horizontal = 20.dp)
+                .padding(top = 4.dp, bottom = 12.dp)
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.version) + " " + versionName,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = stringResource(R.string.app_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 8.dp),
+            color = MaterialTheme.colorScheme.outlineVariant,
         )
     }
 }

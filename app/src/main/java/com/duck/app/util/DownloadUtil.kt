@@ -743,10 +743,11 @@ object DownloadUtil {
             }
 
             onProcessStarted()
-            withContext(Dispatchers.Main) {
-                onTaskStarted(template, url)
-            }
-            runCatching {
+            try {
+                withContext(Dispatchers.Main) {
+                    onTaskStarted(template, url)
+                }
+                runCatching {
                 val response = YoutubeDL.getInstance().execute(
                     request = request, processId = taskId
                 ) { progress, _, text ->
@@ -762,16 +763,20 @@ object DownloadUtil {
                         template = template, url = url, line = text, progress = progress
                     )
                 }
-                onTaskEnded(template, url, response.out + "\n" + response.err)
-            }.onFailure {
-                it.printStackTrace()
-                if (it is YoutubeDL.CanceledException) return@onFailure
-                it.message.run {
-                    if (isNullOrEmpty()) onTaskEnded(template, url)
-                    else onTaskError(this, template, url)
+                    onTaskEnded(template, url, response.out + "\n" + response.err)
+                }.onFailure {
+                    it.printStackTrace()
+                    if (it is YoutubeDL.CanceledException) return@onFailure
+                    it.message.run {
+                        if (isNullOrEmpty()) onTaskEnded(template, url)
+                        else onTaskError(this, template, url)
+                    }
                 }
+            } finally {
+                // Always release the process slot, including cancellation, so the
+                // foreground service can stop once nothing is running.
+                onProcessEnded()
             }
-            onProcessEnded()
         }
     }
 
