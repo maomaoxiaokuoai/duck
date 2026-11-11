@@ -6,17 +6,17 @@ import android.util.Log
 import androidx.annotation.CheckResult
 import com.duck.app.App
 import com.duck.app.R
-import com.duck.app.util.douyin.DouyinAdapter
-import com.duck.app.util.douyin.DouyinDownloader
 import com.duck.app.ui.page.settings.network.Cookie
 import com.duck.app.util.FileUtil
 import com.duck.app.util.PreferenceUtil.AUDIO_CONVERT
 import com.duck.app.util.PreferenceUtil.AUDIO_FORMAT
 import com.duck.app.util.PreferenceUtil.AUDIO_QUALITY
+import com.duck.app.util.PreferenceUtil.AUTO_SUBTITLE
+import com.duck.app.util.PreferenceUtil.AUTO_TRANSLATED_SUBTITLES
 import com.duck.app.util.PreferenceUtil.COMMAND_DIRECTORY
-import com.duck.app.util.PreferenceUtil.COOKIES
 import com.duck.app.util.PreferenceUtil.CONCURRENT
 import com.duck.app.util.PreferenceUtil.CONVERT_SUBTITLE
+import com.duck.app.util.PreferenceUtil.COOKIES
 import com.duck.app.util.PreferenceUtil.CROP_ARTWORK
 import com.duck.app.util.PreferenceUtil.DEBUG
 import com.duck.app.util.PreferenceUtil.DOWNLOAD_ARCHIVE
@@ -47,15 +47,13 @@ import com.duck.app.util.PreferenceUtil.SUBTITLE_LANGUAGE
 import com.duck.app.util.PreferenceUtil.THUMBNAIL
 import com.duck.app.util.PreferenceUtil.USER_AGENT
 import com.duck.app.util.PreferenceUtil.USER_AGENT_STRING
-import com.duck.app.util.PreferenceUtil.AUTO_SUBTITLE
-import com.duck.app.util.PreferenceUtil.AUTO_TRANSLATED_SUBTITLES
-]
-
-import com.duck.app.util.douyin.DouyinParser
 import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.PreferenceUtil.getInt
-import com.duck.app.util.PreferenceUtil.getString
 import com.duck.app.util.PreferenceUtil.getLong
+import com.duck.app.util.PreferenceUtil.getString
+import com.duck.app.util.douyin.DouyinAdapter
+import com.duck.app.util.douyin.DouyinDownloader
+import com.duck.app.util.douyin.DouyinParser
 
 /**
  * Coordinates media extraction and downloading.
