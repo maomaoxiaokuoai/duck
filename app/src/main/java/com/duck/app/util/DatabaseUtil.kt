@@ -18,7 +18,10 @@ object DatabaseUtil {
     private const val DATABASE_NAME = "app_database"
     private val db = Room.databaseBuilder(
         context, AppDatabase::class.java, DATABASE_NAME
-    ).build()
+    )
+        // v6 removed a table; rebuild local tables rather than ship a migration.
+        .fallbackToDestructiveMigration()
+        .build()
     private val dao = db.videoInfoDao()
     fun insertInfo(vararg infoList: DownloadedVideoInfo) {
         applicationScope.launch(Dispatchers.IO) {

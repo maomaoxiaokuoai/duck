@@ -9,7 +9,9 @@ import com.duck.app.database.objects.OptionShortcut
 
 @Database(
     entities = [DownloadedVideoInfo::class, CommandTemplate::class, OptionShortcut::class],
-    version = 5,
+    // v6 drops the CookieProfile table; Room cannot auto-migrate a table removal,
+    // so older installs rebuild the (small, regenerable) local tables instead.
+    version = 6,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
