@@ -13,7 +13,7 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <!-- Splash: the duck fills the icon, so no extra icon background plate is drawn. -->
+    <!-- Pre-Android 12 splash, provided by androidx.core:core-splashscreen. -->
     <style name="Theme.Duck.Splashscreen" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.Duck</item>
         <item name="windowSplashScreenBackground">@android:color/white</item>
