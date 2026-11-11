@@ -165,8 +165,6 @@ fun DownloadSettingDialog(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    }
-
     LaunchedEffect(showDialog) {
         if (showDialog) {
 
@@ -364,8 +362,6 @@ fun DownloadSettingDialog(
                     }, label = stringResource(R.string.create_thumbnail)
                 )
             }
-
-
         }
     }
     if (showDialog) {
