@@ -81,7 +81,12 @@ object DouyinParser {
                     try {
                         val nonce = fetchNonce(id)
                         val signature = DouyinSigner.sign(context, nonce)
-                        if (signature == null) Log.w(TAG, "no signature, trying unsigned")
+                        Log.d(
+                            TAG,
+                            "nonce=" + nonce + " sig=" +
+                                (signature?.take(40) ?: "NULL") +
+                                " len=" + (signature?.length ?: 0)
+                        )
 
                         val cookie =
                             buildString {
@@ -140,7 +145,9 @@ object DouyinParser {
                 TAG,
                 "html len=" + body.length +
                     " pace_f=" + body.contains("self.__pace_f") +
-                    " awemeId=" + body.contains("awemeId")
+                    " awemeId=" + body.contains("awemeId") +
+                    " verify=" + (body.contains("验证") || body.contains("captcha")) +
+                    " head=" + body.take(180).replace("\n", " ")
             )
             return body
         }
