@@ -56,6 +56,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 
+const val weblate = "https://github.com/maomaoxiaokuoai/duck"
 private const val TAG = "AboutPage"
 
 @OptIn(ExperimentalMaterial3Api::class)

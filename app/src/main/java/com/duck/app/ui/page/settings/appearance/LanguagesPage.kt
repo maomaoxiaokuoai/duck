@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,8 +44,6 @@ import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.HorizontalDivider
 import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.PreferenceSingleChoiceItem
-import com.duck.app.ui.component.PreferencesHintCard
-import com.duck.app.ui.page.settings.about.weblate
 import com.duck.app.ui.theme.DuckTheme
 import com.duck.app.util.LocaleLanguageCodeMap
 import com.duck.app.util.PreferenceUtil
@@ -108,7 +104,6 @@ private fun LanguagePageImpl(
         rememberTopAppBarState(),
         canScroll = { true }
     )
-    val uriHandler = LocalUriHandler.current
 
     Scaffold(
         modifier = Modifier
@@ -132,15 +127,6 @@ private fun LanguagePageImpl(
                 modifier = Modifier
                     .padding(it)
             ) {
-                item {
-                    PreferencesHintCard(
-                        title = stringResource(R.string.translate),
-                        description = stringResource(R.string.translate_desc),
-                        icon = Icons.Outlined.Translate,
-                    ) { uriHandler.openUri(weblate) }
-                }
-
-
                 item {
                     PreferenceSingleChoiceItem(
                         text = stringResource(id = R.string.follow_system),
