@@ -98,7 +98,6 @@ import com.duck.app.util.NOTIFICATION
 import com.duck.app.util.NotificationUtil
 import com.duck.app.util.PLAYLIST
 import com.duck.app.util.PRIVATE_MODE
-import com.duck.app.util.PreferenceStrings.getUpdateIntervalText
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.PreferenceUtil.getLong
 import com.duck.app.util.PreferenceUtil.getString
@@ -109,14 +108,7 @@ import com.duck.app.util.SPONSORBLOCK
 import com.duck.app.util.SUBTITLE
 import com.duck.app.util.THUMBNAIL
 import com.duck.app.util.ToastUtil
-import com.duck.app.util.UpdateIntervalList
 import com.duck.app.util.UpdateUtil
-import com.duck.app.util.YT_DLP_AUTO_UPDATE
-import com.duck.app.util.YT_DLP_NIGHTLY
-import com.duck.app.util.YT_DLP_STABLE
-import com.duck.app.util.YT_DLP_UPDATE_CHANNEL
-import com.duck.app.util.YT_DLP_UPDATE_INTERVAL
-import com.duck.app.util.YT_DLP_VERSION
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -135,7 +127,6 @@ fun GeneralDownloadPreferences(
     val hapticFeedback = LocalHapticFeedback.current
 
     var showSponsorBlockDialog by remember { mutableStateOf(false) }
-    var showYtdlpDialog by remember { mutableStateOf(false) }
     var isUpdating by remember { mutableStateOf(false) }
 
     val downloadSubtitle by SUBTITLE.booleanState
@@ -381,118 +372,6 @@ fun GeneralDownloadPreferences(
         SponsorBlockDialog {
             showSponsorBlockDialog = false
         }
-    }
-    if (showYtdlpDialog) {
-        var ytdlpUpdateChannel by YT_DLP_UPDATE_CHANNEL.intState
-        var ytdlpAutoUpdate by YT_DLP_AUTO_UPDATE.booleanState
-        var updateInterval by remember { mutableLongStateOf(YT_DLP_UPDATE_INTERVAL.getLong()) }
-
-        DuckDialog(
-            onDismissRequest = { showYtdlpDialog = false },
-            confirmButton = {
-                ConfirmButton {
-                    YT_DLP_AUTO_UPDATE.updateBoolean(ytdlpAutoUpdate)
-                    YT_DLP_UPDATE_CHANNEL.updateInt(ytdlpUpdateChannel)
-                    YT_DLP_UPDATE_INTERVAL.updateLong(updateInterval)
-                    showYtdlpDialog = false
-                }
-            },
-            dismissButton = {
-                DismissButton {
-                    showYtdlpDialog = false
-                }
-            },
-            title = { Text(text = stringResource(id = R.string.update)) },
-            icon = { Icon(Icons.Outlined.SyncAlt, null) },
-            text = {
-                LazyColumn() {
-                    item {
-                        Text(
-                            text = stringResource(id = R.string.update_channel),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                                .padding(top = 16.dp, bottom = 8.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                    item {
-                        DialogSingleChoiceItem(
-                            text = "yt-dlp",
-                            selected = ytdlpUpdateChannel == YT_DLP_STABLE,
-                            label = "Stable"
-                        ) {
-                            ytdlpUpdateChannel = YT_DLP_STABLE
-                        }
-                    }
-                    item {
-                        DialogSingleChoiceItem(
-                            text = "yt-dlp-nightly-builds",
-                            selected = ytdlpUpdateChannel == YT_DLP_NIGHTLY,
-                            label = "Nightly",
-                            labelContainerColor = MaterialTheme.colorScheme.tertiary
-                        ) {
-                            ytdlpUpdateChannel = YT_DLP_NIGHTLY
-                        }
-                    }
-                    item {
-                        Text(
-                            text = stringResource(id = R.string.additional_settings),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                                .padding(top = 16.dp, bottom = 16.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
-                    item {
-                        var expanded by remember { mutableStateOf(false) }
-
-                        ExposedDropdownMenuBox(
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                            expanded = expanded,
-                            onExpandedChange = { expanded = it }) {
-                            OutlinedTextField(
-                                value = if (!ytdlpAutoUpdate) stringResource(id = R.string.disabled)
-                                else getUpdateIntervalText(updateInterval),
-                                onValueChange = {},
-                                label = { Text(text = stringResource(id = R.string.auto_update)) },
-                                readOnly = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(),
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                                },
-                            )
-                            ExposedDropdownMenu(
-                                modifier = Modifier.verticalScroll(rememberScrollState()),
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(id = R.string.disabled)) },
-                                    onClick = {
-                                        ytdlpAutoUpdate = false
-                                        expanded = false
-                                    })
-                                for ((interval, stringId) in UpdateIntervalList) {
-                                    DropdownMenuItem(
-                                        text = { Text(text = stringResource(id = stringId)) },
-                                        onClick = {
-                                            ytdlpAutoUpdate = true
-                                            updateInterval = interval
-                                            expanded = false
-                                        })
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-        )
     }
     if (showClearArchiveDialog) {
         DownloadArchiveDialog(

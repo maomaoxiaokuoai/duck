@@ -248,7 +248,7 @@
     <string name="download_queue" translatable="false">Download queue</string>
     <string name="unavailable">Unavailable</string>
     <string name="format_settings_desc">File format, video quality, subtitles</string>
-    <string name="general_settings_desc">Yt-dlp version, notification, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Rate limit, downloader, cookies</string>
     <string name="disable_preview">Disable preview</string>
     <string name="disable_preview_desc">No display of thumbnails during download</string>

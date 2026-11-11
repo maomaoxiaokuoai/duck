@@ -46,8 +46,6 @@ import com.duck.app.ui.component.BackButton
 import com.duck.app.ui.component.ConfirmButton
 import com.duck.app.ui.component.LargeTopAppBar
 import com.duck.app.ui.component.PreferenceItem
-import com.duck.app.ui.component.PreferenceSwitchWithDivider
-import com.duck.app.util.AUTO_UPDATE
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.ToastUtil
 import androidx.compose.foundation.layout.Column
@@ -64,7 +62,7 @@ private const val TAG = "AboutPage"
 fun AboutPage(
     onNavigateBack: () -> Unit,
     onNavigateToCreditsPage: () -> Unit = {},
-    onNavigateToUpdatePage: () -> Unit,
+    onNavigateToUpdatePage: () -> Unit = {},
     onNavigateToDonatePage: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -76,7 +74,6 @@ fun AboutPage(
 //    val screenDensity = configuration.densityDpi / 160f
 //    val screenHeight = (configuration.screenHeightDp.toFloat() * screenDensity).roundToInt()
 //    val screenWidth = (configuration.screenWidthDp.toFloat() * screenDensity).roundToInt()
-    var isAutoUpdateEnabled by remember { mutableStateOf(PreferenceUtil.isAutoUpdateEnabled()) }
 
     val info = App.getVersionReport()
     val versionName = packageInfo.versionName
@@ -119,20 +116,6 @@ fun AboutPage(
                     clipboardManager.setText(AnnotatedString(info))
                     ToastUtil.makeToast(R.string.info_copied)
                 }
-            }
-            item {
-                PreferenceSwitchWithDivider(
-                    title = stringResource(R.string.auto_update),
-                    description = stringResource(R.string.check_for_updates_desc),
-                    icon = if (isAutoUpdateEnabled) Icons.Outlined.Update else Icons.Outlined.UpdateDisabled,
-                    isChecked = isAutoUpdateEnabled,
-                    isSwitchEnabled = !App.isFDroidBuild(),
-                    onClick = onNavigateToUpdatePage,
-                    onChecked = {
-                        isAutoUpdateEnabled = !isAutoUpdateEnabled
-                        PreferenceUtil.updateValue(AUTO_UPDATE, isAutoUpdateEnabled)
-                    }
-                )
             }
         }
     })
