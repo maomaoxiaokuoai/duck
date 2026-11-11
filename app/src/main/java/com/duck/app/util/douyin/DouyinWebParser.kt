@@ -9,43 +9,37 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
-import kotlin.coroutines.resume
 
 /**
- * Fallback extractor that renders the real Douyin page in a WebView.
+ * Fallback extractor that renders the real Douyin page in a headless WebView.
  *
- * Used when the unsigned API refuses an item (image posts get reason=8) and as the
- * safety net if Douyin changes the API shape. Because a real browser engine loads
- * the page, the site's own JS performs whatever signing it needs; we only intercept
- * the detail response it fetches, so no reverse-engineered signature is involved.
+ * Used when the unsigned API refuses an item (image posts come back with reason=8).
+ * A real browser engine loads the page, so the site's own JavaScript performs
+ * whatever signing it needs; we only read the JSON it fetches, so nothing is
+ * reverse-engineered or hard-coded.
  */
 object DouyinWebParser {
 
     private const val TAG = "DouyinWebParser"
     private const val TIMEOUT_MS = 30_000L
 
-    /** Endpoints whose JSON body carries the item the page is displaying. */
+    /** Responses that carry the item currently on screen. */
     private val CAPTURE_HINTS =
-        listOf(
-            "/aweme/detail/",
-            "/aweme/slidesinfo/",
-            "/aweme/iteminfo/",
-            "/aweme/post/",
-        )
+        listOf("/aweme/detail/", "/aweme/slidesinfo/", "/aweme/iteminfo/", "/aweme/post/")
 
     suspend fun parse(context: Context, input: String): Result<DouyinPost> =
         withContext(Dispatchers.Main) {
-            val id = DouyinParser.extractId(DouyinParser.resolveShortLink(input))
+            val resolved = DouyinParser.resolveShortLink(input)
+            val id = DouyinParser.extractId(resolved)
                 ?: return@withContext Result.failure(
                     IllegalArgumentException("链接里没有作品 ID")
                 )
 
-            val captured = captureDetail(context, id)
+            val captured = capture(context, id)
             if (captured != null) {
                 Result.success(DouyinParser.normalize(captured))
             } else {
@@ -53,38 +47,54 @@ object DouyinWebParser {
             }
         }
 
-    /** Opens the share page and waits for a detail response to pass through. */
-    private suspend fun captureDetail(context: Context, id: String): JSONObject? {
+    /**
+     * Loads the note page and waits for the app's own detail request.
+     *
+     * The request is intercepted before it leaves the WebView: we fetch the same URL
+     * ourselves (the page's cookies are shared by CookieManager), parse it, then hand
+     * the original bytes back so the page keeps rendering normally.
+     */
+    private suspend fun capture(context: Context, id: String): JSONObject? {
         var hit: JSONObject? = null
-        val view = newWebView(context) { json -> if (hit == null) hit = json }
+        val view = buildWebView(context) { json -> if (hit == null) hit = json }
 
-        val url = "https://www.iesdouyin.com/share/video/" + id + "/"
-        view.loadUrl(url)
+        // Both spellings resolve to the same post; note is the one that fails the API.
+        view.loadUrl("https://www.iesdouyin.com/share/note/" + id + "/")
 
         val deadline = System.currentTimeMillis() + TIMEOUT_MS
-        while (System.currentTimeMillis() < deadline && hit == null) {
-            kotlinx.coroutines.delay(250)
+        var navigated = false
+        while (System.currentTimeMillis() < deadline) {
+            if (hit != null) break
+            // Give the SPA a nudge: it sometimes only fetches detail after a scroll.
+            if (!navigated && System.currentTimeMillis() > deadline - TIMEOUT_MS + 6_000) {
+                view.evaluateJavascript("window.scrollTo(0, 600);", null)
+                navigated = true
+            }
+            delay(250)
         }
-        Log.i(TAG, "capture finished, hit=" + (hit != null))
 
+        Log.i(TAG, "capture finished, hit=" + (hit != null))
         val result = hit
-        view.stopLoading()
-        view.destroy()
+        runCatching {
+            view.stopLoading()
+            view.destroy()
+        }
         return result
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun newWebView(
+    private fun buildWebView(
         context: Context,
         onDetail: (JSONObject) -> Unit,
     ): WebView =
         WebView(context).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+            settings.databaseEnabled = true
             settings.userAgentString = DouyinParser.USER_AGENT
-            // Never show it: it exists only to let the page run.
             layoutParams = android.view.ViewGroup.LayoutParams(0, 0)
             CookieManager.getInstance().setAcceptCookie(true)
+            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
 
             webViewClient =
                 object : WebViewClient() {
@@ -94,46 +104,50 @@ object DouyinWebParser {
                     ): WebResourceResponse? {
                         val url = request?.url?.toString() ?: return null
                         if (CAPTURE_HINTS.none { url.contains(it) }) return null
+                        Log.d(TAG, "intercepted " + url.take(110))
                         return try {
-                            // Re-issue the request ourselves so the body can be inspected;
-                            // the page still receives the original bytes.
-                            val body = fetchBody(url)
-                            if (body != null) {
-                                parseDetail(body)?.let { onDetail(it) }
-                                body.toResponse()
-                            } else null
+                            val body = fetchWithPageCookies(url)
+                            if (body == null) return null
+                            extractItem(body)?.let(onDetail)
+                            asResponse(body)
                         } catch (e: Exception) {
                             Log.w(TAG, "intercept failed: " + e.message)
                             null
                         }
                     }
+
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        // Some builds inject the detail later; nudge it once.
+                        view?.evaluateJavascript("window.scrollTo(0, 400);", null)
+                    }
                 }
         }
 
-    private fun fetchBody(url: String): String? =
+    /** Re-issues the request with the WebView's cookie jar. */
+    private fun fetchWithPageCookies(url: String): String? =
         runCatching {
+            val cookies = CookieManager.getInstance().getCookie(url) ?: ""
             val request =
                 okhttp3.Request.Builder()
                     .url(url)
                     .header("User-Agent", DouyinParser.USER_AGENT)
+                    .header("Accept", "application/json, text/plain, */*")
                     .header("Referer", "https://www.iesdouyin.com/")
+                    .apply { if (cookies.isNotEmpty()) header("Cookie", cookies) }
                     .build()
-            val client =
-                okhttp3.OkHttpClient.Builder()
-                    .followRedirects(true)
-                    .build()
-            client.newCall(request).execute().use { it.body.string() }
+            okhttp3.OkHttpClient.Builder()
+                .followRedirects(true)
+                .build()
+                .newCall(request)
+                .execute()
+                .use { if (it.isSuccessful) it.body.string() else null }
         }.getOrNull()
 
-    private fun String.toResponse(): WebResourceResponse =
-        WebResourceResponse(
-            "application/json",
-            "utf-8",
-            ByteArrayInputStream(toByteArray()),
-        )
+    private fun asResponse(body: String): WebResourceResponse =
+        WebResourceResponse("application/json", "utf-8", ByteArrayInputStream(body.toByteArray()))
 
-    /** The payload shape differs per endpoint; pick whichever holds item data. */
-    private fun parseDetail(body: String): JSONObject? {
+    /** The payload shape differs per endpoint; take whichever holds the item. */
+    private fun extractItem(body: String): JSONObject? {
         val root = runCatching { JSONObject(body) }.getOrNull() ?: return null
         root.optJSONObject("aweme_detail")?.let { return it }
         root.optJSONArray("aweme_details")?.let { if (it.length() > 0) return it.getJSONObject(0) }
