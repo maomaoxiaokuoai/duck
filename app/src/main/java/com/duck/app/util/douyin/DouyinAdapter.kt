@@ -25,7 +25,7 @@ object DouyinAdapter {
                     )
                 }
             } else {
-                post.videos.mapIndexed { index, video ->
+                post.videos.take(1).mapIndexed { index, video ->
                     Format(
                         formatId = "video-" + (index + 1),
                         url = video.url,
@@ -45,7 +45,7 @@ object DouyinAdapter {
 
         return VideoInfo(
             id = post.id,
-            title = post.desc.lineSequence().firstOrNull()?.take(120) ?: post.id,
+            title = shortTitle(post),
             formats = formats,
             thumbnail = post.cover,
             description = post.desc,
@@ -67,4 +67,15 @@ object DouyinAdapter {
     fun bestUrl(post: DouyinPost): String? =
         if (post.isNote) post.images.firstOrNull()
         else post.videos.maxByOrNull { it.size }?.url
+    /** First meaningful line of the caption, trimmed to a sane filename length. */
+    private val TRAILING_PUNCT = charArrayOf(0x3002.toChar(), '.', 0xFF0C.toChar(), ',', ' ', 0x0A.toChar())
+
+    private fun shortTitle(post: DouyinPost): String {
+        val first = post.desc.lineSequence()
+            .map { it.trim() }
+            .firstOrNull { it.isNotEmpty() }
+            ?: return post.id
+        val cleaned = first.trimEnd(*TRAILING_PUNCT)
+        return if (cleaned.length > 50) cleaned.take(50).trim() else cleaned
+    }
 }
