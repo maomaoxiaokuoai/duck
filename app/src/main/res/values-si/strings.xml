@@ -164,7 +164,7 @@
     <string name="rate_limit_desc">බාගැනීම් සඳහා උපරිම වේගය සීමා කරන්න</string>
     <string name="permission_issue">ආචයන අවසර ගැටලුවකි</string>
     <string name="network_settings_desc">අනුපාත සීමාව, බාගත කරන්නා, cookies</string>
-    <string name="general_settings_desc">Yt-dlp අනුවාදය, දැනුම්දීම්, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="crop_artwork_desc">අන්තර්ගත රූපය චතුරස්‍රාකාර ලෙස කපන්න</string>
     <string name="embed_subtitles">උපසිරැසි ඇතුළත් කරන්න</string>
     <string name="template_label">ලේබල්</string>

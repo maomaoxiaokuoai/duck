@@ -234,7 +234,7 @@
     <string name="download_disabled_with_cellular">Preuzimanje putem mobilnih podataka je onemogućeno u postavkama</string>
     <string name="file_unavailable">Ova datoteka više nije dostupna</string>
     <string name="format_settings_desc">Oblik datoteke, kvaliteta videozapisa, titlovi</string>
-    <string name="general_settings_desc">Inačica Yt-dlp-a, obavijest, popis za reprodukciju</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="unavailable">Nedostupno</string>
     <string name="crop_artwork_desc">Izrežite ugrađenu sliku u oblik kvadrata</string>
     <string name="rate_limit">Ograničenje brzine</string>

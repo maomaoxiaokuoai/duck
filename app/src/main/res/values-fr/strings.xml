@@ -200,7 +200,7 @@
     <string name="private_directory">Répertoire privé</string>
     <string name="unavailable">Indisponible</string>
     <string name="format_settings_desc">Format de fichier, qualité vidéo, sous-titres</string>
-    <string name="general_settings_desc">Version Yt-dlp, notification, liste de lecture</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="disable_preview">Désactiver l’aperçu</string>
     <string name="disable_preview_desc">Désactiver les images d\'aperçu pendant le téléchargement</string>
     <string name="use_custom_command">Utiliser une commande personnalisée</string>

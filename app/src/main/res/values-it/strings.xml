@@ -196,7 +196,7 @@
     <string name="lowest_quality">Qualità più bassa</string>
     <string name="unavailable">Non disponibile</string>
     <string name="format_settings_desc">Formato file, qualità video, sottotitoli</string>
-    <string name="general_settings_desc">Versione Yt-dlp, notifica, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="disable_preview">Disattiva l\'anteprima</string>
     <string name="crop_artwork">Ritaglia immagine</string>
     <string name="crop_artwork_desc">Ritaglia l\'immagine incorporata in un quadrato</string>

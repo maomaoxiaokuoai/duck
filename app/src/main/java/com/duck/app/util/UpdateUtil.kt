@@ -39,14 +39,25 @@ object UpdateUtil {
     private const val X64 = "x86_64"
     private const val TAG = "UpdateUtil"
 
-    private val client = OkHttpClient()
-    private val requestForLatestRelease =
-        Request.Builder().url("https://api.github.com/repos/${OWNER}/${REPO}/releases/latest")
+    private val client =
+        OkHttpClient.Builder()
+            .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .build()
 
-    private val requestForReleases =
-        Request.Builder().url("https://api.github.com/repos/${OWNER}/${REPO}/releases")
-            .build()
+    /**
+     * GitHub API endpoints tried in order. Direct access is blocked on some networks,
+     * so fall back to public mirrors before giving up.
+     */
+    private val apiEndpoints =
+        listOf(
+            "https://api.github.com/repos/${OWNER}/${REPO}/releases",
+            "https://gh-proxy.com/https://api.github.com/repos/${OWNER}/${REPO}/releases",
+            "https://ghfast.top/https://api.github.com/repos/${OWNER}/${REPO}/releases",
+        )
+
+    /** Download endpoints for release assets, same fallback idea. */
+    private val assetPrefixes = listOf("", "https://gh-proxy.com/", "https://ghfast.top/")
 
     private const val ytdlpNightlyBuildRelease =
         "https://api.github.com/repos/yt-dlp/yt-dlp-nightly-builds/releases/latest"
@@ -76,20 +87,38 @@ object UpdateUtil {
 
 
     private suspend fun getLatestRelease(): LatestRelease =
-        client.newCall(requestForReleases).execute().run {
-            val releaseList =
-                jsonFormat.decodeFromString<List<LatestRelease>>(this.body.string())
-            val latestRelease =
-                releaseList.filter { if (UPDATE_CHANNEL.getInt() == STABLE) it.name.toVersion() is Version.Stable else true }
-                    .maxByOrNull { it.name.toVersion() }
-                    ?: throw Exception("null response")
-            releaseList.sortedBy { it.name.toVersion() }.forEach {
-                Log.d(TAG, it.tagName.toString())
+        withContext(Dispatchers.IO) {
+            var lastError: Exception? = null
+            for (base in apiEndpoints) {
+                try {
+                    val request = Request.Builder().url(base).build()
+                    client.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) {
+                            throw Exception("HTTP " + response.code)
+                        }
+                        val releaseList =
+                            jsonFormat.decodeFromString<List<LatestRelease>>(
+                                response.body.string()
+                            )
+                        val latestRelease =
+                            releaseList
+                                .filter {
+                                    if (UPDATE_CHANNEL.getInt() == STABLE)
+                                        it.name.toVersion() is Version.Stable
+                                    else true
+                                }
+                                .maxByOrNull { it.name.toVersion() }
+                                ?: throw Exception("null response")
+                        Log.d(TAG, "release source: " + base)
+                        return@withContext latestRelease
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "release fetch failed: " + base, e)
+                    lastError = e
+                }
             }
-            body.close()
-            latestRelease
+            throw lastError ?: Exception("no endpoint available")
         }
-
 
     suspend fun checkForUpdate(context: Context = App.context): LatestRelease? {
         val currentVersion = context.getCurrentVersion()
@@ -111,13 +140,16 @@ object UpdateUtil {
         }
 
 
-    private fun Context.getLatestApk() =
+    internal fun Context.getLatestApk() =
         File(getExternalFilesDir("apk"), "latest.apk")
 
 
-    fun installLatestApk(context: Context = App.context) = context.run {
+    fun installLatestApk(
+        context: Context = App.context,
+        apk: File = context.getLatestApk(),
+    ) = context.run {
         kotlin.runCatching {
-            val contentUri = FileProvider.getUriForFile(this, getFileProvider(), getLatestApk())
+            val contentUri = FileProvider.getUriForFile(this, getFileProvider(), apk)
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -162,16 +194,27 @@ object UpdateUtil {
         val abiList = Build.SUPPORTED_ABIS
         val preferredArch = abiList.firstOrNull() ?: return@withContext emptyFlow()
 
-        val targetUrl = latestRelease.assets?.find {
-            return@find it.name?.contains(preferredArch) ?: false
-        }?.browserDownloadUrl ?: return@withContext emptyFlow()
-        val request = Request.Builder().url(targetUrl).build()
-        try {
-            val response = client.newCall(request).execute()
-            val responseBody = response.body
-            return@withContext responseBody.downloadFileWithProgress(context.getLatestApk())
-        } catch (e: Exception) {
-            e.printStackTrace()
+        // Prefer the exact ABI build, fall back to the universal package.
+        val assets = latestRelease.assets.orEmpty()
+        val targetUrl =
+            (assets.firstOrNull { it.name?.contains(preferredArch) == true }
+                ?: assets.firstOrNull { it.name?.contains("universal") == true })
+                ?.browserDownloadUrl ?: return@withContext emptyFlow()
+
+        for (prefix in assetPrefixes) {
+            val url = prefix + targetUrl
+            try {
+                Log.d(TAG, "downloading apk from: " + url)
+                val request = Request.Builder().url(url).build()
+                val response = client.newCall(request).execute()
+                if (!response.isSuccessful) {
+                    throw Exception("HTTP " + response.code)
+                }
+                val responseBody = response.body
+                return@withContext responseBody.downloadFileWithProgress(context.getLatestApk())
+            } catch (e: Exception) {
+                Log.w(TAG, "apk download failed: " + url, e)
+            }
         }
         emptyFlow()
     }

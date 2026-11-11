@@ -186,7 +186,7 @@
     <string name="lowest_quality">Qualidade mais baixa</string>
     <string name="clear_temp_files_count">Eliminado %1$d ficheiro(s) temporário(s)</string>
     <string name="dynamic_color">Cor dinâmica</string>
-    <string name="general_settings_desc">Versão yt-dlp, notificação, lista de reprodução</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Limite de velocidade, descarregador, cookies</string>
     <string name="disable_preview">Desativar a pré-visualização</string>
     <string name="private_directory_desc">Armazenar descargas num diretório oculto</string>

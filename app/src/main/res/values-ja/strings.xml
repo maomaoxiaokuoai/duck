@@ -189,7 +189,7 @@
     <string name="high_contrast">高コントラストのダークテーマ</string>
     <string name="invalid_input">無効な入力値です</string>
     <string name="format_settings_desc">ファイル形式、画質、字幕</string>
-    <string name="general_settings_desc">yt-dlpのバージョン、通知、再生リスト</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="private_mode_desc">ダウンロード履歴を無効にする</string>
     <string name="check_for_updates_desc">GitHubに最新版があるか自動的に確認する</string>
     <string name="app_up_to_date">最新版です</string>

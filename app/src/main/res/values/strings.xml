@@ -94,9 +94,7 @@
     <string name="download_desc">Then click \"Download\" after adjusting its settings.
     </string>
     <string name="download_history_desc">Check and manage in-app downloads, including videos and audio files.</string>
-    <string name="check_download_settings_desc">Take a look at the download settings and make sure
-        you have the latest version of yt-dlp before using it.
-    </string>
+    <string name="check_download_settings_desc">Take a look at the download settings before your first download.</string>
     <string name="download_playlist">Download playlist</string>
     <string name="download_playlist_desc">Download multiple videos from a playlist</string>
     <string name="defaults">Default</string>

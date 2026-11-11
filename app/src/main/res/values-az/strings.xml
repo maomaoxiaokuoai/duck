@@ -176,7 +176,7 @@
     <string name="high_contrast">Yüksək ziddiyyət, qaranlıq mövzu</string>
     <string name="lowest_quality">Ən aşağı keyfiyyət</string>
     <string name="unavailable">Əlçatmaz</string>
-    <string name="general_settings_desc">Yt-dlp versiyası, bildiriş, oynatma siyahısı</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Sürət həddi, yükləyici, məlumat bazası</string>
     <string name="disable_preview">Önizləməni qeyri-aktiv et</string>
     <string name="disable_preview_desc">Yükləmə əsnasında miniatürlər göstərilmir</string>

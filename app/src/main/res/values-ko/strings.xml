@@ -213,7 +213,7 @@
     <string name="app_up_to_date">현재 버전이 최신입니다</string>
     <string name="app_update_failed">최신 버전으로 업데이트하지 못했습니다</string>
     <string name="max_rate">최대 비율</string>
-    <string name="general_settings_desc">Yt-dlp 버전, 알림, 재생목록</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="unlimited">무제한</string>
     <string name="audio_quality">오디오 품질</string>
     <string name="audio_format_preference">선호하는 오디오 형식</string>

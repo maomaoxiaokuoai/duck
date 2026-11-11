@@ -244,7 +244,7 @@
     <string name="lowest_quality">Laveste kvalitet</string>
     <string name="unavailable">Utilgængelig</string>
     <string name="format_settings_desc">Filformat, videokvalitet, undertekster</string>
-    <string name="general_settings_desc">Yt-dlp version, notifikation, afspilningsliste</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="disable_preview">Deaktiver forhåndsvisning</string>
     <string name="disable_preview_desc">Deaktiver forhåndsvisning på downloads</string>
     <string name="privacy">Privatliv</string>

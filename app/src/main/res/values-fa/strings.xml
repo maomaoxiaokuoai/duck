@@ -254,7 +254,7 @@
     <string name="lowest_quality">پایین ترین کیفیت</string>
     <string name="unavailable">در دسترس نیست</string>
     <string name="format_settings_desc">فرمت فایل، کیفیت ویدئو، زیرنویس</string>
-    <string name="general_settings_desc">نسخه Yt-dlp، اعلان، لیست پخش</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="download_selection_desc">ویدیوها را برای بارگیری از لیست پخش \"%1$s\" انتخاب کنید</string>
     <string name="selected_item_count">%1$d مورد انتخاب شد</string>
     <string name="sdcard_directory">پوشه حافظه خارجی</string>

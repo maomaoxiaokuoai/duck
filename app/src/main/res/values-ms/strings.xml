@@ -206,7 +206,7 @@
     <string name="download_with_cellular">Muat turun menggunakan selular</string>
     <string name="download_with_cellular_desc">Benarkan muat turun berlaku ketika bersambung dengan rangkaian terhad</string>
     <string name="unavailable">Tidak tersedia</string>
-    <string name="general_settings_desc">Versi Yt-dlp, notifikasi, senarai main</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="file_unavailable">Fail ini tidak lagi wujud</string>
     <string name="download_selection_desc">Pilih video-video untuk dimuat turun dalam senarai main \"%1$s\"</string>
     <string name="video_only">Video (tiada audio)</string>

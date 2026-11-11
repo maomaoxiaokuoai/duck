@@ -191,7 +191,7 @@
     <string name="concurrent_download_num">%d tråd(ar) vil verte nytta til å hente DASH/HLS-innebygd video samstundes.</string>
     <string name="options">Val</string>
     <string name="github_issue_desc">Send inn ein mistakrapport om problem eller ynskte funksjonar</string>
-    <string name="general_settings_desc">Yt-dlp-utgåve, merknad, speleliste</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="concurrent_download_desc">Hent fleire delar av M3U8/MPD-videoar samstundes</string>
     <string name="invalid_index_range">Ugildt indeksområde</string>
     <string name="video_only">Video (ingen ljod)</string>

@@ -29,6 +29,7 @@ import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.PreferenceUtil.getString
 import com.duck.app.util.PreferenceUtil.updateString
 import com.duck.app.util.SDCARD_URI
+import com.duck.app.util.SilentUpdater
 import com.duck.app.util.UpdateUtil
 import com.duck.app.util.VIDEO_DIRECTORY
 import com.duck.app.util.YT_DLP_VERSION
@@ -86,6 +87,9 @@ class App : Application() {
             COMMAND_DIRECTORY.updateString(videoDownloadDir)
         }
         if (Build.VERSION.SDK_INT >= 26) NotificationUtil.createNotificationChannel()
+
+        // Quiet self-update check on every start.
+        runCatching { SilentUpdater.scheduleOnStart(this) }
 
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->

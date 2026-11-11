@@ -200,7 +200,7 @@
     <string name="selected_item_count">%1$d محدد</string>
     <string name="unavailable">غير متوفر</string>
     <string name="format_settings_desc">صيغة الملف، دقة الفيديو، التَرْجمات</string>
-    <string name="general_settings_desc">إصدار Yt-dlp، إشعار، قائمة تشغيل</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">حدود المعدل، مدير التنزيلات، ملفات تعريف الارتباط</string>
     <string name="disable_preview">تعطيل المعاينة</string>
     <string name="disable_preview_desc">عدم عرض الصور المصغرة أثناء التنزيل</string>

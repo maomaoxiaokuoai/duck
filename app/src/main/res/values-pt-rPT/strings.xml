@@ -95,7 +95,7 @@
     <string name="preferred_format_desc">Formato preferido quando são fornecidos vários</string>
     <string name="download_playlist">Descarregar lista de reprodução</string>
     <string name="paste_desc">Clique em \"Colar\" para obter a ligação do vídeo da sua área de transferência.</string>
-    <string name="general_settings_desc">Versão yt-dlp, notificação, lista de reprodução</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="rename">Renomear</string>
     <string name="convert_subtitle">Converter legendas</string>
     <string name="aria2_desc">Utilizar aria2c como descarregador externo</string>

@@ -199,7 +199,7 @@
     <string name="private_directory">സ്വകാര്യ ഡയറക്ടറി</string>
     <string name="cookies">കുക്കികൾ</string>
     <string name="select_all">എല്ലാം തിരഞ്ഞെടുക്കുക</string>
-    <string name="general_settings_desc">Yt-dlp പതിപ്പ്, അറിയിപ്പ്, പ്ലേലിസ്റ്റ്</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">നിരക്ക് പരിധി, ഡൗൺലോഡർ, കുക്കികൾ</string>
     <string name="crop_artwork">ക്രോപ്പ് ആർട്ട് വർക്ക്</string>
     <string name="privacy">സ്വകാര്യത</string>

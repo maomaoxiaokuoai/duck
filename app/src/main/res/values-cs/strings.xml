@@ -151,7 +151,7 @@
     <string name="github_issue">Problém na GitHubu</string>
     <string name="github_issue_desc">Vytvořit nový problém pro nahlášení chyby nebo žádost o funkci</string>
     <string name="info_copied">Informace zkopírovány do schránky</string>
-    <string name="general_settings_desc">Verze yt-dlp, upozornění, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="check_for_updates">Zkontrolovat aktualizace</string>
     <string name="app_up_to_date">Používáte nejnovější verzi</string>
     <string name="update">Aktualizovat</string>

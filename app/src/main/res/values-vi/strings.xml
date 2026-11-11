@@ -232,7 +232,7 @@
     <string name="lowest_quality">Chất lượng thấp nhất</string>
     <string name="unavailable">Không khả dụng</string>
     <string name="format_settings_desc">Định dạng tệp, chất lượng băng hình, phụ đề</string>
-    <string name="general_settings_desc">Phiên bản Yt-dlp, thông báo, danh sách phát</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="privacy">Riêng tư</string>
     <string name="private_directory">Thư mục riêng</string>
     <string name="custom_command_enabled_hint">Một vài tùy chọn không khả dụng khi sử dụng lệnh tùy chỉnh</string>

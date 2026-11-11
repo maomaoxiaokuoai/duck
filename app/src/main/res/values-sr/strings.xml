@@ -39,7 +39,7 @@
     <string name="github_issue_desc">Пријавите проблем или пошаљите захтев за нову функцију</string>
     <string name="clear_temp_files_desc">Избришите све привремене фајлове из привременог фолдера</string>
     <string name="dynamic_color">Динамичка боја</string>
-    <string name="general_settings_desc">Yt-dlp верзија, обавештење, плејлиста</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="rate_limit_desc">Ограничите максималну брзину преузимања</string>
     <string name="unavailable">Недоступно</string>
     <string name="video_directory">Фасцикла за видео снимке</string>

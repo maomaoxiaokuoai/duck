@@ -192,7 +192,7 @@
     <string name="lowest_quality">En düşük kalite</string>
     <string name="unavailable">Kullanım dışı</string>
     <string name="format_settings_desc">Dosya biçimi, video kalitesi, alt yazılar</string>
-    <string name="general_settings_desc">Yt-dlp sürümü, bildirim, çalma listesi</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Hız sınırı, indirici, çerezler</string>
     <string name="disable_preview">Önizlemeyi devre dışı bırak</string>
     <string name="disable_preview_desc">İndirme sırasında küçük resimler görüntülenmiyor</string>

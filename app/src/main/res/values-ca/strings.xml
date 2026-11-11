@@ -221,7 +221,7 @@
     <string name="format_settings_desc">Format del fitxer, qualitat del vídeo, subtítols</string>
     <string name="download_selection_desc">Seleccioneu els vídeos a baixar de la llista de reproducció «%1$s»</string>
     <string name="select_all">Selecciona-ho tot</string>
-    <string name="general_settings_desc">Versió del yt-dlp, notificacions, llistes de reproducció</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="video_only">Vídeo (sense àudio)</string>
     <string name="suggested">Suggerit</string>
     <string name="format_selection">Selecció del format</string>

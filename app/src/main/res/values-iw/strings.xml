@@ -230,7 +230,7 @@
     <string name="dynamic_color">צבע דינמי</string>
     <string name="max_rate">קצב מקסימלי</string>
     <string name="unavailable">לא זמין</string>
-    <string name="general_settings_desc">גרסת yt-dlp, התראות, פלייליסט</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="private_directory">תיקייה פרטית</string>
     <string name="sdcard_directory">תיקיית כרטיס ה-SD</string>
     <string name="clear">ניקוי</string>

@@ -208,7 +208,7 @@
     <string name="dynamic_color_desc">वॉलपेपर से ऐप थीम पर रंग लागू करें</string>
     <string name="download_with_cellular_desc">मीटर्ड नेटवर्क पर मीडिया को डाउनलोड करने की अनुमति दें</string>
     <string name="rate_limit_desc">अधिकतम डाउनलोड गति सीमित करें</string>
-    <string name="general_settings_desc">Yt-dlp वर्शन, सूचना, प्लेलिस्ट</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="disable_preview_desc">डाउनलोड के समय थंमनेल ना दिखाएं</string>
     <string name="download_selection_desc">प्लेलिस्ट \"%1$s\" से डाउनलोड करने के लिए वीडियो चुनें</string>
     <string name="video_only">वीडियो (कोई ऑडियो नहीं)</string>

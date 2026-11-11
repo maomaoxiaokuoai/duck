@@ -225,7 +225,7 @@
 \n
 \nDostęp do tych plików można uzyskać w %1$s</string>
     <string name="cookies_usage_msg">Pobieranie z niektórych witryn wymaga informacji uwierzytelniających konto. Kliknij „Wygeneruj nowe ciasteczka”, wprowadź adres URL witryny, a następnie zaloguj się swoim kontem na stronie przeglądarki, aplikacja wygeneruje je za Ciebie.</string>
-    <string name="general_settings_desc">Wersja Yt-dlp, powiadomienia, playlista</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="how_does_it_work">Jak to działa\?</string>
     <string name="downloading_indicator_text">Pobieranie w trakcie…</string>
     <string name="task_canceled">Pobierania zostało anulowane</string>

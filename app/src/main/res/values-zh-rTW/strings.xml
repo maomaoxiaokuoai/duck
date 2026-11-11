@@ -81,7 +81,7 @@
     <string name="download_playlist">下載播放清單</string>
     <string name="defaults">預設</string>
     <string name="download_history_desc">檢查並管理應用程式內下載，包含影片檔和音訊檔。</string>
-    <string name="check_download_settings_desc">檢查下載配置並確保在使用前擁有最新版本的 yt-dlp。</string>
+    <string name="check_download_settings_desc">開始使用前，建議先確認一下下載設定。</string>
     <string name="download_playlist_desc">從播放清單中下載多項影片</string>
     <string name="channel_name">下載</string>
     <string name="execute_command_notification">正在執行自訂命令…</string>
@@ -207,7 +207,7 @@
     <string name="crop_artwork_desc">將內嵌封面裁剪至正方形</string>
     <string name="crop_artwork">裁剪封面</string>
     <string name="format_settings_desc">檔案格式、影片畫質、字幕</string>
-    <string name="general_settings_desc">Yt-dlp 版本、通知、播放清單</string>
+    <string name="general_settings_desc">通知、隱私、播放清單</string>
     <string name="download_selection_desc">從「%1$s」播放清單中選取影片以進行下載</string>
     <string name="selected_item_count">已選取 %1$d 項</string>
     <string name="select_all">全部選取</string>

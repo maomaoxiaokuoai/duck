@@ -225,7 +225,7 @@
     <string name="format_settings_desc">Pormat ng file, kalidad ng video, mga subtitles</string>
     <string name="download_with_cellular_desc">Payagan ang pag-download ng media kapag nakakonekta sa mga metreng network</string>
     <string name="dynamic_color_desc">Gumamit ng mga kulay mula sa mga wallpaper sa tema ng app</string>
-    <string name="general_settings_desc">Bersyon ng yt-dlp, abiso, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Limitahan ang dami, pampababa, mga cookies</string>
     <string name="download_selection_desc">Pumili ng mga video na i-download mula sa playlist na \"%1$s\"</string>
     <string name="selected_item_count">%1$d napili</string>

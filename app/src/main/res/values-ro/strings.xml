@@ -90,7 +90,7 @@
     <string name="max_rate">Rata maximă</string>
     <string name="translate">Traduceți</string>
     <string name="video_resolution">Rezoluție video</string>
-    <string name="general_settings_desc">Versiunea YT-dlp, notificare, playlist</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="clear_temp_files_info">Fișierele temporare pot fi utilizate pentru a relua descărcările anulate. Ești sigur că vrei să ștergi toate aceste fișiere?
 \n
 \nPoți accesa aceste fișiere în %1$s</string>

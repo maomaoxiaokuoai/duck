@@ -198,7 +198,7 @@
     <string name="lowest_quality">Calidad más baja</string>
     <string name="unavailable">No disponible</string>
     <string name="format_settings_desc">Formato de archivo, calidad de vídeo, subtítulos</string>
-    <string name="general_settings_desc">Versión de yt-dlp, notificaciones, listas de reprodución</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="network_settings_desc">Límite de uso de datos, descargador, cookies</string>
     <string name="privacy">Privacidad</string>
     <string name="use_custom_command">Usar comandos personalizados</string>

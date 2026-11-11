@@ -298,7 +298,7 @@
 \nสำหรับการใช้งานขั้นสูงของ yt-dlp. Seal ให้คุณสามารถสร้าง, บันทึก และใช้เทมเพลตคำสั่งที่กำเองได้โดยตรง เหมือนเทอมินอลเลย
 \n
 \nเมื่อคุณกำลังใช้คำสั่งที่กำหนดเอง ตัวเลือกและฟีเจอร์ที่เกี่ยวข้องกับส่วนติดต่อผู้ใช้งานจะถูกปิดใช้งานด้วย</string>
-    <string name="general_settings_desc">เวอร์ชั่นของ Yt-dlp, การแจ้งเตือน, เพลย์ลิสต์</string>
+    <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="dynamic_color">สีไดนามิก</string>
     <string name="start">เริ่มต้น</string>
     <string name="crop_artwork_desc">ครอบตัดรูปภาพที่ฝังให้เป็นรูปสี่เหลี่ยม</string>
