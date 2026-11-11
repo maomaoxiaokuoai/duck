@@ -108,7 +108,17 @@ fun AboutPage(
     }, content = {
         LazyColumn(modifier = Modifier.padding(it)) {
             item {
-                AppHeader(versionName)
+                AppHeader()
+            }
+            item {
+                PreferenceItem(
+                    title = stringResource(R.string.version),
+                    description = versionName,
+                    icon = Icons.Outlined.Info,
+                ) {
+                    clipboardManager.setText(AnnotatedString(info))
+                    ToastUtil.makeToast(R.string.info_copied)
+                }
             }
             item {
                 PreferenceSwitchWithDivider(
@@ -123,16 +133,6 @@ fun AboutPage(
                         PreferenceUtil.updateValue(AUTO_UPDATE, isAutoUpdateEnabled)
                     }
                 )
-            }
-            item {
-                PreferenceItem(
-                    title = stringResource(R.string.version),
-                    description = versionName,
-                    icon = Icons.Outlined.Info,
-                ) {
-                    clipboardManager.setText(AnnotatedString(info))
-                    ToastUtil.makeToast(R.string.info_copied)
-                }
             }
         }
     })
@@ -197,7 +197,7 @@ fun AutoUpdateUnavailableDialog(onDismissRequest: () -> Unit = {}) {
 }
 
 @Composable
-private fun AppHeader(versionName: String) {
+private fun AppHeader() {
     Column(
         modifier =
             Modifier.fillMaxWidth()
@@ -209,13 +209,7 @@ private fun AppHeader(versionName: String) {
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.version) + " " + versionName,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.app_description),
             style = MaterialTheme.typography.bodyMedium,
