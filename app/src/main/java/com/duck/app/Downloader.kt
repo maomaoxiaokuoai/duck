@@ -25,7 +25,6 @@ import com.duck.app.util.ToastUtil
 import com.duck.app.util.VideoClip
 import com.duck.app.util.VideoInfo
 import com.duck.app.util.toHttpsUrl
-import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,8 +117,9 @@ object Downloader {
 
 
         fun onRestart() {
+            // Re-run the same link through the current downloader.
             applicationScope.launch(Dispatchers.IO) {
-                DownloadUtil.executeCommandInBackground(url, template)
+                getInfoAndDownload(url)
             }
         }
 
@@ -131,7 +131,6 @@ object Downloader {
 
         fun onCancel() {
             toKey().run {
-                YoutubeDL.destroyProcessById(this)
                 onProcessCanceled(this)
             }
         }
@@ -357,7 +356,7 @@ object Downloader {
                         )
                     }.onFailure {
                         NotificationUtil.cancelNotification(notificationId)
-                        if (it is YoutubeDL.CanceledException) return@onFailure
+                        if (it is kotlinx.coroutines.CancellationException) return@onFailure
                         NotificationUtil.makeErrorReportNotification(
                             title = videoInfo.title, notificationId = notificationId,
                             error = it.message.toString()
@@ -642,7 +641,7 @@ object Downloader {
         isTaskAborted: Boolean = true,
         notificationId: Int? = null,
     ) {
-        if (th is YoutubeDL.CanceledException) return
+        if (th is kotlinx.coroutines.CancellationException) return
         th.printStackTrace()
         val resId =
             if (isFetchingInfo) R.string.fetch_info_error_msg else R.string.download_error_msg
@@ -676,16 +675,13 @@ object Downloader {
         updateState(State.Idle)
         clearProgressState(isFinished = false)
         taskState.value.taskId.run {
-            YoutubeDL.destroyProcessById(this)
             NotificationUtil.cancelNotification(this.toNotificationId())
         }
     }
 
     fun executeCommandWithUrl(url: String) =
         applicationScope.launch(Dispatchers.IO) {
-            DownloadUtil.executeCommandInBackground(
-                url
-            )
+            getInfoAndDownload(url)
         }
 
     fun openDownloadResult() {

@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToInt
 
-sealed interface YoutubeDLInfo
 
 @Serializable
 data class VideoInfo(
@@ -70,7 +69,7 @@ data class VideoInfo(
     @SerialName("requested_formats") val requestedFormats: List<Format>? = null,
     val filename: String? = null,
     @SerialName("_type") val type: String? = null,
-) : YoutubeDLInfo
+)
 
 @Serializable
 data class Format(
@@ -167,7 +166,7 @@ data class PlaylistResult(
     @SerialName("webpage_url") val webpageUrl: String? = null,
     @SerialName("original_url") val originalUrl: String? = null,
     @SerialName("extractor_key") val extractorKey: String? = null,
-) : YoutubeDLInfo
+)
 
 @Serializable
 data class Thumbnail(

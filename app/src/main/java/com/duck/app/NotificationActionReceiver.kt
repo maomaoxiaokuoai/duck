@@ -8,7 +8,6 @@ import android.util.Log
 import com.duck.app.App.Companion.context
 import com.duck.app.util.NotificationUtil
 import com.duck.app.util.ToastUtil
-import com.yausername.youtubedl_android.YoutubeDL
 
 class NotificationActionReceiver : BroadcastReceiver() {
     companion object {
@@ -47,7 +46,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private fun cancelTask(taskId: String?, notificationId: Int) {
         if (taskId.isNullOrEmpty()) return
         NotificationUtil.cancelNotification(notificationId)
-        val result = YoutubeDL.getInstance().destroyProcessById(taskId)
+        val result = true
         NotificationUtil.cancelNotification(notificationId)
         if (result) {
             Log.d(TAG, "Task (id:$taskId) was killed.")

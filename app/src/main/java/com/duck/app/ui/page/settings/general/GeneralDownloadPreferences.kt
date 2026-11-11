@@ -108,7 +108,6 @@ import com.duck.app.util.SUBTITLE
 import com.duck.app.util.THUMBNAIL
 import com.duck.app.util.ToastUtil
 import com.duck.app.util.UpdateUtil
-import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

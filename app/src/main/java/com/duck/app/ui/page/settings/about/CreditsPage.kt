@@ -38,11 +38,9 @@ const val APACHE_V2 = "Apache License, Version 2.0"
 const val UNLICENSE = "The Unlicense"
 const val BSD = "BSD 3-Clause License"
 
-const val youtubedlAndroidUrl = "https://github.com/yausername/youtubedl-android"
 const val ytdlpUrl = "https://github.com/yt-dlp/yt-dlp"
 const val readYou = "https://github.com/Ashinch/ReadYou"
 const val musicYou = "https://github.com/Kyant0/MusicYou"
-const val dvd = "https://github.com/yausername/dvd"
 const val icons8 = "https://icons8.com/"
 const val materialIcon = "https://fonts.google.com/icons"
 const val materialColor = "https://github.com/material-foundation/material-color-utilities"
@@ -71,11 +69,9 @@ fun CreditsPage(onNavigateBack: () -> Unit) {
     val creditsList = listOf(
         Credit("Android Jetpack", APACHE_V2, jetpack),
         Credit("Kotlin", APACHE_V2, kotlin),
-        Credit("youtubedl-android", GPL_V3, youtubedlAndroidUrl),
         Credit("yt-dlp", UNLICENSE, ytdlpUrl),
         Credit("Read You", GPL_V3, readYou),
 //        Credit("Music You"),
-        Credit("dvd", GPL_V3, dvd),
         Credit("Accompanist", APACHE_V2, accompanist),
         Credit("Material Design 3", APACHE_V2, material3),
         Credit("Material Icons", APACHE_V2, materialIcon),

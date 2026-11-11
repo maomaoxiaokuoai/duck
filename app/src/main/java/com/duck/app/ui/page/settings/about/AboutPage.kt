@@ -82,7 +82,6 @@ fun AboutPage(
 //            .append("Device information: Android $release (API ${Build.VERSION.SDK_INT})\n")
 //            .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n")
 //            .append("\nScreen resolution: $screenHeight x $screenWidth")
-//            .append("Yt-dlp Version: ${YoutubeDL.version(context.applicationContext)}").toString()
 
     val uriHandler = LocalUriHandler.current
     fun openUrl(url: String) {

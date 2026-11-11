@@ -32,11 +32,7 @@ import com.duck.app.util.SDCARD_URI
 import com.duck.app.util.SilentUpdater
 import com.duck.app.util.UpdateUtil
 import com.duck.app.util.VIDEO_DIRECTORY
-import com.duck.app.util.YT_DLP_VERSION
 import com.tencent.mmkv.MMKV
-import com.yausername.aria2c.Aria2c
-import com.yausername.ffmpeg.FFmpeg
-import com.yausername.youtubedl_android.YoutubeDL
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +60,6 @@ class App : Application() {
 
         applicationScope.launch((Dispatchers.IO)) {
             try {
-                YoutubeDL.init(this@App)
                 FFmpeg.init(this@App)
                 Aria2c.init(this@App)
                 DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
@@ -199,7 +194,6 @@ class App : Application() {
             return StringBuilder().append("App version: $versionName ($versionCode)\n")
                 .append("Device information: Android $release (API ${Build.VERSION.SDK_INT})\n")
                 .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n")
-                .append("Yt-dlp version: ${YT_DLP_VERSION.getString()}\n").toString()
         }
 
         fun isFDroidBuild(): Boolean = packageInfo.versionName.contains("F-Droid")

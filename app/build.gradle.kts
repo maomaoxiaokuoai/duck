@@ -54,7 +54,7 @@ sealed class Version(
 val currentVersion: Version = Version.Stable(
     versionMajor = 2,
     versionMinor = 0,
-    versionPatch = 30,
+    versionPatch = 31,
 )
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -104,7 +104,7 @@ android {
         applicationId = "com.duck.app"
         minSdk = 21
         targetSdk = 34
-        versionCode = 20000030
+        versionCode = 20000031
 
         if (splitApks) {
             splits {
@@ -256,8 +256,7 @@ dependencies {
     // Network requests (OkHttp)
     implementation(libs.okhttp)
 
-    //YoutubeDl for Android (youtubedl-android)
-    implementation(libs.bundles.youtubedlAndroid)
+    // yt-dlp removed: parsing and downloading are implemented natively.
 
     //SVG implementation (AndroidSVG by Caverock)
     implementation(libs.caverock.androidsvg)

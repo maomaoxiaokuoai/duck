@@ -57,10 +57,6 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
     fun startDownloadVideo() {
         val url = viewStateFlow.value.url
         Downloader.clearErrorState()
-        if (CUSTOM_COMMAND.getBoolean()) {
-            applicationScope.launch(Dispatchers.IO) { DownloadUtil.executeCommandInBackground(url) }
-            return
-        }
         if (!Downloader.isDownloaderAvailable())
             return
         if (url.isBlank()) {
@@ -91,37 +87,6 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
         Downloader.updateState(State.Idle)
     }
 
-
-    private fun parsePlaylistInfo(url: String): Unit =
-        Downloader.run {
-            if (!isDownloaderAvailable()) return
-            clearErrorState()
-            updateState(State.FetchingInfo)
-            DownloadUtil.getPlaylistOrVideoInfo(url).onSuccess { info ->
-                updateState(State.Idle)
-                when (info) {
-                    is PlaylistResult -> {
-                        showPlaylistPage(info)
-                    }
-
-                    is VideoInfo -> {
-                        if (FORMAT_SELECTION.getBoolean()) {
-
-                            showFormatSelectionPageOrDownload(info)
-                        } else if (isDownloaderAvailable()) {
-                            downloadVideoWithInfo(info = info)
-                        }
-                    }
-                }
-            }.onFailure {
-                manageDownloadError(
-                    th = it,
-                    url = url,
-                    isFetchingInfo = true,
-                    isTaskAborted = true
-                )
-            }
-        }
 
     private fun showPlaylistPage(playlistResult: PlaylistResult) {
         updatePlaylistResult(playlistResult)
