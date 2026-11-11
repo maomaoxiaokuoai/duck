@@ -110,6 +110,7 @@ object DouyinParser {
                 .url(BASE + "/note/" + id)
                 .header("User-Agent", USER_AGENT)
                 .header("Accept", "text/html,application/xhtml+xml")
+                .header("Accept-Encoding", "identity")
                 .build()
         client.newCall(request).execute().use { response ->
             val cookies = response.headers.values("Set-Cookie")
@@ -130,10 +131,18 @@ object DouyinParser {
                 .header("Accept-Language", "zh-CN,zh;q=0.9")
                 .header("Cookie", cookie)
                 .header("Referer", BASE + "/")
+                .header("Accept-Encoding", "identity")
                 .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IllegalStateException("HTTP " + response.code)
-            return response.body.string()
+            val body = response.body.string()
+            Log.d(
+                TAG,
+                "html len=" + body.length +
+                    " pace_f=" + body.contains("self.__pace_f") +
+                    " awemeId=" + body.contains("awemeId")
+            )
+            return body
         }
     }
 
