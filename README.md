@@ -1,6 +1,6 @@
 # duck
 
-> 一个用 Kotlin + Jetpack Compose 写的 Android 视频/音频下载器：输入链接，选格式，下到本地。
+> 国内短视频与图文聚合解析的 Android 客户端，粘贴分享链接即可解析、预览并下载无水印视频、图集与音频。
 
 duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，底层调用 [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 完成实际解析与下载，界面、主题、图标和产品形态由本项目维护。

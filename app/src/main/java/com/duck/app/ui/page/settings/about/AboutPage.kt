@@ -53,6 +53,11 @@ import com.duck.app.ui.component.PreferenceSwitchWithDivider
 import com.duck.app.util.AUTO_UPDATE
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.ToastUtil
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 
 private const val releaseURL = "https://github.com/maomaoxiaokuoai/duck/releases"
 private const val repoUrl = "https://github.com/maomaoxiaokuoai/duck"
@@ -109,6 +114,9 @@ fun AboutPage(
         )
     }, content = {
         LazyColumn(modifier = Modifier.padding(it)) {
+            item {
+                AppHeader()
+            }
             item {
                 PreferenceItem(
                     title = stringResource(R.string.readme),
@@ -216,3 +224,23 @@ fun AutoUpdateUnavailableDialog(onDismissRequest: () -> Unit = {}) {
         })
 }
 
+@Composable
+private fun AppHeader() {
+    Column(
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = stringResource(R.string.app_description),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}

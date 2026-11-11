@@ -456,4 +456,6 @@
         <item quantity="other">%d items</item>
     </plurals>
     <string name="repo_url">Project repository</string>
+
+    <string name="app_description">国内短视频与图文聚合解析的 Android 客户端，粘贴分享链接即可解析、预览并下载无水印视频、图集与音频</string>
 </resources>
