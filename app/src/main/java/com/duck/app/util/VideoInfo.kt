@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToInt
 
-
 @Serializable
 data class VideoInfo(
     val id: String = "",

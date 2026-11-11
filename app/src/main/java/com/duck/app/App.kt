@@ -60,8 +60,6 @@ class App : Application() {
 
         applicationScope.launch((Dispatchers.IO)) {
             try {
-                FFmpeg.init(this@App)
-                Aria2c.init(this@App)
                 DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
                     FileUtil.writeContentToFile(it, getCookiesFile())
                 }
@@ -193,7 +191,7 @@ class App : Application() {
             }
             return StringBuilder().append("App version: $versionName ($versionCode)\n")
                 .append("Device information: Android $release (API ${Build.VERSION.SDK_INT})\n")
-                .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n")
+                .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n").toString()
         }
 
         fun isFDroidBuild(): Boolean = packageInfo.versionName.contains("F-Droid")

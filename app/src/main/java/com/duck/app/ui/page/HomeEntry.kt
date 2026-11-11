@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -68,16 +67,12 @@ import com.duck.app.ui.page.settings.network.NetworkPreferences
 import com.duck.app.ui.page.settings.network.WebViewPage
 import com.duck.app.ui.page.videolist.VideoListPage
 import com.duck.app.util.PreferenceUtil
-import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.PreferenceUtil.getInt
-import com.duck.app.util.PreferenceUtil.getLong
-import com.duck.app.util.PreferenceUtil.getString
 import com.duck.app.util.ToastUtil
 import com.duck.app.util.UpdateUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private const val TAG = "HomeEntry"
 
@@ -199,8 +194,6 @@ fun HomeEntry(
             )
 
         }
-
-        val downloaderState by Downloader.downloaderState.collectAsStateWithLifecycle()
 
         LaunchedEffect(Unit) {
             if (!PreferenceUtil.isNetworkAvailableForDownload() || !PreferenceUtil.isAutoUpdateEnabled()

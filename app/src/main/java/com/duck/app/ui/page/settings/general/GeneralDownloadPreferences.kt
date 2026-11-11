@@ -125,7 +125,6 @@ fun GeneralDownloadPreferences(
     val hapticFeedback = LocalHapticFeedback.current
 
     var showSponsorBlockDialog by remember { mutableStateOf(false) }
-    var isUpdating by remember { mutableStateOf(false) }
 
     val downloadSubtitle by SUBTITLE.booleanState
 
@@ -458,16 +457,6 @@ fun DialogCheckBoxItem(
             style = MaterialTheme.typography.bodyMedium,
         )
     }
-}
-
-@Composable
-private fun UpdateProgressIndicator() {
-    CircularProgressIndicator(
-        modifier = Modifier
-            .padding(start = 8.dp, end = 16.dp)
-            .size(24.dp)
-            .padding(2.dp)
-    )
 }
 
 

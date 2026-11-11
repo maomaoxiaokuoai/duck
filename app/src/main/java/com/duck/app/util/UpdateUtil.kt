@@ -11,7 +11,6 @@ import com.duck.app.App.Companion.context
 import com.duck.app.R
 import com.duck.app.util.FileUtil.getFileProvider
 import com.duck.app.util.PreferenceUtil.getInt
-import com.duck.app.util.PreferenceUtil.updateLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

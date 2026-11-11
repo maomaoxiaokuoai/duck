@@ -63,10 +63,6 @@ class DownloadViewModel @Inject constructor() : ViewModel() {
             ToastUtil.makeToast(context.getString(R.string.url_empty))
             return
         }
-        if (PLAYLIST.getBoolean()) {
-            viewModelScope.launch(Dispatchers.IO) { parsePlaylistInfo(url) }
-            return
-        }
 
         if (FORMAT_SELECTION.getBoolean()) {
             viewModelScope.launch(Dispatchers.IO) { fetchInfoForFormatSelection(url) }

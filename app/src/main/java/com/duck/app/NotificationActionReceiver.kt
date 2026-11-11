@@ -46,13 +46,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private fun cancelTask(taskId: String?, notificationId: Int) {
         if (taskId.isNullOrEmpty()) return
         NotificationUtil.cancelNotification(notificationId)
-        val result = true
-        NotificationUtil.cancelNotification(notificationId)
-        if (result) {
-            Log.d(TAG, "Task (id:$taskId) was killed.")
-            Downloader.onProcessCanceled(taskId)
-
-        }
+        Log.d(TAG, "Task (id:$taskId) was canceled.")
+        Downloader.onProcessCanceled(taskId)
     }
 
     private fun copyErrorReport(error: String, notificationId: Int) {
