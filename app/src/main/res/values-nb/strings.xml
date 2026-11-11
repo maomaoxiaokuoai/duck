@@ -40,7 +40,6 @@
     <string name="yt_dlp_docs">Bruksreferanse for yt-dlp</string>
     <string name="permission_issue">Problem med lagringstilgang</string>
     <string name="subdirectory_desc">Lagre filer i mapper med respektive nettsidenavn</string>
-    <string name="download_desc">Klikk på «Last ned»-etter å ha justert innstillingene dens.</string>
     <string name="download_notification_desc">Merknad om framdrift og nedlastede filer</string>
     <string name="create_thumbnail">Lagre minatyrbilde</string>
     <string name="download">Last ned</string>
@@ -66,8 +65,6 @@
     <string name="service_title">Seal laster ned …</string>
     <string name="video_format_preference">Foretrukket videoformat</string>
     <string name="preferred_format_desc">Valgt format når flere tilbys</string>
-    <string name="paste_desc">Klikk «Lim inn» for å hente videolenken fra utklippstavlen din.</string>
-    <string name="download_history_desc">Sjekk og håndter nedlastninger i programmet, inkludert video- og lydfiler.</string>
     <string name="channel_description">Merknad om nedlastingsframdrift og fullføring</string>
     <string name="settings_before_download_desc">Sett opp innstillinger før nedlastning</string>
     <string name="settings_before_download_text">Juster denne nedlastingen</string>
@@ -90,17 +87,14 @@
     <string name="on">På</string>
     <string name="off">Av</string>
     <string name="best_quality">Beste kvalitet (forvalg)</string>
-    <string name="user_guide">Brukerveiledning</string>
     <string name="download_playlist_desc">Last ned flere videoer fra en spilleliste</string>
     <string name="show_more_actions">Vis flere handlinger</string>
     <string name="checked">Sjekket</string>
     <string name="credits_desc">Bidragsytere og fri programvare</string>
     <string name="settings_before_download">Sett opp før nedlasting</string>
     <string name="battery_configuration">Batterioppsett</string>
-    <string name="close_never_show_again">Ikke vis igjen</string>
     <string name="execute_command_notification">Kjører egendefinerte kommandoer …</string>
     <string name="video_quality_desc">Begrens formatkvaliteten til dette nivået</string>
-    <string name="battery_settings_desc">Sett batteribruk for dette programmet til «Ubegrenset» i systeminnstillingene for nedlasting i bakgrunnen.</string>
     <string name="translate">Oversett</string>
     <string name="translate_desc">Bistå oversettelsen på Hosted Weblate</string>
     <string name="video_directory">Videomappe</string>
@@ -123,7 +117,6 @@
     <string name="paste_fail_msg">Kunne ikke jamføre med nettadressen i utklippstavlen</string>
     <string name="start_download">Last ned</string>
     <string name="convert_audio">Konverter</string>
-    <string name="check_download_settings_desc">Ta en titt på nedlastningsinnstillingene og ha nyeste utgave av yt-dlp før bruk.</string>
     <string name="download_finish_notification">Nedlastning fullført. Klikk for å åpne.</string>
     <string name="playlist_indicator_text">Laster ned spilleliste (%1$d/%2$d). Klikk for å stoppe.</string>
     <string name="edit_template_desc">Utdatasti og nettadresse blir lagt til av programmet.</string>

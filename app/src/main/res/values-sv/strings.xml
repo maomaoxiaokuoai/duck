@@ -73,11 +73,7 @@
     <string name="convert_audio">Konvertera</string>
     <string name="start_download">Ladda ner</string>
     <string name="close">Stäng</string>
-    <string name="close_never_show_again">Visa inte igen</string>
-    <string name="user_guide">Användarguide</string>
     <string name="open_settings">Öppna inställningar</string>
-    <string name="download_desc">Klicka sedan på \"Ladda ner\" efter att ha justerat inställningarna.</string>
-    <string name="check_download_settings_desc">Ta en titt på nedladdningsinställningarna och se till att du har den senaste versionen av yt-dlp innan du använder den.</string>
     <string name="download_playlist">Ladda ner spellista</string>
     <string name="download_playlist_desc">Ladda ner flera videor från en spellista</string>
     <string name="defaults">Standard</string>
@@ -107,10 +103,7 @@
     <string name="settings_before_download">Konfigurera före nedladdning</string>
     <string name="edit_template_desc">Utmatningssökväg och URL kommer att läggas till av appen.</string>
     <string name="convert_audio_format_desc">Omkodning av ljudfiler leder till försämrad ljudkvalitet och ökad filstorlek.</string>
-    <string name="paste_desc">Klicka på \"Klistra in\" för att hämta videolänk från urklipp.</string>
-    <string name="download_history_desc">Kontrollera och hantera nedladdningar i appen, inklusive videor och ljudfiler.</string>
     <string name="execute_command_notification">Kör anpassade kommandon…</string>
-    <string name="battery_settings_desc">Ställ in batterianvändningen för denna app på \"Obegränsad\" i systeminställningarna för att ladda ner i bakgrunden.</string>
     <string name="additional_settings">Ytterligare inställningar</string>
     <string name="download_notification">Nedladdningsanmälan</string>
     <string name="download_range_selection">Urval av spellista</string>

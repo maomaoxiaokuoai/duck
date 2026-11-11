@@ -59,7 +59,6 @@
     <string name="start_download">Hent</string>
     <string name="convert_audio">Lag om</string>
     <string name="close">Lat att</string>
-    <string name="close_never_show_again">Ikkje vis att</string>
     <string name="open_settings">Opne innstillingane</string>
     <string name="create_thumbnail">Gøym småbilete</string>
     <string name="create_thumbnail_summary">Gøym videosmåbilete som ei fil</string>
@@ -165,9 +164,6 @@
     <string name="convert_audio_format">Lag om ljodformatet</string>
     <string name="not_convert">Ikkje omlaga</string>
     <string name="convert_to">Lag om til %1$s</string>
-    <string name="user_guide">Brukarrettleiing</string>
-    <string name="paste_desc">Trykk på «Lim inn» for å hente videolenka ifrå utklippstavla di.</string>
-    <string name="check_download_settings_desc">Tak og so sjå på hentingsinnstillingane og syrg for at du har den nyaste utgåva av yt-dlp før du nyttar han.</string>
     <string name="download_playlist">Hent speleliste</string>
     <string name="download_playlist_desc">Hent fleire videoar ifrå ei speleliste</string>
     <string name="defaults">Føreval</string>
@@ -176,7 +172,6 @@
     <string name="video_url">Videolenke</string>
     <string name="about_page">Utgåve, tilbakemelding, sjølvoppdater</string>
     <string name="release_desc">Sjå etter brigdelister og nye utgåver</string>
-    <string name="download_history_desc">Gransk og handsam hentingar i appen, gjeld au videoar og ljodfiler.</string>
     <string name="download_finish_notification">Henta. Trykk for å opne.</string>
     <string name="execute_command_notification">Køyrer eigne påbod…</string>
     <string name="check_for_updates_desc">Lat appen sjå etter den nyaste utgåva på GitHub av seg sjølv</string>
@@ -200,7 +195,6 @@
     <string name="format_selection">Formatval</string>
     <string name="print_details">Detaljert utdata</string>
     <string name="print_details_desc">Skriv ut detaljerte opplysingar ved henting</string>
-    <string name="battery_settings_desc">Om du vil hente i bakgrunnen, sett denne appens batteribruk til «uavgrensa» i systeminnstillingane.</string>
     <string name="sponsorblock_desc">Tak bort stødde delar ifrå videoar med SponsorBlocks API</string>
     <string name="check_for_updates">Sjå etter oppdateringar</string>
     <string name="high_contrast">Svart vising</string>
@@ -213,7 +207,6 @@
     <string name="generate_new_cookies">Lag nye informasjonskapslar</string>
     <string name="download_with_cellular_desc">Gje løyve til henting av media når sambunden til forbruksmålte nettverk</string>
     <string name="settings_before_download_text">Still inn denne hentinga</string>
-    <string name="download_desc">Trykk so på «hent» etter å ha stilt inn innstillingane.</string>
     <string name="share_fail_msg">Kunne ikkje samsvare nettadresse ifrå delt innhald</string>
     <string name="cookies">Informasjonskapslar</string>
     <string name="invalid_input">Ugild innmating</string>

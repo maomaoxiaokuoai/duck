@@ -55,9 +55,6 @@
     <string name="convert_audio">Konvertál</string>
     <string name="start_download">Letöltés</string>
     <string name="open_settings">Beállítások megnyitása</string>
-    <string name="paste_desc">Kattintson a \"Beillesztés\" gombra, hogy a vágólapról beszúrd a videó linkjét.</string>
-    <string name="download_desc">Ezután kattints a \"Letöltés\" gombra a beállítások módosítása után.</string>
-    <string name="check_download_settings_desc">Vess egy pillantást a letöltési beállításokra, és győződjön meg arról, hogy az yt-dlp legfrissebb verziójával rendelkezel, mielőtt használnád.</string>
     <string name="defaults">Alapértelmezett</string>
     <string name="download_finish_notification">Letöltés befejeződött. Kattints a megnyitáshoz.</string>
     <string name="execute_command_notification">Egyéni parancsok futtatása…</string>
@@ -103,17 +100,13 @@
     <string name="convert_to">Konvertálja ebbe %1$s</string>
     <string name="video_quality_desc">Korlátozza a videó minőségét, ha több van jelen</string>
     <string name="not_specified">Nincs megadva (alapértelmezett)</string>
-    <string name="download_history_desc">Kezeld az alkalmazáson belüli letöltéseket, beleértve a videókat és hangfájlokat.</string>
     <string name="best_quality">Legjobb minőség</string>
     <string name="close">Bezár</string>
-    <string name="close_never_show_again">Ne jelenjen meg újra</string>
-    <string name="user_guide">Felhasználói útmutató</string>
     <string name="download_playlist">Lejátszásilista letöltése</string>
     <string name="download_playlist_desc">Több videó letöltése egy lejátszási-listáról</string>
     <string name="channel_name">Letöltés</string>
     <string name="extract_audio_summary">Letöltés hangfájlként, videó helyett</string>
     <string name="print_details_desc">Részletes üzenetek megjelenítése letöltés közben</string>
-    <string name="battery_settings_desc">Kérlek állítsd át az akkumulátor korlátozásokat ezen az applikáción \"korlátlanra\" a rendszerbeállításokban.</string>
     <string name="concurrent_download_num">%d szálat/kat használnának fel a DASH/HLS natív videó egyidejű letöltésére.</string>
     <string name="fetching_playlist_info">Lejátszási lista információinak lekérése…</string>
     <string name="download_range_selection">Lejátszási lista kiválasztása</string>

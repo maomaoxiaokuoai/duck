@@ -43,9 +43,7 @@
     <string name="video_format">Format video</string>
     <string name="convert_audio">Ubah</string>
     <string name="start_download">Unduh</string>
-    <string name="user_guide">Panduan pengguna</string>
     <string name="open_settings">Buka pengaturan</string>
-    <string name="download_history_desc">Periksa dan kelola unduhan dalam aplikasi, termasuk video dan file audio.</string>
     <string name="download_playlist">Unduh daftar putar</string>
     <string name="download_playlist_desc">Unduh beberapa video dari daftar putar</string>
     <string name="defaults">Bawaan</string>
@@ -53,7 +51,6 @@
     <string name="video_url">Tautan video</string>
     <string name="download_finish_notification">Unduhan selesai. Ketuk untuk membuka.</string>
     <string name="execute_command_notification">Menjalankan perintah khusus…</string>
-    <string name="battery_settings_desc">Harap atur penggunaan baterai aplikasi ini ke \"Tidak dibatasi\" di pengaturan sistem untuk mengunduh di latar belakang.</string>
     <string name="concurrent_download_desc">Unduh lebih banyak bagian video dari M3U8/MPD secara parallel</string>
     <string name="concurrent_download_num">%d bagian akan digunakan untuk mengunduh video asli DASH/HLS secara bersamaan.</string>
     <string name="options">Pilihan</string>
@@ -101,10 +98,6 @@
     <string name="convert_to">Ubah ke %1$s</string>
     <string name="video_quality_desc">Batasi kualitas video ketika ada beberapa yang tersedia</string>
     <string name="not_specified">Tidak ditentukan (bawaan)</string>
-    <string name="close_never_show_again">Jangan tampilkan lagi</string>
-    <string name="paste_desc">Tekan \"Tempel\" untuk mendapatkan link video dari papan klip Anda.</string>
-    <string name="download_desc">Kemudian tekan \"Unduh\" setelah menyesuaikan pengaturannya.</string>
-    <string name="check_download_settings_desc">Lihat pengaturan unduhan dan pastikan Anda memiliki yt-dlp versi terbaru sebelum menggunakannya.</string>
     <string name="concurrent_download">Unduhan multiutas</string>
     <string name="additional_settings">Pengaturan tambahan</string>
     <string name="share_fail_msg">Tidak dapat mencocokkan URL dari konten yang dibagikan</string>

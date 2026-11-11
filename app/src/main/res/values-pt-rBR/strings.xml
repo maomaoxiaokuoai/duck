@@ -70,10 +70,7 @@
     <string name="preferred_format_desc">Formato preferido quando vários formatos estiverem presentes</string>
     <string name="language">Idioma de exibição</string>
     <string name="language_settings">Definir idioma de exibição</string>
-    <string name="close_never_show_again">Não mostrar novamente</string>
-    <string name="user_guide">Guia do usuário</string>
     <string name="open_settings">Abrir configurações</string>
-    <string name="paste_desc">Clique em “Colar” para obter o link do vídeo da sua área de transferência.</string>
     <string name="download_playlist">Baixar playlist</string>
     <string name="download_playlist_desc">Baixe vários vídeos de uma playlist</string>
     <string name="defaults">Padrão</string>
@@ -99,12 +96,8 @@
     <string name="subdirectory">Salvar no subdiretório</string>
     <string name="subdirectory_desc">Salve arquivos em pastas nomeadas como respectivos campos</string>
     <string name="battery_configuration">Configuração da bateria</string>
-    <string name="download_history_desc">Verifique e gerencie downloads no aplicativo, incluindo vídeos e arquivos de áudio.</string>
-    <string name="download_desc">Em seguida, clique em “Download” depois de ajustar suas configurações.</string>
-    <string name="check_download_settings_desc">Dê uma olhada nas configurações de download e verifique se você tem a versão mais recente do yt-dlp antes de usá-lo.</string>
     <string name="concurrent_download_desc">Número de fragmentos de um vídeo nativo em M3U8/MPD para baixar paralelamente</string>
     <string name="permission_issue_desc">Diretórios fora de Download/ e Documents/ não são suportados</string>
-    <string name="battery_settings_desc">Por favor, defina o uso da bateria deste aplicativo para “Irrestrito” nas configurações do sistema para fazer download em segundo plano.</string>
     <string name="additional_settings">Configurações adicionais</string>
     <string name="share_fail_msg">Não foi possível corresponder o URL do conteúdo compartilhado</string>
     <string name="concurrent_download_num">%d fragmento(s) seriam usados para baixar vídeo nativo DASH/HLS simultaneamente.</string>

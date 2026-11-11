@@ -152,16 +152,12 @@
     <string name="video_format_preference">Format video preferat</string>
     <string name="video_format">Format video</string>
     <string name="start_download">Descarcă</string>
-    <string name="user_guide">Ghid de utilizare</string>
     <string name="open_settings">Deschide setările</string>
     <string name="concurrent_download">Descărcare multi-threaded</string>
     <string name="download_directory">Director de descărcare</string>
     <string name="show_more_actions">Mai multe acțiuni</string>
     <string name="download_finish_notification">Descărcare terminat. Atingeți pentru a deschide.</string>
-    <string name="battery_settings_desc">Vă rugăm să setați utilizarea bateriei acestei aplicații la \"Nerestricționat” în setările sistemului pentru a o descărca în fundal.</string>
     <string name="share_fail_msg">Nu se poate potrivi adresa URL din conținutul partajat</string>
-    <string name="close_never_show_again">Să nu mai apari din nou</string>
-    <string name="download_desc">Apoi faceți clic pe \"Descarcă” după ajustarea setărilor.</string>
     <string name="download_notification_desc">Notifică fișierele descărcate și progresul</string>
     <string name="close">Închide</string>
     <string name="additional_settings">Setari aditionale</string>
@@ -170,11 +166,9 @@
     <string name="execute_command_notification">Se rulează comenzi personalizate…</string>
     <string name="concurrent_download_desc">Descărcați mai multe părți ale videoclipurilor M3U8/MPD în paralel</string>
     <string name="download_notification">Notificare de descărcare</string>
-    <string name="paste_desc">Faceți clic pe \"Lipește\" pentru a obține link-ul video din clipboard.</string>
     <string name="channel_name">Descarcă</string>
     <string name="options">Opțiuni</string>
     <string name="preferred_format_desc">Formatul preferat atunci când sunt furnizate mai multe</string>
-    <string name="download_history_desc">Verificați și gestionați descărcările în aplicație, inclusiv videoclipuri și fișiere audio.</string>
     <string name="defaults">Implicit</string>
     <string name="filesize_gb">%.2f G</string>
     <string name="apply">Aplică</string>
@@ -211,7 +205,6 @@
     <string name="best_quality">Cea mai bună calitate</string>
     <string name="template_imported">Șablon(uri) %1$d importat(e)</string>
     <string name="settings_before_download_desc">Configurați preferințele înainte de descărcare</string>
-    <string name="check_download_settings_desc">Aruncă o privire la setările de descărcare și asigură-te că ai cea mai recentă versiune de yt-dlp înainte de a o folosi.</string>
     <string name="template_exported">Șablon(uri) exportat(e) %1$d</string>
     <string name="settings_before_download_text">Ajustați această descărcare</string>
     <string name="task_running">Se execută deja o sarcină de descărcare existentă</string>

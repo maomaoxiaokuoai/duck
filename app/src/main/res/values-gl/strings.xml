@@ -20,7 +20,6 @@
     <string name="advanced_settings">Avanzado</string>
     <string name="close">Pechar</string>
     <string name="print_details">Saída detallada</string>
-    <string name="user_guide">Guía de usuario</string>
     <string name="video_format_preference">Preferencia de formato de vídeo</string>
     <string name="link_copied">Enlace copiado ao portapapeis</string>
     <string name="credits_desc">Créditos e software de código aberto</string>
@@ -30,7 +29,6 @@
     <string name="ytdlp_update">Fai clic para actualizar a libraría yt-dlp</string>
     <string name="paste_fail_msg">Non se puido pegar a URL dende o portapapeis</string>
     <string name="preferred_format_desc">Formato preferido cando se facilitan varios</string>
-    <string name="paste_desc">Faga clic no botón de “Pegar” para obter o enlace dende o seu portapapeis.</string>
     <string name="on">Activado</string>
     <string name="yt_dlp_docs">Referencias de uso para yt-dlp</string>
     <string name="edit">Editar</string>
@@ -69,7 +67,6 @@
     <string name="download_start_msg">Descargando “%1$s”</string>
     <string name="dark_theme">Tema escuro</string>
     <string name="cancel">Cancelar</string>
-    <string name="close_never_show_again">Non mostrar de novo</string>
     <string name="settings_before_download">Configurar antes da descarga</string>
     <string name="confirm">Confirmar</string>
     <string name="language_settings">Escoller lingua</string>

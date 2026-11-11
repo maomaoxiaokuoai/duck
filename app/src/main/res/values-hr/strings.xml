@@ -57,16 +57,11 @@
     <string name="start_download">Preuzmi</string>
     <string name="convert_audio">Pretvori</string>
     <string name="close">Zatvori</string>
-    <string name="close_never_show_again">Ne prikazuj više</string>
-    <string name="paste_desc">Kliknite „Zalijepi“ kako biste zalijepili poveznicu na videozapis iz međuspremnika.</string>
-    <string name="download_desc">Tada kliknite „Preuzmi“ nakon prilagodbe postavki.</string>
-    <string name="check_download_settings_desc">Pregledajte postavke preuzimanja i provjerite da li koristite najnoviju inačicu yt-dlp prije nego što počnete koristiti aplikaciju.</string>
     <string name="channel_name">Preuzimanje</string>
     <string name="channel_description">Obavijesti me o preuzetim datotekama i preuzimanjima u tijeku</string>
     <string name="video_url">Poveznica na videozapis</string>
     <string name="download_finish_notification">Preuzimanje završeno. Dodirnite kako biste otvorili.</string>
     <string name="execute_command_notification">Pokretanje prilagođene naredbe…</string>
-    <string name="battery_settings_desc">Postavite potrošnju baterije ove aplikacije na „Neograničeno“ u postavkama sustava za preuzimanje u pozadini.</string>
     <string name="concurrent_download">Višenitno preuzimanje</string>
     <string name="concurrent_download_num">%d nit(i) bi bilo korišteno kako bi se istovremeno preuzeli DASH/HLS videozapisi.</string>
     <string name="options">Opcije</string>
@@ -154,9 +149,7 @@
     <string name="preferred_format_desc">Preferirani oblik, kada ih je više ponuđeno</string>
     <string name="download_playlist">Preuzmi popis za reprodukciju</string>
     <string name="video_format">Oblik videozapisa</string>
-    <string name="user_guide">Korisnički vodič</string>
     <string name="open_settings">Otvori postavke</string>
-    <string name="download_history_desc">Pregledajte i upravljajte preuzimanjima, uključujući datoteke videozapisa i zvučnih zapisa.</string>
     <string name="defaults">Zadano</string>
     <string name="download_playlist_desc">Preuzmite više videozapisa s popisa za reprodukciju</string>
     <string name="concurrent_download_desc">Paralelno preuzmite više dijelova M3U8/MPD videozapisa</string>

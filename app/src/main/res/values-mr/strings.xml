@@ -80,10 +80,7 @@
     <string name="ytdlp_update_action">अपडेट yt-dlp</string>
     <string name="video_format">व्हिडिओ चा स्वरूप</string>
     <string name="close">बंद</string>
-    <string name="close_never_show_again">पून्हा दाखवू नका</string>
-    <string name="user_guide">यूजर गाईड</string>
     <string name="open_settings">सेटिंग्ज उघडा</string>
-    <string name="paste_desc">क्लिप-बोर्डवरून व्हिडिओ लिंक मिळविण्यासाठी \"पेस्ट\" वर क्लिक करा</string>
     <string name="preferred_format_desc">अधिक व्हिडिओ साठी तुमचा आवडीचा स्वरूप कोणता</string>
     <string name="convert_audio">रूपांतर</string>
     <string name="start_download">डाऊनलोड</string>

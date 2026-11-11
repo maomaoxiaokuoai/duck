@@ -50,16 +50,12 @@
     <string name="not_specified">Nespecifikován (výchozí)</string>
     <string name="preferred_format_desc">Preferovaný formát při dostupnosti více formátů</string>
     <string name="start_download">Stáhnout</string>
-    <string name="close_never_show_again">Již nezobrazovat</string>
-    <string name="user_guide">Uživatelská příručka</string>
     <string name="open_settings">Otevřít nastavení</string>
-    <string name="download_history_desc">Přehled a správa stažených souborů, včetně videí i zvukových souborů.</string>
     <string name="download_playlist">Stáhnout playlist</string>
     <string name="download_playlist_desc">Stáhnout několik videí z playlistu</string>
     <string name="channel_name">Stahování</string>
     <string name="channel_description">Oznámení o stažených souborech a průběhu stahování</string>
     <string name="execute_command_notification">Spouštění vlastních příkazů…</string>
-    <string name="battery_settings_desc">Pro stahování na pozadí nastavte v systémových nastaveních využití baterie pro tuto aplikaci na „Neomezeno“.</string>
     <string name="concurrent_download">Stahování ve více vláknech</string>
     <string name="options">Možnosti</string>
     <string name="additional_settings">Další nastavení</string>
@@ -114,9 +110,6 @@
     <string name="best_quality">Nejlepší kvalita</string>
     <string name="video_format_preference">Preferovaný formát videa</string>
     <string name="close">Zavřít</string>
-    <string name="paste_desc">Klepněte na „Vložit“ pro získání odkazu na video ze schránky.</string>
-    <string name="download_desc">Po úpravě nastavení klepněte na „Stáhnout“.</string>
-    <string name="check_download_settings_desc">Před používáním se podívejte se na nastavení stahování a ujistěte se, že máte nejnovější verzi yt-dlp.</string>
     <string name="convert_audio">Převést</string>
     <string name="defaults">Výchozi</string>
     <string name="video_url">Odkaz na video</string>

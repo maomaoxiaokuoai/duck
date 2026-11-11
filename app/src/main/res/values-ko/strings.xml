@@ -64,7 +64,6 @@
     <string name="download_directory">다운로드 디렉터리</string>
     <string name="battery_configuration">배터리 구성</string>
     <string name="embed_subtitles_desc">동영상에 제공되는 자막 포함 (사용 가능한 경우)</string>
-    <string name="paste_desc">클립보드에서 비디오 링크를 가져오려면 \"붙여넣기\"를 클릭하세요.</string>
     <string name="not_convert">변환되지 않은</string>
     <string name="on">켜짐</string>
     <string name="dark_theme">어두운 테마</string>
@@ -76,12 +75,7 @@
     <string name="video_format">비디오 형식</string>
     <string name="convert_audio">변환</string>
     <string name="start_download">다운로드</string>
-    <string name="user_guide">사용자 설명서</string>
     <string name="close">닫음</string>
-    <string name="close_never_show_again">다시 표시하지 않음</string>
-    <string name="download_desc">설정을 조정한 후 \"다운로드\"를 클릭하세요.</string>
-    <string name="download_history_desc">비디오 및 오디오 파일을 포함한 앱 내 다운로드를 확인하고 관리합니다.</string>
-    <string name="check_download_settings_desc">다운로드 설정을 살펴보고 yt-dlp의 최신 버전이 있는지 확인한 후 사용하십시오.</string>
     <string name="concurrent_download_desc">더 많은 M3U8/MPD 비디오 부분들을 동시에 다운로드</string>
     <string name="concurrent_download_num">%d 스레드는 DASH/HLS 기본 비디오를 동시에 다운로드하는 데 사용됩니다.</string>
     <string name="embed_subtitles">자막 포함</string>
@@ -112,7 +106,6 @@
     <string name="channel_description">다운로드한 파일 및 진행 상황 알림</string>
     <string name="download_finish_notification">다운로드가 완료되었습니다. 열려면 탭하세요.</string>
     <string name="execute_command_notification">사용자 지정 명령 실행 중…</string>
-    <string name="battery_settings_desc">백그라운드에서 다운로드하려면 시스템 설정에서 이 앱의 배터리 항목을 \"제한없음\"으로 설정하세요.</string>
     <string name="options">옵션</string>
     <string name="additional_settings">추가 설정</string>
     <string name="share_fail_msg">공유 콘텐츠의 URL을 일치시킬 수 없습니다</string>

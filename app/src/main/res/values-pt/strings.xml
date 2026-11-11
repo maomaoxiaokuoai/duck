@@ -84,13 +84,7 @@
     <string name="video_format">Formato de vídeo</string>
     <string name="start_download">Descarregar</string>
     <string name="close">Fechar</string>
-    <string name="close_never_show_again">Não voltar a aparecer</string>
-    <string name="user_guide">Guia do utilizador</string>
     <string name="open_settings">Abrir definições</string>
-    <string name="paste_desc">Clique em \"Colar\" para obter a ligação do vídeo da sua área de transferência.</string>
-    <string name="download_desc">Em seguida, clique em \"Descarregar\" depois de ajustar as definições.</string>
-    <string name="download_history_desc">Verificar e gerir as descargas na aplicação, incluindo vídeos e ficheiros de áudio.</string>
-    <string name="check_download_settings_desc">Consulte as definições de descarga e certifique-se de que tem a versão mais recente do yt-dlp antes de o utilizar.</string>
     <string name="download_playlist">Descarregar lista de reprodução</string>
     <string name="download_playlist_desc">Descarregar vários vídeos de uma lista de reprodução</string>
     <string name="defaults">Predefinição</string>
@@ -100,7 +94,6 @@
     <string name="video_url">Ligação vídeo</string>
     <string name="download_finish_notification">Descarga concluída. Toque para abrir.</string>
     <string name="execute_command_notification">Executar comandos personalizados…</string>
-    <string name="battery_settings_desc">Defina a utilização da bateria desta aplicação como \"Sem restrições\" nas definições do sistema para descarregar em segundo plano.</string>
     <string name="concurrent_download">Descarga multi-tarefa</string>
     <string name="concurrent_download_desc">Descarregar mais partes de vídeos M3U8/MPD em paralelo</string>
     <string name="concurrent_download_num">%d thread(s) seria(m) utilizado(s) para descarregar vídeo nativo DASH/HLS em simultâneo.</string>

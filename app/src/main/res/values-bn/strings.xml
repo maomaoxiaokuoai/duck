@@ -73,7 +73,6 @@
     <string name="cancel">বাতিল করুন</string>
     <string name="edit_template_desc">আউটপুট পাথ এবং URL এই অ্যাপ দ্বারা যোগ করা হবে।</string>
     <string name="video_quality">ভিডিও কোয়ালিটি</string>
-    <string name="paste_desc">ক্লিপবোর্ড থেকে ভিডিও লিংক পাবার জন্য পেস্ট এ ক্লিক করুন</string>
     <string name="paste_fail_msg">আপনার ক্লিপবোর্ডের সাথে URL এর মিল পাওয়া যাচ্ছে না</string>
     <string name="dark_theme">কালো থিম</string>
     <string name="follow_system">সিস্টেম</string>
@@ -82,16 +81,11 @@
     <string name="convert_to">কনভার্ট %1$s</string>
     <string name="not_specified">নির্দিষ্ট করা নেই (ডিফল্ট)</string>
     <string name="video_format_preference">পছন্দের ভিডিও ফরম্যাট</string>
-    <string name="close_never_show_again">পুনরায় দেখবো না</string>
     <string name="open_settings">ওপেন সেটিংস</string>
     <string name="format">ফরমেট</string>
     <string name="convert_audio_format_desc">অডিও ফাইল পুনরায় এনকোড করার ফলে অডিওর গুণমান নষ্ট হবে এবং ফাইলের আকার বৃদ্ধি পাবে।</string>
-    <string name="user_guide">ব্যবহারকারীর নির্দেশিকা</string>
     <string name="video_quality_desc">একাধিক উপস্থিত থাকলে ভিডিওর কোয়ালিটি লিমিট করুন</string>
     <string name="preferred_format_desc">পছন্দের ফরমেট যখন একাধিক দেওয়া থাকে</string>
-    <string name="check_download_settings_desc">ব্যাবহার করার আগে ডাউনলোড সেটিংস দেখুন এবং নিশ্চিত করুন yt-dlp এর সর্বোচ্চ ভার্সনে আছে কি না।</string>
-    <string name="download_history_desc">ভিডিও এবং অডিও ফাইল সহ অ্যাপ-মধ্যস্থ ডাউনলোডগুলি পরীক্ষা করুন এবং পরিচালনা করুন।</string>
-    <string name="download_desc">এরপর সেটিংস ঠিক করে ডাউনলোড এ ক্লিক করুন।</string>
     <string name="download_playlist_desc">প্লেলিস্ট থেকে একাধিক ভিডিও ডাউনলোড করুন</string>
     <string name="defaults">নরমাল</string>
     <string name="channel_name">ডাউনলোড</string>
@@ -219,7 +213,6 @@
     <string name="download_disabled_with_cellular">সেলুলার নেটওয়ার্কের সাথে ডাউনলোড করা আপনার সেটিংস অনুযায়ী অক্ষম করা হয়েছে</string>
     <string name="format_selection">বিন্যাস নির্বাচন</string>
     <string name="telegram_channel">টেলিগ্রাম চ্যানেল</string>
-    <string name="battery_settings_desc">ব্যাকগ্রাউন্ডে ডাউনলোড করার জন্য অনুগ্রহ করে সিস্টেম সেটিংসে এই অ্যাপের ব্যাটারি ব্যবহারকে \"অনিয়ন্ত্রিত\" এ সেট করুন।</string>
     <string name="download_notification">বিজ্ঞপ্তি ডাউনলোড করুন</string>
     <string name="status_canceled">বাতিল</string>
     <string name="use_custom_command">কাস্টম কমান্ড ব্যবহার করুন</string>

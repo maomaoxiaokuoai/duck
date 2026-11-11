@@ -32,12 +32,8 @@
     <string name="video_quality_desc">Limitahan ang kalidad ng video kapag marami ang naroroon</string>
     <string name="not_specified">Hindi tukoy (kasalukuyan)</string>
     <string name="convert_audio">I-convert</string>
-    <string name="download_history_desc">Surrin at i-manage ang in-app downloads, kasama ang videos at audio files.</string>
-    <string name="check_download_settings_desc">Tignan ang setting pang-download, at siguraduhing gumagamit ka ng pinakabagong bersyon ng yt-dlp bago ito gamitin.</string>
-    <string name="download_desc">Pagkatapos pindutin ang \"Download\" after na ma adjust ang settings nito.</string>
     <string name="download_playlist">Download playlist</string>
     <string name="download_playlist_desc">I-download ang maraming videos mula sa isang playlist</string>
-    <string name="battery_settings_desc">Paki set ang battery usage ng app na ito bilang \"Unrestricted\" sa system upang makapag download ang app sa background.</string>
     <string name="options">Mga pagpipilian</string>
     <string name="additional_settings">Mga dag-dag na setting</string>
     <string name="download_notification">Abiso sa mga download</string>
@@ -66,7 +62,6 @@
     <string name="custom_command_template">Template ng command</string>
     <string name="readme_desc">Suriin ang GitHub repository at ang README</string>
     <string name="video">Video</string>
-    <string name="close_never_show_again">Wag nang ipakita ulit</string>
     <string name="close">cerrar</string>
     <string name="custom_command">Pasadyang utos</string>
     <string name="custom_command_desc">I-run ang yt-dlp command gamit ang custom template</string>
@@ -90,7 +85,6 @@
     <string name="best_quality">Pinakamahusay na kalidad</string>
     <string name="preferred_format_desc">Mas gustong format kapag marami ang ibinigay</string>
     <string name="open_settings">I-open ang settings</string>
-    <string name="paste_desc">Pindutin ang \"Paste\" upang makuha ang video link na galing sa iyong clipboard.</string>
     <string name="link_copied">Ang link ay kinopya na sa clipboard</string>
     <string name="concurrent_download">Multi-threaded na pag-download</string>
     <string name="defaults">Default</string>
@@ -120,7 +114,6 @@
     <string name="paste">I-paste</string>
     <string name="convert_audio_format_desc">Ang audio pormat na MP3 at M4A ay gagana sa lahat ng devices.</string>
     <string name="start_download">Download</string>
-    <string name="user_guide">Gabay para sa gumagamit</string>
     <string name="off">Naka-off</string>
     <string name="release">Pinakabagong release</string>
     <string name="display_settings">Madilim na tema, paiba-ibang kulay, wika</string>

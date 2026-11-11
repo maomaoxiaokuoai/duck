@@ -199,11 +199,6 @@
     <string name="video_format">פורמט וידאו</string>
     <string name="start_download">הורדה</string>
     <string name="close">סגור</string>
-    <string name="close_never_show_again">אל תציג שוב</string>
-    <string name="user_guide">מדריך למשתמש</string>
-    <string name="paste_desc">לחץ \"הדבק\" כדי לקבל קישור לוידאו מהלוח שלך.</string>
-    <string name="download_desc">ואז לחץ \"הורדה\" אחרי התאמת ההגדרות האלה.</string>
-    <string name="download_history_desc">בדוק ונהל הורדות מתוך האפליקציה, כולל סרטונים וקובצי אודיו.</string>
     <string name="embed_subtitles_desc">הטמע כתוביות בסרטון אם זמינות</string>
     <string name="download_playlist_desc">הורדת מספר סרטונים מתוך פלייליסט</string>
     <string name="channel_description">הצג התראה על התקדמות והשלמת הורדות</string>
@@ -275,7 +270,6 @@
     <string name="convert_audio_format_desc">קידוד מחדש של קובצי אודיו יגרום לאובדן איכות שמע ולהגדלת גודל הקובץ.</string>
     <string name="task_canceled">משימת ההורדה בוטלה</string>
     <string name="clear_temp_files">נקה קבצים זמניים</string>
-    <string name="battery_settings_desc">אנא הגדר את השימוש בסוללה של אפליקציה זו ל\"בלתי מוגבל\" בהגדרות המערכת כדי להוריד ברקע.</string>
     <string name="clear_temp_files_desc">מחק את כל הקבצים הזמניים מהתיקייה הזמנית</string>
     <string name="fetching_playlist_info">משיג מידע פלייליסט…</string>
     <string name="unknown_error">שגיאה לא ידועה</string>
@@ -367,7 +361,6 @@
     <string name="format_preference">העדפות פורמט</string>
     <string name="learn_more">למד עוד</string>
     <string name="custom_command_desc">הרץ פקודת yt-dlp עם תבנית מותאמת אישית</string>
-    <string name="check_download_settings_desc">עיין בהגדרות ההורדה וודא שיש לך את הגרסה העדכנית ביותר של yt-dlp לפני השימוש.</string>
     <string name="permission_issue_desc">תיקיות מחוץ ל\"הורדות\" ו\"מסמכים\" אינן נתמכות</string>
     <string name="cookies_desc">השתמש בעוגיות בפורמט Netscape להורדות</string>
     <string name="output_template">תבנית פלט</string>

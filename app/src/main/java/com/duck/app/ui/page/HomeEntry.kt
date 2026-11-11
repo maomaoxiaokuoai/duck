@@ -205,10 +205,6 @@ fun HomeEntry(
 
         }
 
-        WelcomeDialog {
-            navController.navigate(Route.SETTINGS)
-        }
-
         val downloaderState by Downloader.downloaderState.collectAsStateWithLifecycle()
 
         LaunchedEffect(Unit) {

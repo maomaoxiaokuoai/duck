@@ -31,7 +31,6 @@
     <string name="video_format_preference">Preferowany format wideo</string>
     <string name="video_format">Format wideo</string>
     <string name="convert_audio">Konwertuj</string>
-    <string name="user_guide">Instrukcja obsługi</string>
     <string name="download_playlist_desc">Pobierz wiele filmów z playlisty</string>
     <string name="channel_name">Pobieranie</string>
     <string name="download_finish_notification">Pobieranie zakończone. Naciśnij, aby otworzyć.</string>
@@ -86,7 +85,6 @@
     <string name="best_quality">Najwyższa jakość</string>
     <string name="close">Zamknij</string>
     <string name="start_download">Pobierz</string>
-    <string name="close_never_show_again">Nie pokazuj ponownie</string>
     <string name="open_settings">Otwórz ustawienia</string>
     <string name="download_playlist">Pobierz playlistę</string>
     <string name="defaults">Domyślne</string>
@@ -97,10 +95,6 @@
     <string name="translate_desc">Pomóż tłumaczyć tę aplikację na Hosted Weblate</string>
     <string name="unknown_error">Nieznany błąd</string>
     <string name="invalid_index_range">Nieprawidłowy zakres</string>
-    <string name="download_desc">Następnie, po dostosowaniu opcji pobierania, naciśnij „Pobierz”.</string>
-    <string name="paste_desc">Naciśnij „Wklej”, aby dodać link do filmu ze schowka.</string>
-    <string name="download_history_desc">Sprawdź i zarządzaj pobraniami w aplikacji, w tym plikami wideo i audio.</string>
-    <string name="check_download_settings_desc">Przed użyciem upewnij się, że korzystasz z najnowszej wersji yt-dlp sprawdzając ustawienia aplikacji.</string>
     <string name="checked">Sprawdzono</string>
     <string name="error_copied">Raport o błędach został skopiowany do schowka</string>
     <string name="concurrent_download">Wielowątkowe pobieranie</string>
@@ -119,7 +113,6 @@
     <string name="download_range_selection">Zakres playlisty</string>
     <string name="download_directory">Folder pobierania</string>
     <string name="delete_info_msg">Czy chcesz na zawsze usunąć „%1$s” z historii pobierania\?</string>
-    <string name="battery_settings_desc">W ustawieniach systemowych dla tej aplikacji ustaw „Wykorzystanie baterii” na „Bez ograniczeń”, aby pobierać w tle.</string>
     <string name="show_more_actions">Pokaż więcej akcji</string>
     <string name="download_notification">Powiadomienie o pobieraniu</string>
     <string name="subdirectory">Zapisz w podfolderze</string>

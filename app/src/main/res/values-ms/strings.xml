@@ -80,12 +80,7 @@
     <string name="preferred_format_desc">Format yang dipilih apabila terdapat pelbagai pilihan</string>
     <string name="start_download">Muat turun</string>
     <string name="close">Tutup</string>
-    <string name="close_never_show_again">Jangan tunjuk untuk selama-lamanya</string>
-    <string name="user_guide">Panduan pengguna</string>
     <string name="open_settings">Buka tetapan</string>
-    <string name="paste_desc">Tekan \"Tampal\" untuk dapatkan pautan video daripada papan keratan.</string>
-    <string name="download_history_desc">Periksa dan uruskan muat turun, termasuk video and audio.</string>
-    <string name="check_download_settings_desc">Periksa versi yt-dlp dalam tetapan adalah terbaharu sebelum menggunakannya.</string>
     <string name="defaults">Tetapan asal</string>
     <string name="channel_name">Muat turun</string>
     <string name="channel_description">Maklumkan tentang perkembangan dan fail yang telah dimuat turun</string>
@@ -135,7 +130,6 @@
     <string name="import_from_clipboard">Import daripada papan keratan</string>
     <string name="template_exported">Eksport %1$d templat</string>
     <string name="video_format">Format video</string>
-    <string name="download_desc">Kemudian tekan \"Muat turun\" selepas melaras tetapannya.</string>
     <string name="convert_audio_format_desc">Pengekodan semula fail audio akan menyebabkan kehilangan kualiti audio dan peningkatan saiz fail.</string>
     <string name="video_quality">Qualiti video</string>
     <string name="download_directory_desc">Pilih tempat untuk menyimpan fail video dan audio</string>
@@ -143,7 +137,6 @@
     <string name="convert_audio">Ubah</string>
     <string name="download_playlist_desc">Muat turun beberapa video ke senarai-main</string>
     <string name="download_playlist">Senarai-main muat turun</string>
-    <string name="battery_settings_desc">Sila laras penggunaan bateri kepada \"Tidak terhad\" untuk aplikasi ini dalam tetapan sistem bagi membolehkannya berjalan dibelakang.</string>
     <string name="unknown_error">Masalah tidak diketahui</string>
     <string name="downloading_indicator_text">Muat turun sedang berjalan, tekan untuk batal.</string>
     <string name="additional_settings">Tetapan tambahan</string>

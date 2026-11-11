@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="download_desc">Затим, додирни на „Преузми“ након прилагођавања подешавања.</string>
-    <string name="check_download_settings_desc">Погледај подешавања преузимања и увери се да имаш најновију верзију yt-dlp пре коришћења.</string>
     <string name="download_playlist">Преузми листу</string>
     <string name="download_playlist_desc">Преузми више видео снимака са листе</string>
     <string name="defaults">Подразумевано</string>
@@ -11,7 +9,6 @@
     <string name="channel_description">Обавештење о преузетим датотекама и напретку</string>
     <string name="download_finish_notification">Преузимање је завршено. Додирни да отвориш.</string>
     <string name="execute_command_notification">Покретање прилагођених команди…</string>
-    <string name="battery_settings_desc">Подеси потрошњу батерије ове апликације на „Неограничено“ у системским подешавањима да би се преузимање наставило у позадини.</string>
     <string name="options">Опције</string>
     <string name="additional_settings">Додатна подешавања</string>
     <string name="download_range_selection">Избор плејлисте</string>
@@ -79,10 +76,7 @@
     <string name="video_quality">Квалитет видео снимка</string>
     <string name="video_quality_desc">Ограничи квалитет видео снимка, када их је доступно више</string>
     <string name="convert_audio">Претвори</string>
-    <string name="user_guide">Упутство за употребу</string>
     <string name="open_settings">Отвори подешавања</string>
-    <string name="paste_desc">Додирни на „Налепи“ да би добио повезницу видео снимка из привремене меморије.</string>
-    <string name="download_history_desc">Провери и управљај преузимањима у апликацији , укључујући датотеке видео и звучних снимака.</string>
     <string name="video_url">Повезница видео снимка</string>
     <string name="concurrent_download">Вишенитно преузимање</string>
     <string name="concurrent_download_desc">Преузмите више делова M3U8/MPD видео снимака паралелно</string>
@@ -202,7 +196,6 @@
     <string name="import_from_clipboard">Увези из привремене меморије</string>
     <string name="preferred_format_desc">Пожељни формат, када их је доступно више</string>
     <string name="close">Затвори</string>
-    <string name="close_never_show_again">Не приказуј поново</string>
     <string name="start_download">Преузми</string>
     <string name="cookies_desc">Користите Netscape форматиране колачиће за преузимања</string>
     <string name="delete_multiple_items_msg">Заувек уклонити %1$d предмет(а) из историје преузимања\?</string>

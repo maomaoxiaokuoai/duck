@@ -66,9 +66,6 @@
     <string name="convert_audio">گۆڕین</string>
     <string name="start_download">دابەزاندن</string>
     <string name="close">داخستن</string>
-    <string name="user_guide">ڕینمایی بەکارهێنەر</string>
-    <string name="paste_desc">بۆ وەرگرتنی بەستەری ڤیدیۆ لە کلیپبۆردەکەتەوە کلیک لە \"Paste\" بکە.</string>
-    <string name="download_history_desc">پشکنین و بەڕێوەبردنی دابەزاندنی ناو ئەپەکە، لەوانەش ڤیدیۆ و فایلە دەنگییەکان.</string>
     <string name="download_playlist">پلەی لیست دابەزێنە</string>
     <string name="download_playlist_desc">چەندین ڤیدیۆ لە پلەی لیستێکەوە دابەزێنە</string>
     <string name="defaults">بنەڕەت</string>
@@ -99,12 +96,8 @@
     <string name="convert_to">گۆڕینی بۆ %1$s</string>
     <string name="convert_audio_format_desc">دووبارە کۆدکردنەوەی فایلە دەنگییەکان دەبێتە هۆی لەدەستدانی کوالیتی دەنگ و زیادبوونی قەبارەی فایلەکان.</string>
     <string name="preferred_format_desc">فۆرماتی پەسەندکراو کاتێک چەندین جار دابین دەکرێن</string>
-    <string name="close_never_show_again">جارێکی تر نیشانی مەدە</string>
-    <string name="check_download_settings_desc">سەیری ڕێکخستنەکانی دابەزاندن بکە و دڵنیابە کە نوێترین وەشانی yt-dlpت هەیە پێش بەکارهێنانی.</string>
     <string name="open_settings">ڕێکخستنەکان بکەرەوە</string>
-    <string name="download_desc">پاشان دوای ڕێکخستنی ڕێکخستنەکان کلیک لە \"Download\" بکە.</string>
     <string name="download_finish_notification">داگرتن تەواو بوو. بۆ کردنەوەی پەنجە بنێ.</string>
-    <string name="battery_settings_desc">تکایە بەکارهێنانی پاتری ئەم ئەپە لە ڕێکخستنەکانی سیستەمدا لەسەر \"Unrestricted\" دابنێ بۆ ئەوەی لە پاشتەوە دابەزاندن بکات.</string>
     <string name="concurrent_download">دابەزاندنی فرە ڕەگ</string>
     <string name="concurrent_download_num">%d thread(s) بەکاردەهێنرێت بۆ دابەزاندنی ڤیدیۆی ڕەسەنی DASH/HLS لە یەک کاتدا.</string>
     <string name="options">بژاردەکان</string>

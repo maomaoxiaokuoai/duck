@@ -84,13 +84,7 @@
     <string name="convert_audio">ਬਦਲੋ</string>
     <string name="start_download">ਡਾਊਨਲੋਡ ਕਰੋ</string>
     <string name="close">ਬੰਦ ਕਰੋ</string>
-    <string name="close_never_show_again">ਦੁਬਾਰਾ ਨਾ ਦਿਖਾਓ</string>
-    <string name="user_guide">ਉਪਭੋਗਤਾ ਗਾਈਡ</string>
     <string name="open_settings">ਸੈਟਿੰਗਾਂ ਖੋਲ੍ਹੋ</string>
-    <string name="paste_desc">ਆਪਣੇ ਕਲਿੱਪਬੋਰਡ ਤੋਂ ਵੀਡੀਓ ਲਿੰਕ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ \"ਪੇਸਟ ਕਰੋ\" \'ਤੇ ਕਲਿੱਕ ਕਰੋ।</string>
-    <string name="download_desc">ਇਸ ਦੀਆਂ ਸੈਟਿੰਗਾਂ ਨੂੰ ਐਡਜਸਟ ਕਰਨ ਤੋਂ ਬਾਅਦ ਫੇਰ \"ਡਾਊਨਲੋਡ\" \'ਤੇ ਕਲਿੱਕ ਕਰੋ।</string>
-    <string name="download_history_desc">ਵੀਡੀਓ ਅਤੇ ਆਡੀਓ ਫਾਈਲਾਂ ਸਮੇਤ ਐਪ-ਵਿੱਚ ਡਾਊਨਲੋਡਾਂ ਦੀ ਜਾਂਚ ਅਤੇ ਪ੍ਰਬੰਧਨ ਕਰੋ।</string>
-    <string name="check_download_settings_desc">ਡਾਊਨਲੋਡ ਸੈਟਿੰਗਾਂ \'ਤੇ ਇੱਕ ਨਜ਼ਰ ਮਾਰੋ ਅਤੇ ਇਸਦੀ ਵਰਤੋਂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਹਾਡੇ ਕੋਲ yt-dlp ਦਾ ਨਵੀਨਤਮ ਸੰਸਕਰਣ ਹੈ।</string>
     <string name="download_playlist">ਪਲੇਲਿਸਟ ਡਾਊਨਲੋਡ ਕਰੋ</string>
     <string name="download_playlist_desc">ਇੱਕ ਪਲੇਲਿਸਟ ਤੋਂ ਕਈ ਵੀਡੀਓ ਡਾਊਨਲੋਡ ਕਰੋ</string>
     <string name="defaults">ਡਿਫਾਲਟ</string>
@@ -99,7 +93,6 @@
     <string name="video_url">ਵੀਡੀਓ ਲਿੰਕ</string>
     <string name="download_finish_notification">ਡਾਊਨਲੋਡ ਪੂਰਾ ਹੋਇਆ, ਖੋਲ੍ਹਣ ਲਈ ਟੈਪ ਕਰੋ।</string>
     <string name="execute_command_notification">ਕਸਟਮ ਕਮਾਂਡਾਂ ਚੱਲ ਰਹੀਆਂ ਹਨ…</string>
-    <string name="battery_settings_desc">ਕਿਰਪਾ ਕਰਕੇ ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਡਾਊਨਲੋਡ ਕਰਨ ਲਈ ਸਿਸਟਮ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਇਸ ਐਪ ਦੀ ਬੈਟਰੀ ਵਰਤੋਂ ਨੂੰ \"ਅਪ੍ਰਬੰਧਿਤ\" \'ਤੇ ਸੈੱਟ ਕਰੋ।</string>
     <string name="concurrent_download">ਮਲਟੀ-ਥਰੈੱਡਡ ਡਾਊਨਲੋਡ</string>
     <string name="concurrent_download_desc">ਸਮਾਨਾਂਤਰ ਵਿੱਚ M3U8/MPD ਵੀਡੀਓ ਦੇ ਹੋਰ ਭਾਗਾਂ ਨੂੰ ਡਾਊਨਲੋਡ ਕਰੋ</string>
     <string name="concurrent_download_num">%d ਥ੍ਰੈੱਡ(s) ਨੂੰ ਇੱਕੋ ਸਮੇਂ DASH/HLS ਮੂਲ ਵੀਡੀਓ ਨੂੰ ਡਾਊਨਲੋਡ ਕਰਨ ਲਈ ਵਰਤਿਆ ਜਾਵੇਗਾ।</string>

@@ -75,10 +75,7 @@
     <string name="video_format">Video formatı</string>
     <string name="start_download">Yüklə</string>
     <string name="close">Bağla</string>
-    <string name="user_guide">İstifadəçi bələdçisi</string>
     <string name="open_settings">Tənzimləmələri aç</string>
-    <string name="download_desc">Tənzimləmələrin nizamladıqdan sonra \"Yüklə\"-ni kliklə.</string>
-    <string name="download_history_desc">Videolar və səs fayllar daxil olmaqla tətbiqdaxili yükləmələri yoxla və idarə et.</string>
     <string name="download_playlist">Oynatma siyahısın yüklə</string>
     <string name="download_playlist_desc">Oynatma siyahısından çoxlu video yüklə</string>
     <string name="defaults">Standart</string>
@@ -87,7 +84,6 @@
     <string name="video_url">Video bağlantısı</string>
     <string name="download_finish_notification">Yükləmə bitdi. Açmaq üçün toxun.</string>
     <string name="execute_command_notification">Fərdi əmrlər icra edilir…</string>
-    <string name="battery_settings_desc">Zəhmət olmasa, arxa planda yükləmək üçün bu tətbiqin batareya istifadəsin sistem seçimlərində \"Qeyri-məhdud\" kimi təyin edin.</string>
     <string name="concurrent_download">Çox yönlü yükləmə</string>
     <string name="options">Seçimlər</string>
     <string name="additional_settings">Əlavə tənzimləmələr</string>
@@ -106,9 +102,6 @@
     <string name="on">Aç</string>
     <string name="settings_before_download_desc">Yükləməzdən əvvəl seçimləri konfiqurasiya et</string>
     <string name="convert_audio">Döndər</string>
-    <string name="close_never_show_again">Təkrar göstərmə</string>
-    <string name="paste_desc">Lövhənizdən video əlaqəsin əldə etmək üçün \"Yapışdır\"-a klikləyin.</string>
-    <string name="check_download_settings_desc">Yükləmə tənzimləmələrinə baxın və istifadədən əvvəl yt-dlp\'nin ən son versiyasına sahib olduğunuzdan əmin olun.</string>
     <string name="concurrent_download_desc">M3U8/MPD videoların daha çox hissələrin yanaşı yüklə</string>
     <string name="concurrent_download_num">%d parça(lar) DASH/HLS yerli videosun eyni vaxtda yükləmək üçün istifadə olunacaq.</string>
     <string name="download_notification_desc">Yüklənilmiş fayllar və irəliləyiş bildirilir</string>

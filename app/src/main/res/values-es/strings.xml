@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="paste_desc">Haz clic en el botón de «Pegar» para obtener el enlace desde tu portapapeles.</string>
-    <string name="battery_settings_desc">Para descargar en segundo plano, por favor cambia el ajuste de uso de batería en los ajustes del teléfono a «No restringir».</string>
     <string name="yt_dlp_update_fail">No se pudo instalar la última versión de yt-dlp. Por favor asegúrate de estar conectado al Internet.</string>
     <string name="task_running">Una descarga existente se está ejecutando</string>
     <string name="edit_template_desc">El directorio de salida y la URL serán añadidas por la aplicación.</string>
@@ -85,12 +83,7 @@
     <string name="convert_audio">Convertir audio</string>
     <string name="start_download">Iniciar descarga</string>
     <string name="close">Cerrar</string>
-    <string name="close_never_show_again">No mostrarlo otra vez</string>
-    <string name="user_guide">Guía del usuario</string>
     <string name="open_settings">Abrir ajustes</string>
-    <string name="download_desc">Después de realizar los ajustes pertinentes, haz clic en el botón «Descargar».</string>
-    <string name="download_history_desc">Verifica y administra las descargas dentro de la aplicación, incluyendo videos y archivos de audio.</string>
-    <string name="check_download_settings_desc">Se recomienda echar un vistazo rápido a los ajustes y asegurarse de tener yt-dlp antes de empezar a usar la aplicación.</string>
     <string name="download_playlist">Descargar lista de reproducción</string>
     <string name="download_playlist_desc">Descargar varios vídeos de una lista de reproducción</string>
     <string name="defaults">Predeterminado</string>

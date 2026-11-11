@@ -24,7 +24,6 @@
     <string name="rate_limit_desc">Limitar velocidade máxima de descarga</string>
     <string name="save">Guardar</string>
     <string name="print_details">Saída detalhada</string>
-    <string name="user_guide">Guia do utilizador</string>
     <string name="logs">Registo</string>
     <string name="split_video_msg">O vídeo será dividido em %1$d capítulos</string>
     <string name="remove_cookie_profile_desc">Remover esta entrada para \"%1$s\"? Observe que os cookies armazenados neste site não serão apagados.</string>
@@ -80,7 +79,6 @@
     <string name="high_contrast">Tema escuro de alto contraste</string>
     <string name="template_selection">Seleção do modelo</string>
     <string name="fetching_playlist_info">Obter informações sobre a lista de reprodução…</string>
-    <string name="check_download_settings_desc">Consulte as definições de transferência e certifique-se de que tem a versão mais recente do yt-dlp antes de o utilizar.</string>
     <string name="translate">Traduzir</string>
     <string name="extract_audio_summary">Descarregar e guardar áudio, em vez de vídeo</string>
     <string name="subdirectory_desc">Guardar ficheiros em pastas com o nome dos respectivos campos</string>
@@ -94,7 +92,6 @@
     <string name="learn_more">Saiba mais</string>
     <string name="preferred_format_desc">Formato preferido quando são fornecidos vários</string>
     <string name="download_playlist">Descarregar lista de reprodução</string>
-    <string name="paste_desc">Clique em \"Colar\" para obter a ligação do vídeo da sua área de transferência.</string>
     <string name="general_settings_desc">Notification, privacy, playlist</string>
     <string name="rename">Renomear</string>
     <string name="convert_subtitle">Converter legendas</string>
@@ -151,7 +148,6 @@
     <string name="back">Atrás</string>
     <string name="downloads_history">Transferências</string>
     <string name="release">Versão mais recente</string>
-    <string name="download_desc">Em seguida, clique em \"Descarregar\" depois de ajustar as definições.</string>
     <string name="audio_directory">Pasta áudio</string>
     <string name="sponsor_msg">O Seal será sempre gratuito e de código aberto para todos. Se gostar, por favor considere patrocinar-me no GitHub!</string>
     <string name="crop_artwork">Cortar arte</string>
@@ -176,7 +172,6 @@
     <string name="discard">Descartar</string>
     <string name="sdcard_directory">Pasta do cartão SD</string>
     <string name="open_settings">Abrir definições</string>
-    <string name="download_history_desc">Verificar e gerir as transferências na aplicação, incluindo vídeos e ficheiros de áudio.</string>
     <string name="download_success_msg">Descarga concluída</string>
     <string name="audio_format_preference">Formato áudio preferido</string>
     <string name="new_task">Nova tarefa de transferência</string>
@@ -248,7 +243,6 @@
     <string name="clear_temp_files_desc">Eliminar todos os ficheiros temporários do diretório temporário</string>
     <string name="video_title_sample_text">Título do vídeo texto de amostra</string>
     <string name="use_custom_command">Utilizar comando personalizado</string>
-    <string name="close_never_show_again">Não voltar a aparecer</string>
     <string name="settings_before_download">Configurar antes de descarregar</string>
     <string name="check_for_updates_desc">Verificar automaticamente a versão mais recente no GitHub</string>
     <string name="file_unavailable">Este ficheiro já não está disponível</string>
@@ -300,7 +294,6 @@
     <string name="proxy_desc">Utilizar proxy para ligações à Internet</string>
     <string name="generate_new_cookies">Gerar novos cookies</string>
     <string name="quality">Qualidade</string>
-    <string name="battery_settings_desc">Defina a utilização da bateria desta aplicação como \"Sem restrições\" nas definições do sistema para descarregar em segundo plano.</string>
     <string name="refresh_cookies_desc">Toque para abrir a página Web para gerar novos cookies:</string>
     <string name="not_specified">Não especificado (predefinição)</string>
     <string name="status_downloading">A descarregar</string>

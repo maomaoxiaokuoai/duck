@@ -76,13 +76,7 @@
     <string name="preferred_format_desc">Định dạng ưa thích khi nhiều định dạng được cung cấp</string>
     <string name="start_download">Tải xuống</string>
     <string name="close">Đóng</string>
-    <string name="close_never_show_again">Không hiển thị lại</string>
-    <string name="user_guide">Hướng dẫn người dùng</string>
     <string name="open_settings">Mở thiết đặt</string>
-    <string name="paste_desc">Nhấp vào \"Dán\" để nhận liên kết băng hình từ khay nhớ tạm của bạn.</string>
-    <string name="download_desc">Kế đến nhấp vào \"Tải xuống\" sau khi điều chỉnh thiết đặt của nó.</string>
-    <string name="download_history_desc">Kiểm tra và quản lý Tải xuống trong ứng dụng, gồm các tệp băng hình và âm thanh.</string>
-    <string name="check_download_settings_desc">Hãy xem thiết đặt tải xuống và đảm bảo bạn có phiên bản yt-dlp mới nhất trước khi sử dụng.</string>
     <string name="download_playlist">Tải xuống danh sách phát</string>
     <string name="download_playlist_desc">Tải xuống nhiều băng hình từ một danh sách phát</string>
     <string name="defaults">Mặc định</string>
@@ -113,7 +107,6 @@
     <string name="execute_command_notification">Đang chạy lệnh tùy chỉnh…</string>
     <string name="fetching_playlist_info">Đang nạp thông tin danh sách phát…</string>
     <string name="download_range_desc">Chỉ định phạm vi các băng hình sẽ tải xuống từ danh sách phát \"%3$s\" (từ %1$d tới %2$d).</string>
-    <string name="battery_settings_desc">Hãy chuyển mức sử dụng pin của ứng dụng này sang \"Không giới hạn\" trong thiết đặt hệ thống để tải xuống trong nền.</string>
     <string name="download_range_selection">Lựa chọn danh sách phát</string>
     <string name="to">Kết thúc</string>
     <string name="playlist_indicator_text">Đang tải xuống danh sách phát (%1$d/%2$d)…</string>

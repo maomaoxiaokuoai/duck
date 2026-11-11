@@ -53,9 +53,6 @@
     <string name="custom_command_desc">Запусціце yt-dlp з карыстальніцкім шаблонам</string>
     <string name="advanced_settings">Пашыраныя налады</string>
     <string name="print_details">Падрабязная справаздача</string>
-    <string name="paste_desc">Націсніце «Уставіць», каб атрымаць спасылку на відэа з буфера абмену.</string>
-    <string name="download_desc">Затым націсніце \"Спампаваць\", наладзіўшы яго параметры.</string>
-    <string name="download_history_desc">Правярайце і кіруйце загрузкамі ў праграме, уключаючы відэа і аўдыяфайлы.</string>
     <string name="download_playlist">Спампаваць плэйліст</string>
     <string name="channel_description">Апавяшчаць аб запампаваных файлах і прагрэсе</string>
     <string name="download_finish_notification">Спампоўка скончана. Націсніце, каб адкрыць.</string>
@@ -91,14 +88,10 @@
     <string name="convert_audio">Канвертаваць</string>
     <string name="start_download">Спампаваць</string>
     <string name="close">Зачыніць</string>
-    <string name="close_never_show_again">Не паказваць зноў</string>
-    <string name="user_guide">Інструкцыя для карыстальніка</string>
     <string name="open_settings">Адчыніць налады</string>
-    <string name="check_download_settings_desc">Зірніце на налады загрузкі і пераканайцеся, што ў вас апошняя версія yt-dlp перад яе выкарыстаннем.</string>
     <string name="download_playlist_desc">Спампаваць некалькі відэа з плэйліста</string>
     <string name="defaults">Па змаўчанні</string>
     <string name="execute_command_notification">Выкананне карыстальніцкай каманды…</string>
-    <string name="battery_settings_desc">Каб спампоўваць у фонавым рэжыме, усталюйце ў сістэмных наладах \"Неабмежаваны\" расход батарэі для гэтай праграмы.</string>
     <string name="concurrent_download">Шматструменная загрузка</string>
     <string name="concurrent_download_desc">Спампоўвайце больш частак відэа M3U8/MPD паралельна</string>
     <string name="convert_audio_format">Канвертаваць фармат аўдыё</string>

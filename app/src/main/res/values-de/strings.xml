@@ -48,7 +48,6 @@
     <string name="download_finish_notification">Download beendet. Zum Öffnen antippen.</string>
     <string name="download_playlist">Wiedergabeliste herunterladen</string>
     <string name="download_playlist_desc">Mehrere Videos aus einer Wiedergabeliste herunterladen</string>
-    <string name="user_guide">Benutzerhandbuch</string>
     <string name="open_settings">Einstellungen öffnen</string>
     <string name="start_download">Herunterladen</string>
     <string name="video_format_preference">Bevorzugtes Videoformat</string>
@@ -71,7 +70,6 @@
     <string name="display_settings">Dunkles Farbschema, dynamische Farben, Sprachen</string>
     <string name="cancel">Abbrechen</string>
     <string name="custom_command">Benutzerdefinierter Befehl</string>
-    <string name="close_never_show_again">Nicht mehr anzeigen</string>
     <string name="edit">Bearbeiten</string>
     <string name="follow_system">System</string>
     <string name="on">Ein</string>
@@ -109,7 +107,6 @@
     <string name="print_details_desc">Detaillierte Meldungen beim Herunterladen drucken</string>
     <string name="not_convert">Nicht konvertieren</string>
     <string name="audio_directory">Audioordner</string>
-    <string name="battery_settings_desc">Bitte setze die Akkunutzung dieser App in den Systemeinstellungen auf „Uneingeschränkt“, um im Hintergrund herunterzuladen.</string>
     <string name="share_fail_msg">URL aus geteilten Inhalt kann nicht zugeordnet werden</string>
     <string name="download_directory">Downloadordner</string>
     <string name="unknown_error">Unbekannter Fehler</string>
@@ -118,10 +115,6 @@
     <string name="translate_desc">Hilf bei der Übersetzung dieser App auf Weblate</string>
     <string name="edit_template_desc">Ausgabepfad und URL werden von der App hinzugefügt.</string>
     <string name="convert_audio">Konvertieren</string>
-    <string name="paste_desc">Klicke auf „Einfügen“, um den Videolink aus der Zwischenablage zu holen.</string>
-    <string name="download_desc">Klicke dann auf „Herunterladen“, nachdem du die Einstellungen angepasst hast.</string>
-    <string name="download_history_desc">Überprüfe und verwalte In-App-Downloads, einschließlich Videos und Audiodateien.</string>
-    <string name="check_download_settings_desc">Schaue dir die Download-Einstellungen an und stelle sicher, dass du die neueste Version von yt-dlp hast, bevor du es verwendest.</string>
     <string name="concurrent_download_num">%d Thread(s) würden für das gleichzeitige Herunterladen von nativen DASH/HLS-Videos verwendet werden.</string>
     <string name="share_success_msg">Videolink von geteilten Inhalten lesen…</string>
     <string name="download_range_desc">Gib den Bereich der Videos an, die aus der Wiedergabeliste „%3$s“ heruntergeladen werden sollen (von %1$d bis %2$d).</string>

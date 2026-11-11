@@ -35,8 +35,6 @@
     <string name="video_quality_desc">ආකෘතියේ ගුණාත්මකභාවය සහ විශාලත්වය සීමා කිරීම</string>
     <string name="preferred_format_desc">බහු බාගැනීම් වලදී තෝරාගත් ආකෘතිය</string>
     <string name="close">වසන්න</string>
-    <string name="close_never_show_again">නැවත නොපෙන්වන්න</string>
-    <string name="user_guide">පරිශීලක මාර්ගෝපදේශ</string>
     <string name="open_settings">සැකසුම් පෙන්වන්න</string>
     <string name="download_playlist">Playlist බාගන්න</string>
     <string name="channel_description">බාගැනීම් සහ ප්‍රගතිය දන්වන්න</string>
@@ -124,15 +122,11 @@
     <string name="video_format">වීඩියෝ ආකෘතිය</string>
     <string name="convert_audio">පරිවර්තනය කරන්න</string>
     <string name="start_download">බාගත කරන්න</string>
-    <string name="paste_desc">ක්ලිප්බෝඩයෙන් වීඩියෝ සබැඳිය ලබා ගැනීමට \"පේස්ට්\" ක්ලික් කරන්න.</string>
-    <string name="download_desc">සැකසුම් සකස් කිරීමෙන් පසු \"බාගත කරන්න\" ක්ලික් කරන්න.</string>
     <string name="execute_command_notification">අභිරුචි විධානයන් ක්‍රියාත්මක වෙමින්…</string>
-    <string name="check_download_settings_desc">බාගැනීම් සැකසුම් බලන්න සහ නවතම yt-dlp අනුවාදයෙහි සිටීදැයි තහවුරු කරගන්න.</string>
     <string name="download_playlist_desc">වීඩියෝ රැසක් එකවර playlist මගින් බාගන්න</string>
     <string name="channel_name">බාගන්න</string>
     <string name="concurrent_download">කොටස් ගණනාවකින් බාගන්න</string>
     <string name="download_finish_notification">බාගැනීම අවසන්. විවෘත කිරීමට ක්ලික් කරන්න.</string>
-    <string name="battery_settings_desc">කරුණාකර පසුබිම් බාගැනීම් සිදුකිරීමට යෙදුමේ බැටරි භාවිතය පද්ධති සැකසීම් තුළ \"Unrestricted\" ලෙස සකසන්න.</string>
     <string name="concurrent_download_desc">M3U8/MPD වීඩියෝවල කොටස් සමාන්තරව බාගත කරන්න</string>
     <string name="fetching_playlist_info">Playlist තොරතුරු ලබා ගනිමින්…</string>
     <string name="options">විකල්ප</string>
@@ -192,7 +186,6 @@
     <string name="advanced_settings">උසස් සැකසුම්</string>
     <string name="thumbnail">සංක්ෂිප්ත රූපය</string>
     <string name="not_convert">පරිවර්තනය නොවේ</string>
-    <string name="download_history_desc">යෙදුමේ බාගැනීම් හසුරුවන්න, වීඩියෝ සහ ශ්‍රව්‍ය ගොනු ඇතුලුව.</string>
     <string name="defaults">පෙරනිමිය</string>
     <string name="concurrent_download_num">DASH/HLS වීඩියෝ සමගාමීව බාගැනීමට ත්‍රෙඩ් %d ක් භාවිතා කරනු ඇත.</string>
     <string name="prefix">ආචයන ටෙම්ප්ලේට ස්ථානය</string>

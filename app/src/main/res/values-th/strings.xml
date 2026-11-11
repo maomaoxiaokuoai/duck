@@ -55,7 +55,6 @@
     <string name="clip_video_desc">ทำคลิปวิดีโอในหน้าเลือกรูปแบบ</string>
     <string name="convert_to">แปลงเป็น %1$s</string>
     <string name="convert_audio">แปลง</string>
-    <string name="battery_settings_desc">โปรดตั้งค่าการใช้งานแบตเตอรี่ของแอปนี้เป็น \"ไม่จำกัด\" ในการตั้งค่าระบบเพื่อดาวน์โหลดในพื้นหลัง</string>
     <string name="channel_description">แจ้งเตือนเกี่ยวกับไฟล์ที่ดาวน์โหลดแล้วและความคืบหน้าของการดาวน์โหลด</string>
     <string name="download_directory">ไดเรกทอรีดาวน์โหลด</string>
     <string name="audio_directory">โฟลเดอร์เสียง</string>
@@ -120,7 +119,6 @@
     <string name="not_specified">ไม่ได้ระบุ (ค่าเริ่มต้น)</string>
     <string name="video_quality_desc">จำกัดคุณภาพวิดีโอเมื่อมีให้วีดีโอหลายรายการ</string>
     <string name="best_quality">คุณภาพดีที่สุด</string>
-    <string name="close_never_show_again">ไม่ต้องแสดงอีก</string>
     <string name="close">ปิด</string>
     <string name="start_download">ดาวน์โหลด</string>
     <string name="video_url">ลิงก์วีดีโอ</string>
@@ -183,8 +181,6 @@
     <string name="fetching_playlist_info">กำลังดึงข้อมูลของเพลย์ลิสต์…</string>
     <string name="cookies">คุกกี้</string>
     <string name="suggested">แนะนำ</string>
-    <string name="download_desc">หลังจากที่คุณปรับการตั้งค่าแล้ว ให้คลิกที่ \"ดาวน์โหลด\"</string>
-    <string name="user_guide">คู่มือผู้ใช้</string>
     <string name="sponsorblock_desc">ลบเซ็กเมนต์ในวิดีโอด้วย SponsorBlock API</string>
     <string name="format">รูปแบบ</string>
     <string name="video_only">วิดีโอ (ไม่มีเสียง)</string>
@@ -210,8 +206,6 @@
     <string name="settings_before_download_text">ปรับแต่งการดาวน์โหลดนี้</string>
     <string name="task_running">การดาวน์โหลดที่มีอยู่แล้วกำลังทำงานอยู่</string>
     <string name="download_notification">การแจ้งเตือนการดาวน์โหลด</string>
-    <string name="check_download_settings_desc">ลองดูที่การตั้งค่าการดาวน์โหลดและตรวจสอบว่าคุณมี yt-dlp เวอร์ชันล่าสุดของก่อนที่จะใช้มัน</string>
-    <string name="download_history_desc">ตรวจสอบและจัดการการดาวน์โหลดในแอปรวมถึงวิดีโอและไฟล์เสียง</string>
     <string name="video_format_preference">รูปแบบวิดีโอที่ต้องการ</string>
     <string name="remove_cookie_profile_desc">ลบรายการสำหรับ \"%1$s\" หรือไม่? โดยคุกกี้ที่เก็บไว้สำหรับเว็บไซต์นี้จะไม่ถูกลบไปด้วย</string>
     <string name="use_cookies">ใช้คุกกี้</string>
@@ -238,7 +232,6 @@
     <string name="show_more_actions">แสดงการกระทำเพิ่มเติม</string>
     <string name="concurrent_download_num">%d เธรดจะถูกใช้เพื่อดาวน์โหลดวิดีโอ DASH/HLS พร้อมกัน</string>
     <string name="concurrent_download_desc">ดาวน์โหลดส่วนอื่น ๆ ของวิดีโอ M3U8/MPD พร้อมกัน</string>
-    <string name="paste_desc">คลิก \"วาง\" เพื่อวางลิงค์วิดีโอจากคลิปบอร์ดของคุณ</string>
     <string name="convert_audio_format_desc">การเข้ารหัสไฟล์เสียงอีกครั้งจะทำให้ไฟล์เสียงสูญเสียคุณภาพและขนาดไฟล์ที่เพิ่มขึ้น</string>
     <string name="advanced_settings">ขั้นสูง</string>
     <string name="delete_info_msg">ต้องการลบ \"%1$s\" ออกจากประวัติการดาวน์โหลดของคุณอย่างถาวร?</string>

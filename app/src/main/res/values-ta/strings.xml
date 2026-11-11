@@ -65,10 +65,7 @@
     <string name="open_settings">அமைப்புகளைத் திறக்கவும்</string>
     <string name="video_format">காணொளி வடிவம்</string>
     <string name="convert_audio">மாற்றவும்</string>
-    <string name="user_guide">பயனர் வழிகாட்டி</string>
     <string name="start_download">பதிவிறக்கம்</string>
-    <string name="close_never_show_again">மீண்டும் காட்ட வேண்டாம்</string>
-    <string name="paste_desc">உங்கள் கிளிப்போர்டிலிருந்து வீடியோ இணைப்பைப் பெற \"Paste\" என்பதைக் கிளிக் செய்யவும்.</string>
     <string name="back">பின்னோக்கி</string>
     <string name="print_details_desc">பதிவிறக்கும் போது விரிவான செய்திகளை அச்சிடவும்</string>
     <string name="print_details">விரிவான வெளியீடு</string>

@@ -93,7 +93,6 @@ import com.duck.app.ui.page.download.DownloadViewModel
 import com.duck.app.ui.theme.DuckTheme
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.ToastUtil
-import com.duck.app.util.WELCOME_DIALOG
 import com.duck.app.util.toDurationText
 import com.duck.app.util.toFileSizeText
 
@@ -201,7 +200,6 @@ fun DownloadPageImplV2(
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 },
                 onLongClick = {
-                    PreferenceUtil.encodeInt(WELCOME_DIALOG, 1)
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 })
 

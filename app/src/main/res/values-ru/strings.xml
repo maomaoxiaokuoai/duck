@@ -34,14 +34,11 @@
     <string name="not_specified">Не указано (по умолчанию)</string>
     <string name="video_format_preference">Предпочитаемый формат видео</string>
     <string name="start_download">Начать загрузку</string>
-    <string name="user_guide">Руководство пользователя</string>
     <string name="open_settings">Открыть настройки</string>
     <string name="video_quality_desc">Ограничить качество видео, если доступны несколько</string>
     <string name="preferred_format_desc">Предпочитаемый формат, если доступны несколько</string>
-    <string name="check_download_settings_desc">Ознакомьтесь с настройками загрузки и убедитесь, что у Вас установлена новейшая версия yt-dlp, прежде чем использовать их.</string>
     <string name="download_playlist_desc">Загружайте сразу несколько видео из плейлиста</string>
     <string name="channel_description">Уведомлять о загруженных файлах и прогрессе</string>
-    <string name="battery_settings_desc">Пожалуйста, установите в настройках контроля фоновой активности приложения значение \"Без ограничений\" для загрузки в фоновом режиме.</string>
     <string name="concurrent_download">Многопоточная загрузка</string>
     <string name="share_fail_msg">Невозможно сопоставить URL-адрес из общего содержимого</string>
     <string name="share_success_msg">Чтение ссылки на видео из общего контента…</string>
@@ -102,8 +99,6 @@
     <string name="best_quality">Наилучшее качество</string>
     <string name="convert_audio">Преобразовать</string>
     <string name="close">Закрыть</string>
-    <string name="close_never_show_again">Не показывать снова</string>
-    <string name="download_desc">Затем нажмите \"Загрузить\" после настройки параметров загрузки.</string>
     <string name="format">Формат</string>
     <string name="video_url">Ссылка на видео</string>
     <string name="download_finish_notification">Загрузка завершена. Нажмите для открытия.</string>
@@ -122,8 +117,6 @@
     <string name="subdirectory_desc">Сохраняйте файлы в папках, названных местами, откуда был скачан материал</string>
     <string name="permission_issue_desc">Каталоги за пределами Download/ и Documents/ не поддерживаются</string>
     <string name="battery_configuration_desc">Игнорируйте оптимизацию батареи, чтобы приложение загружало также и в фоне</string>
-    <string name="paste_desc">Нажмите \"Вставить\", чтобы вставить ссылку на видео из буфера обмена.</string>
-    <string name="download_history_desc">Проверяйте и управляйте загрузками в приложении, включая видео- и аудио-файлы.</string>
     <string name="download_playlist">Загрузка плейлиста</string>
     <string name="defaults">По умолчанию</string>
     <string name="channel_name">Загрузить</string>

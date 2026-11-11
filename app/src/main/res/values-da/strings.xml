@@ -37,7 +37,6 @@
     <string name="video_format">Videoformat</string>
     <string name="start_download">Last ned</string>
     <string name="close">Luk</string>
-    <string name="close_never_show_again">Ikke vis igen</string>
     <string name="open_settings">Åbne indstillingerne</string>
     <string name="additional_settings">Flere indstillinger</string>
     <string name="to">Slut</string>
@@ -93,7 +92,6 @@
     <string name="not_convert">Ukonverteret</string>
     <string name="best_quality">Bedste kvalitet (forvalg)</string>
     <string name="video_quality_desc">Begræns videokvaliteten, når flere er tilgængelige</string>
-    <string name="user_guide">Brugervejledning</string>
     <string name="download_playlist">Last ned spilleliste</string>
     <string name="defaults">Forvalg</string>
     <string name="channel_name">Last ned</string>
@@ -109,16 +107,11 @@
     <string name="subdirectory">Lagre i undermappe</string>
     <string name="subdirectory_desc">Lagre filer i mapper navngivet som respektive internetsider</string>
     <string name="permission_issue">Problem med lagringstilgang</string>
-    <string name="paste_desc">Klik «Lim ind» for at hente videolænke fra udklipsholderen.</string>
-    <string name="download_desc">Klik så «Last ned» når du har justeret dens indstillinger.</string>
-    <string name="download_history_desc">Tjek og kontroller nedlastninger i programmet, inkluderet videoer og lydfiler.</string>
-    <string name="check_download_settings_desc">Kig på nedlastningsindstillingerne og sørg for at du har nyeste version af yt-dlp før du tar det i brug.</string>
     <string name="download_playlist_desc">Last ned flere videoer fra en spilleliste</string>
     <string name="channel_description">Tilby meddelelse om nedlastede filer og fremdrift</string>
     <string name="video_url">Videolænke</string>
     <string name="download_finish_notification">Download fuldført. Klik for at åbne.</string>
     <string name="execute_command_notification">Kører tilpassede kommandoer …</string>
-    <string name="battery_settings_desc">Indstil batteriforbrug for dette program til «Ubegrænset» i systemindstillingerne for at laste ned i baggrunden.</string>
     <string name="concurrent_download_num">%d tråd(er) bil blive brugt samtidig for nedlastning af DASH/HLS native -video.</string>
     <string name="share_fail_msg">Kan ikke matche URL fra delt indhold</string>
     <string name="share_success_msg">Læser videolænke fra delt indhold …</string>

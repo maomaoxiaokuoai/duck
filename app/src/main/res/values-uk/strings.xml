@@ -84,13 +84,7 @@
     <string name="convert_audio">Конвертувати</string>
     <string name="start_download">Завантажити</string>
     <string name="close">Закрити</string>
-    <string name="close_never_show_again">Не показувати знову</string>
-    <string name="user_guide">Інструкція</string>
     <string name="open_settings">Вiдкрити налаштування</string>
-    <string name="paste_desc">Натисніть \"Вставити\", щоб отримати посилання на відео з буфера обміну.</string>
-    <string name="download_desc">Після чого натисніть \"Завантажити\", щоб почати завантаження.</string>
-    <string name="download_history_desc">Перевіряйте та керуйте завантаженнями в застосунку, включаючи відео та аудіо.</string>
-    <string name="check_download_settings_desc">Спочатку ознайомтеся з налаштуваннями завантажень та переконайтеся, що у вас встановлена остання версія yt-dlp.</string>
     <string name="download_playlist">Завантажувати плейлисти</string>
     <string name="download_playlist_desc">Завантажувати декілька відео з плейлиста</string>
     <string name="defaults">Типово</string>
@@ -99,7 +93,6 @@
     <string name="video_url">Посилання на вiдео</string>
     <string name="download_finish_notification">Завантаження завершено. Натисніть, щоб відкрити.</string>
     <string name="execute_command_notification">Виконання користувацьких команд…</string>
-    <string name="battery_settings_desc">Встановіть у налаштуваннях системи режим використання батареї \"Необмежений\" для цього застосунка, щоб завантажувати ваші відео та аудіо у фоновому режимі.</string>
     <string name="concurrent_download">Багатопотокове завантаження</string>
     <string name="concurrent_download_desc">Завантажувати більше частин M3U8/MPD відео паралельно</string>
     <string name="concurrent_download_num">%d потоків буде використано для завантаження DASH/HLS вiдео.</string>
