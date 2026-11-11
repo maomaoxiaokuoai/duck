@@ -46,11 +46,7 @@ object UpdateUtil {
 
     private const val RELEASES_PATH = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases"
 
-        "https://api.github.com/repos/yt-dlp/yt-dlp-nightly-builds/releases/latest"
-
     private val jsonFormat = Json { ignoreUnknownKeys = true }
-
-
 
     private suspend fun getLatestRelease(): LatestRelease =
         withContext(Dispatchers.IO) {
@@ -107,10 +103,8 @@ object UpdateUtil {
             ).versionName.toVersion()
         }
 
-
     internal fun Context.getLatestApk() =
         File(getExternalFilesDir("apk"), "latest.apk")
-
 
     fun installLatestApk(
         context: Context = App.context,
@@ -143,7 +137,6 @@ object UpdateUtil {
             }
         }
     }
-
 
     suspend fun downloadApk(
         context: Context = App.context,
@@ -187,7 +180,6 @@ object UpdateUtil {
         }
         emptyFlow()
     }
-
 
     private fun ResponseBody.downloadFileWithProgress(saveFile: File): Flow<DownloadStatus> = flow {
         emit(DownloadStatus.Progress(0))
@@ -277,7 +269,6 @@ object UpdateUtil {
             }
         } else EMPTY_VERSION
     } ?: EMPTY_VERSION
-
 
     sealed class Version(
         val major: Int,
