@@ -45,19 +45,7 @@ object UpdateUtil {
             .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .build()
 
-    /**
-     * GitHub API endpoints tried in order. Direct access is blocked on some networks,
-     * so fall back to public mirrors before giving up.
-     */
-    private val apiEndpoints =
-        listOf(
-            "https://api.github.com/repos/${OWNER}/${REPO}/releases",
-            "https://gh-proxy.com/https://api.github.com/repos/${OWNER}/${REPO}/releases",
-            "https://ghfast.top/https://api.github.com/repos/${OWNER}/${REPO}/releases",
-        )
-
-    /** Download endpoints for release assets, same fallback idea. */
-    private val assetPrefixes = listOf("", "https://gh-proxy.com/", "https://ghfast.top/")
+    private const val RELEASES_PATH = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/releases"
 
     private const val ytdlpNightlyBuildRelease =
         "https://api.github.com/repos/yt-dlp/yt-dlp-nightly-builds/releases/latest"
@@ -88,19 +76,21 @@ object UpdateUtil {
 
     private suspend fun getLatestRelease(): LatestRelease =
         withContext(Dispatchers.IO) {
+            // Always go through a CDN: direct api.github.com is unreliable on many networks.
+            val mirrors = CdnSelector.allMirrors()
             var lastError: Exception? = null
-            for (base in apiEndpoints) {
+            for (mirror in mirrors) {
+                val url = mirror + RELEASES_PATH
                 try {
-                    val request = Request.Builder().url(base).build()
+                    Log.d(TAG, "fetching releases via " + mirror)
+                    val request = Request.Builder().url(url).build()
                     client.newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
                             throw Exception("HTTP " + response.code)
                         }
                         val releaseList =
-                            jsonFormat.decodeFromString<List<LatestRelease>>(
-                                response.body.string()
-                            )
-                        val latestRelease =
+                            jsonFormat.decodeFromString<List<LatestRelease>>(response.body.string())
+                        val latest =
                             releaseList
                                 .filter {
                                     if (UPDATE_CHANNEL.getInt() == STABLE)
@@ -108,16 +98,16 @@ object UpdateUtil {
                                     else true
                                 }
                                 .maxByOrNull { it.name.toVersion() }
-                                ?: throw Exception("null response")
-                        Log.d(TAG, "release source: " + base)
-                        return@withContext latestRelease
+                                ?: throw Exception("no matching release")
+                        Log.d(TAG, "release source ok: " + mirror)
+                        return@withContext latest
                     }
                 } catch (e: Exception) {
-                    Log.w(TAG, "release fetch failed: " + base, e)
+                    Log.w(TAG, "mirror failed: " + mirror + " - " + e.message)
                     lastError = e
                 }
             }
-            throw lastError ?: Exception("no endpoint available")
+            throw lastError ?: Exception("all mirrors unavailable")
         }
 
     suspend fun checkForUpdate(context: Context = App.context): LatestRelease? {
@@ -201,8 +191,9 @@ object UpdateUtil {
                 ?: assets.firstOrNull { it.name?.contains("universal") == true })
                 ?.browserDownloadUrl ?: return@withContext emptyFlow()
 
-        for (prefix in assetPrefixes) {
-            val url = prefix + targetUrl
+        // Download through the fastest mirror, falling back to the rest in turn.
+        for (mirror in CdnSelector.allMirrors()) {
+            val url = mirror + targetUrl
             try {
                 Log.d(TAG, "downloading apk from: " + url)
                 val request = Request.Builder().url(url).build()
@@ -213,7 +204,7 @@ object UpdateUtil {
                 val responseBody = response.body
                 return@withContext responseBody.downloadFileWithProgress(context.getLatestApk())
             } catch (e: Exception) {
-                Log.w(TAG, "apk download failed: " + url, e)
+                Log.w(TAG, "apk download failed: " + url + " - " + e.message)
             }
         }
         emptyFlow()
