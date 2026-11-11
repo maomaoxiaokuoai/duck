@@ -32,7 +32,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.duck.app.Downloader
 import com.duck.app.R
 import com.duck.app.ui.common.LocalWindowWidthState
 import com.duck.app.ui.common.Route
