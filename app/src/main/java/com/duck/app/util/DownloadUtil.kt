@@ -144,13 +144,13 @@ object DownloadUtil {
     ): Result<VideoInfo> {
         // Douyin has its own extractor: yt-dlp cannot sign its requests, so route there first.
         if (DouyinParser.matches(url)) {
-            runCatching {
+            try {
                 val post = kotlinx.coroutines.runBlocking {
                     DouyinParser.parse(App.context, url)
                 }.getOrThrow()
                 return Result.success(DouyinAdapter.toVideoInfo(post))
-            }.onFailure {
-                Log.w("DownloadUtil", "douyin parse failed, falling back to yt-dlp", it)
+            } catch (e: Exception) {
+                Log.w("DownloadUtil", "douyin parse failed, falling back to yt-dlp", e)
             }
         }
 

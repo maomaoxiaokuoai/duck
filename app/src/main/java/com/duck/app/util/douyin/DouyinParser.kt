@@ -71,12 +71,12 @@ object DouyinParser {
      */
     suspend fun parse(context: Context, input: String): Result<DouyinPost> =
         withContext(Dispatchers.IO) {
-            runCatching {
+            var lastError: Exception? = null
+            try {
                 val resolved = resolveShortLink(input)
                 val id = extractId(resolved) ?: throw IllegalArgumentException("链接里没有作品 ID")
                 Log.d(TAG, "parsing id " + id)
 
-                var lastError: Exception? = null
                 repeat(2) { attempt ->
                     try {
                         val nonce = fetchNonce(id)
@@ -90,15 +90,17 @@ object DouyinParser {
                             }
                         val html = fetchHtml(id, cookie)
                         val detail = parseSsr(html) ?: throw IllegalStateException("页面里没有作品数据")
-                        return@withContext normalize(detail)
+                        return@withContext Result.success(normalize(detail))
                     } catch (e: Exception) {
                         Log.w(TAG, "attempt " + (attempt + 1) + " failed: " + e.message)
                         lastError = e
                         delay(400)
                     }
                 }
-                throw lastError ?: IllegalStateException("解析失败")
+            } catch (e: Exception) {
+                lastError = e
             }
+            Result.failure(lastError ?: IllegalStateException("解析失败"))
         }
 
     /** Requests the page once and reads the __ac_nonce cookie Douyin hands out. */
