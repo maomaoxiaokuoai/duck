@@ -85,7 +85,7 @@ object DouyinAdapter {
             path.endsWith(".png") -> "png"
             path.endsWith(".gif") -> "gif"
             path.endsWith(".webp") -> "webp"
-            path.endsWith(".jpeg"), path.endsWith(".jpg") -> "jpg"
+            path.endsWith(".jpeg") || path.endsWith(".jpg") -> "jpg"
             else -> "jpg"
         }
     }
