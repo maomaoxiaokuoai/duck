@@ -171,7 +171,6 @@ fun VideoListPage(
     var isSelectEnabled by remember { mutableStateOf(false) }
     var showRemoveMultipleItemsDialog by remember { mutableStateOf(false) }
 
-    var showExportDialog by remember { mutableStateOf(false) }
 
     val lazyListState = rememberLazyListState()
 
@@ -322,38 +321,6 @@ fun VideoListPage(
                                     contentDescription = stringResource(R.string.search)
                                 )
                             }
-                        }
-                        var expanded by remember { mutableStateOf(false) }
-                        Box(
-                            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
-                        ) {
-                            IconButton(onClick = { expanded = true }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.MoreVert,
-                                    contentDescription = stringResource(
-                                        id = R.string.show_more_actions
-                                    )
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }) {
-                                if (visibleItemCount.intValue > 0) {
-                                    DropdownMenuItem(
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Outlined.DriveFileMove,
-                                                contentDescription = null
-                                            )
-                                        },
-                                        text = { Text(text = stringResource(id = R.string.export_backup)) },
-                                        onClick = {
-                                            showExportDialog = true
-                                            expanded = false
-                                        })
-                                }
-                            }
-
                         }
                     }
                 }, scrollBehavior = scrollBehavior
@@ -589,60 +556,4 @@ fun VideoListPage(
         )
     }
 
-    var backupString by remember { mutableStateOf("") }
-
-    val exportLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.CreateDocument("text/plain")) { uri ->
-            uri?.let {
-                scope.launch(Dispatchers.IO) {
-                    context.contentResolver.openOutputStream(uri)?.use {
-                        it.write(backupString.toByteArray())
-                    }
-                    withContext(Dispatchers.Main) {
-                        showExportDialog = false
-                    }
-                }
-            }
-        }
-
-
-    if (showExportDialog) {
-        val list = if (selectedItemIds.isNotEmpty()) {
-            videoList.filter { selectedItemIds.contains(it.id) }
-        } else {
-            videoList.filter { it.filterSort(viewState, filterSet) }
-        }
-
-        ExportDialog(
-            onDismissRequest = { showExportDialog = false },
-            itemCount = list.size
-        ) { type, destination ->
-            list.backupToString(type).let {
-                when (destination) {
-                    Clipboard -> clipboardManager.setText(AnnotatedString(it))
-                    File -> {
-                        backupString = it
-                        exportLauncher.launch(BackupUtil.getDownloadHistoryExportFilename(context = context))
-                    }
-                }
-                view.slightHapticFeedback()
-                showExportDialog = false
-            }
-        }
-    }
-
 }
-
-private fun List<DownloadedVideoInfo>.backupToString(
-    type: BackupUtil.BackupType,
-): String {
-    return when (type) {
-        BackupUtil.BackupType.DownloadHistory -> reversed().toJsonString()
-        BackupUtil.BackupType.URLList -> toURLListString()
-        else -> throw IllegalArgumentException()
-    }
-}
-
-
-
-

@@ -8,6 +8,8 @@ import android.util.Log
 import android.webkit.CookieManager
 import androidx.annotation.CheckResult
 import com.duck.app.App
+import com.duck.app.util.douyin.DouyinAdapter
+import com.duck.app.util.douyin.DouyinParser
 import com.duck.app.App.Companion.audioDownloadDir
 import com.duck.app.App.Companion.context
 import com.duck.app.App.Companion.videoDownloadDir
@@ -140,6 +142,18 @@ object DownloadUtil {
         url: String, playlistItem: Int = 0,
         preferences: DownloadPreferences = DownloadPreferences()
     ): Result<VideoInfo> {
+        // Douyin has its own extractor: yt-dlp cannot sign its requests, so route there first.
+        if (DouyinParser.matches(url)) {
+            runCatching {
+                val post = kotlinx.coroutines.runBlocking {
+                    DouyinParser.parse(App.context, url)
+                }.getOrThrow()
+                return Result.success(DouyinAdapter.toVideoInfo(post))
+            }.onFailure {
+                Log.w("DownloadUtil", "douyin parse failed, falling back to yt-dlp", it)
+            }
+        }
+
         with(preferences) {
             val request = YoutubeDLRequest(url).apply {
                 addOption("-o", BASENAME)
