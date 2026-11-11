@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.webkit.CookieManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -60,10 +59,7 @@ import com.duck.app.ui.page.settings.directory.DownloadDirectoryPreferences
 import com.duck.app.ui.page.settings.format.DownloadFormatPreferences
 import com.duck.app.ui.page.settings.format.SubtitlePreference
 import com.duck.app.ui.page.settings.general.GeneralDownloadPreferences
-import com.duck.app.ui.page.settings.network.CookieProfilePage
-import com.duck.app.ui.page.settings.network.CookiesViewModel
 import com.duck.app.ui.page.settings.network.NetworkPreferences
-import com.duck.app.ui.page.settings.network.WebViewPage
 import com.duck.app.ui.page.videolist.VideoListPage
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.PreferenceUtil.getInt
@@ -78,7 +74,6 @@ private const val TAG = "HomeEntry"
 @Composable
 fun HomeEntry(
     downloadViewModel: DownloadViewModel,
-    cookiesViewModel: CookiesViewModel,
     isUrlShared: Boolean
 ) {
     val navController = rememberNavController()
@@ -155,10 +150,6 @@ fun HomeEntry(
                     navigateToPlaylistPage = { navController.navigate(Route.PLAYLIST) },
                     navigateToFormatPage = { navController.navigate(Route.FORMAT_SELECTION) },
                     onNavigateToTaskList = { navController.navigate(Route.TASK_LIST) },
-                    onNavigateToCookieGeneratorPage = {
-                        cookiesViewModel.updateUrl(it)
-                        navController.navigate(Route.COOKIE_GENERATOR_WEBVIEW)
-                    },
                     downloadViewModel = downloadViewModel
                 )
             }
@@ -183,7 +174,6 @@ fun HomeEntry(
             slideInVerticallyComposable(Route.PLAYLIST) { PlaylistSelectionPage { onNavigateBack() } }
             slideInVerticallyComposable(Route.FORMAT_SELECTION) { FormatPage(downloadViewModel) { onNavigateBack() } }
             settingsGraph(
-                cookiesViewModel = cookiesViewModel,
                 onNavigateBack = onNavigateBack,
                 onNavigateTo = { route ->
                     navController.navigate(route = route) {
@@ -245,7 +235,6 @@ fun HomeEntry(
 }
 
 fun NavGraphBuilder.settingsGraph(
-    cookiesViewModel: CookiesViewModel,
     onNavigateBack: () -> Unit,
     onNavigateTo: (route: String) -> Unit
 ) {
@@ -303,23 +292,7 @@ fun NavGraphBuilder.settingsGraph(
         }
         animatedComposable(Route.DARK_THEME) { DarkThemePreferences { onNavigateBack() } }
         animatedComposable(Route.NETWORK_PREFERENCES) {
-            NetworkPreferences(navigateToCookieProfilePage = {
-                onNavigateTo(Route.COOKIE_PROFILE)
-            }) { onNavigateBack() }
-        }
-        animatedComposable(Route.COOKIE_PROFILE) {
-            CookieProfilePage(
-                cookiesViewModel = cookiesViewModel,
-                navigateToCookieGeneratorPage = { onNavigateTo(Route.COOKIE_GENERATOR_WEBVIEW) },
-            ) { onNavigateBack() }
-        }
-        animatedComposable(
-            Route.COOKIE_GENERATOR_WEBVIEW
-        ) {
-            WebViewPage(cookiesViewModel) {
-                onNavigateBack()
-                CookieManager.getInstance().flush()
-            }
+            NetworkPreferences { onNavigateBack() }
         }
     }
 }

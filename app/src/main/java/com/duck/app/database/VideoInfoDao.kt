@@ -7,7 +7,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.duck.app.database.objects.CommandTemplate
-import com.duck.app.database.objects.CookieProfile
 import com.duck.app.database.objects.DownloadedVideoInfo
 import com.duck.app.database.objects.OptionShortcut
 import com.duck.app.util.FileUtil
@@ -62,9 +61,6 @@ interface VideoInfoDao {
     @Query("SELECT * FROM CommandTemplate")
     suspend fun getTemplateList(): List<CommandTemplate>
 
-    @Query("select * from CookieProfile")
-    fun getCookieProfileFlow(): Flow<List<CookieProfile>>
-
     @Insert
     suspend fun insertTemplate(template: CommandTemplate): Long
 
@@ -81,17 +77,7 @@ interface VideoInfoDao {
     @Query("SELECT * FROM CommandTemplate where id = :id")
     suspend fun getTemplateById(id: Int): CommandTemplate
 
-    @Query("select * from CookieProfile where id=:id")
-    suspend fun getCookieById(id: Int): CookieProfile?
 
-    @Update
-    suspend fun updateCookieProfile(cookieProfile: CookieProfile)
-
-    @Delete
-    suspend fun deleteCookieProfile(cookieProfile: CookieProfile)
-
-    @Insert
-    suspend fun insertCookieProfile(cookieProfile: CookieProfile)
 
     @Query("delete from CommandTemplate where id=:id")
     suspend fun deleteTemplateById(id: Int)

@@ -24,8 +24,6 @@ object Route {
     const val DOWNLOAD_QUEUE = "queue"
     const val DOWNLOAD_FORMAT = "download_format"
     const val NETWORK_PREFERENCES = "network_preferences"
-    const val COOKIE_PROFILE = "cookie_profile"
-    const val COOKIE_GENERATOR_WEBVIEW = "cookie_webview"
     const val SUBTITLE_PREFERENCES = "subtitle_preferences"
     const val AUTO_UPDATE = "auto_update"
     const val DONATE = "donate"

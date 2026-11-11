@@ -8,7 +8,6 @@ import com.duck.app.database.backup.Backup
 import com.duck.app.database.backup.BackupUtil.BackupType
 import com.duck.app.database.backup.BackupUtil.decodeToBackup
 import com.duck.app.database.objects.CommandTemplate
-import com.duck.app.database.objects.CookieProfile
 import com.duck.app.database.objects.DownloadedVideoInfo
 import com.duck.app.database.objects.OptionShortcut
 import kotlinx.coroutines.Dispatchers
@@ -41,19 +40,12 @@ object DatabaseUtil {
 
     fun getTemplateFlow() = dao.getTemplateFlow()
 
-    fun getCookiesFlow() = dao.getCookieProfileFlow()
-
     fun getShortcuts() = dao.getOptionShortcuts()
 
     suspend fun deleteShortcut(shortcut: OptionShortcut) = dao.deleteShortcut(shortcut)
     suspend fun insertShortcut(shortcut: OptionShortcut) = dao.insertShortcut(shortcut)
 
-    suspend fun getCookieById(id: Int) = dao.getCookieById(id)
-    suspend fun deleteCookieProfile(profile: CookieProfile) = dao.deleteCookieProfile(profile)
 
-    suspend fun insertCookieProfile(profile: CookieProfile) = dao.insertCookieProfile(profile)
-
-    suspend fun updateCookieProfile(profile: CookieProfile) = dao.updateCookieProfile(profile)
     suspend fun getTemplateList() = dao.getTemplateList()
     suspend fun getShortcutList() = dao.getShortcutList()
     suspend fun deleteInfoList(

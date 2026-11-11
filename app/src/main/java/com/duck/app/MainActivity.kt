@@ -20,7 +20,6 @@ import com.duck.app.ui.common.LocalDynamicColorSwitch
 import com.duck.app.ui.common.SettingsProvider
 import com.duck.app.ui.page.HomeEntry
 import com.duck.app.ui.page.download.DownloadViewModel
-import com.duck.app.ui.page.settings.network.CookiesViewModel
 import com.duck.app.ui.theme.DuckTheme
 import com.duck.app.util.PreferenceUtil
 import com.duck.app.util.matchUrlFromSharedText
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
         }
         context = this.baseContext
         setContent {
-            val cookiesViewModel: CookiesViewModel = viewModel()
 
             val isUrlSharingTriggered =
                 downloadViewModel.viewStateFlow.collectAsState().value.isUrlSharingTriggered
@@ -61,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     HomeEntry(
                         downloadViewModel = downloadViewModel,
-                        cookiesViewModel = cookiesViewModel,
                         isUrlShared = isUrlSharingTriggered
                     )
                 }

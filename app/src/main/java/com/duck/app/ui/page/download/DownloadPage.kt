@@ -129,7 +129,6 @@ fun DownloadPage(
     navigateToPlaylistPage: () -> Unit = {},
     navigateToFormatPage: () -> Unit = {},
     onNavigateToTaskList: () -> Unit = {},
-    onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     downloadViewModel: DownloadViewModel = hiltViewModel(),
 ) {
 
@@ -284,7 +283,6 @@ fun DownloadPage(
 
         DownloadSettingDialog(useDialog = useDialog,
             showDialog = showDownloadDialog,
-            onNavigateToCookieGeneratorPage = onNavigateToCookieGeneratorPage,
             onDownloadConfirm = { checkPermissionOrDownload() },
             onDismissRequest = {
                 showDownloadDialog = false

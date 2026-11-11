@@ -215,7 +215,7 @@ fun DialogSwitchItem(
 private fun SwitchItemPrev() {
     var value by remember { mutableStateOf(false) }
     Surface {
-        DialogSwitchItem(text = "Use cookies", value = value) {
+        DialogSwitchItem(text = "Sample switch", value = value) {
             value = it
         }
     }

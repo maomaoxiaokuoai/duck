@@ -196,9 +196,6 @@ object FileUtil {
     fun Context.getConfigFile(suffix: String = "") =
         File(getConfigDirectory(), "config$suffix.txt")
 
-    fun Context.getCookiesFile() =
-        File(getConfigDirectory(), "cookies.txt")
-
     fun getExternalTempDir() = File(getExternalDownloadDirectory(), "tmp").apply {
         mkdirs()
         createEmptyFile(".nomedia")

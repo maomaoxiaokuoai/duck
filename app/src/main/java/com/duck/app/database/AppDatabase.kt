@@ -4,12 +4,11 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.duck.app.database.objects.CommandTemplate
-import com.duck.app.database.objects.CookieProfile
 import com.duck.app.database.objects.DownloadedVideoInfo
 import com.duck.app.database.objects.OptionShortcut
 
 @Database(
-    entities = [DownloadedVideoInfo::class, CommandTemplate::class, CookieProfile::class, OptionShortcut::class],
+    entities = [DownloadedVideoInfo::class, CommandTemplate::class, OptionShortcut::class],
     version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),

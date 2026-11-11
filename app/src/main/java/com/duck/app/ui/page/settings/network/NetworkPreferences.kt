@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bolt
-import androidx.compose.material.icons.outlined.Cookie
 import androidx.compose.material.icons.outlined.OfflineBolt
 import androidx.compose.material.icons.outlined.SettingsEthernet
 import androidx.compose.material.icons.outlined.SignalCellular4Bar
@@ -36,7 +35,6 @@ import com.duck.app.ui.component.PreferenceSwitch
 import com.duck.app.ui.component.PreferenceSwitchWithDivider
 import com.duck.app.util.ARIA2C
 import com.duck.app.util.CELLULAR_DOWNLOAD
-import com.duck.app.util.COOKIES
 import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.FORCE_IPV4
 import com.duck.app.util.PROXY
@@ -48,7 +46,6 @@ import com.duck.app.util.RATE_LIMIT
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetworkPreferences(
-    navigateToCookieProfilePage: () -> Unit = {},
     onNavigateBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -61,7 +58,6 @@ fun NetworkPreferences(
     var showProxyDialog by remember { mutableStateOf(false) }
     var aria2c by remember { mutableStateOf(getValue(ARIA2C)) }
     var proxy by PROXY.booleanState
-    var isCookiesEnabled by COOKIES.booleanState
     var forceIpv4 by FORCE_IPV4.booleanState
 
     Scaffold(

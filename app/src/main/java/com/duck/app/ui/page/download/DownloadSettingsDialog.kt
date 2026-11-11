@@ -76,12 +76,10 @@ import com.duck.app.ui.page.settings.format.AudioQuickSettingsDialog
 import com.duck.app.ui.page.settings.format.FormatSortingDialog
 import com.duck.app.ui.page.settings.format.VideoFormatDialog
 import com.duck.app.ui.page.settings.format.VideoQualityDialog
-import com.duck.app.ui.page.settings.network.CookiesQuickSettingsDialog
 import com.duck.app.util.AUDIO_CONVERSION_FORMAT
 import com.duck.app.util.AUDIO_CONVERT
 import com.duck.app.util.CONVERT_M4A
 import com.duck.app.util.CONVERT_MP3
-import com.duck.app.util.COOKIES
 import com.duck.app.util.DOWNLOAD_TYPE_INITIALIZATION
 import com.duck.app.util.DatabaseUtil
 import com.duck.app.util.DownloadUtil
@@ -90,7 +88,6 @@ import com.duck.app.util.EXTRACT_AUDIO
 import com.duck.app.util.FORMAT_SELECTION
 import com.duck.app.util.FORMAT_SORTING
 import com.duck.app.util.FileUtil
-import com.duck.app.util.FileUtil.getCookiesFile
 import com.duck.app.util.PLAYLIST
 import com.duck.app.util.PreferenceStrings
 import com.duck.app.util.PreferenceUtil
@@ -123,7 +120,6 @@ fun DownloadSettingDialog(
     useDialog: Boolean = false,
     showDialog: Boolean = false,
     isQuickDownload: Boolean = false,
-    onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     onDownloadConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -135,7 +131,6 @@ fun DownloadSettingDialog(
     var formatSelection by FORMAT_SELECTION.booleanState
     var videoFormatPreference by VIDEO_FORMAT.intState
     var videoQuality by VIDEO_QUALITY.intState
-    var cookies by COOKIES.booleanState
     var formatSorting by FORMAT_SORTING.booleanState
 
     var type by remember(showDialog) {
@@ -165,19 +160,11 @@ fun DownloadSettingDialog(
 
     var sortingFields by remember(showFormatSortingDialog) { mutableStateOf(SORTING_FIELDS.getString()) }
 
-    var showCookiesDialog by rememberSaveable { mutableStateOf(false) }
 
-    val cookiesProfiles by DatabaseUtil.getCookiesFlow().collectAsStateWithLifecycle(emptyList())
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    LaunchedEffect(showCookiesDialog) {
-        withContext(Dispatchers.IO) {
-            DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
-                FileUtil.writeContentToFile(it, context.getCookiesFile())
-            }
-        }
     }
 
     LaunchedEffect(showDialog) {
@@ -530,21 +517,6 @@ fun DownloadSettingDialog(
     }
 
 
-    if (showCookiesDialog && cookiesProfiles.isNotEmpty()) {
-        CookiesQuickSettingsDialog(
-            onDismissRequest = { showCookiesDialog = false },
-            onConfirm = {},
-            cookieProfiles = cookiesProfiles,
-            onCookieProfileClicked = {
-                onNavigateToCookieGeneratorPage(it.url)
-            },
-            isCookiesEnabled = cookies,
-            onCookiesToggled = {
-                cookies = it
-                COOKIES.updateBoolean(cookies)
-            }
-        )
-    }
     if (showAudioConversionDialog) {
         AudioConversionQuickSettingsDialog(onDismissRequest = {
             showAudioConversionDialog = false

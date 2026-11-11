@@ -1,14 +1,10 @@
 package com.duck.app.util
 
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteDatabase.OPEN_READONLY
 import android.util.Log
 import androidx.annotation.CheckResult
 import com.duck.app.App
 import com.duck.app.R
-import com.duck.app.ui.page.settings.network.Cookie
 import com.duck.app.util.FileUtil
-import com.duck.app.util.FileUtil.getCookiesFile
 import com.duck.app.util.PreferenceUtil.getBoolean
 import com.duck.app.util.PreferenceUtil.getInt
 import com.duck.app.util.PreferenceUtil.getLong
@@ -24,15 +20,6 @@ import com.duck.app.util.douyin.DouyinParser
  * (currently Douyin) and files are fetched directly with OkHttp.
  */
 object DownloadUtil {
-
-    object CookieScheme {
-        const val NAME = "name"
-        const val VALUE = "value"
-        const val SECURE = "is_secure"
-        const val EXPIRY = "expires_utc"
-        const val HOST = "host_key"
-        const val PATH = "path"
-    }
 
 
     private const val TAG = "DownloadUtil"
@@ -62,7 +49,6 @@ object DownloadUtil {
         val concurrentFragments: Int = CONCURRENT.getInt(),
         val sponsorBlock: Boolean = PreferenceUtil.getValue(SPONSORBLOCK),
         val sponsorBlockCategory: String = PreferenceUtil.getSponsorBlockCategories(),
-        val cookies: Boolean = COOKIES.getBoolean(),
         val aria2c: Boolean = PreferenceUtil.getValue(ARIA2C),
         val audioFormat: Int = AUDIO_FORMAT.getInt(),
         val audioQuality: Int = AUDIO_QUALITY.getInt(),
@@ -99,49 +85,6 @@ object DownloadUtil {
         val mergeAudioStream: Boolean = false,
         val mergeToMkv: Boolean = (downloadSubtitle && embedSubtitle) || MERGE_OUTPUT_MKV.getBoolean()
     )
-
-    @CheckResult
-    fun getCookieListFromDatabase(): Result<List<Cookie>> = runCatching {
-        val cookiesFile = App.context.getCookiesFile()
-        if (!cookiesFile.exists()) return@runCatching emptyList()
-        val db = SQLiteDatabase.openDatabase(
-            cookiesFile.absolutePath, null, OPEN_READONLY
-        )
-        val cursor = db.rawQuery("SELECT * FROM cookies", null)
-        val cookies = mutableListOf<Cookie>()
-        cursor.use {
-            while (it.moveToNext()) {
-                cookies.add(
-                    Cookie(
-                        name = it.getString(it.getColumnIndexOrThrow(CookieScheme.NAME)),
-                        value = it.getString(it.getColumnIndexOrThrow(CookieScheme.VALUE)),
-                        secure = it.getInt(it.getColumnIndexOrThrow(CookieScheme.SECURE)) == 1,
-                        expiry = it.getLong(it.getColumnIndexOrThrow(CookieScheme.EXPIRY)),
-                        domain = it.getString(it.getColumnIndexOrThrow(CookieScheme.HOST)),
-                        path = it.getString(it.getColumnIndexOrThrow(CookieScheme.PATH)),
-                    )
-                )
-            }
-        }
-        db.close()
-        cookies
-    }
-
-    fun List<Cookie>.toCookiesFileContent(): String =
-        joinToString(separator = "\n", postfix = "\n") {
-            buildString {
-                append(it.domain).append("\t")
-                append(if (!it.includeSubdomains) "FALSE" else "TRUE").append("\t")
-                append(it.path).append("\t")
-                append(if (it.secure) "TRUE" else "FALSE").append("\t")
-                append(it.expiry).append("\t")
-                append(it.name).append("\t")
-                append(it.value)
-            }
-        }
-
-    fun getCookiesContentFromDatabase(): Result<String> =
-        getCookieListFromDatabase().mapCatching { it.toCookiesFileContent() }
 
     @CheckResult
     fun fetchVideoInfoFromUrl(

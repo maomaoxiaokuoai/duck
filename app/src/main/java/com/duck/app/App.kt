@@ -21,7 +21,6 @@ import com.duck.app.util.COMMAND_DIRECTORY
 import com.duck.app.util.DownloadUtil
 import com.duck.app.util.FileUtil
 import com.duck.app.util.FileUtil.createEmptyFile
-import com.duck.app.util.FileUtil.getCookiesFile
 import com.duck.app.util.FileUtil.getExternalDownloadDirectory
 import com.duck.app.util.FileUtil.getExternalPrivateDownloadDirectory
 import com.duck.app.util.NotificationUtil
@@ -60,9 +59,7 @@ class App : Application() {
 
         applicationScope.launch((Dispatchers.IO)) {
             try {
-                DownloadUtil.getCookiesContentFromDatabase().getOrNull()?.let {
-                    FileUtil.writeContentToFile(it, getCookiesFile())
-                }
+            }
                 UpdateUtil.deleteOutdatedApk()
             } catch (th: Throwable) {
                 withContext(Dispatchers.Main) {
