@@ -133,3 +133,20 @@ kotlinx.serialization · youtubedl-android
 ## 许可证
 
 GPL-3.0 © duck contributors
+
+## 本地开发约定
+
+所有构建产物、模拟器截图、下载的 APK、临时脚本一律放在仓库外的 临时缓存 目录，
+不要写到 C 盘根目录：
+
+    聚合解析/
+    |- duck/            源码仓库（只放代码）
+    |- 工具/             抖音解析参考实现
+    |- duck-签名密钥/    签名文件（已在 .gitignore 排除）
+    |- 临时缓存/         所有测试产物
+         |- cookies/    抖音 / YouTube cookie
+         |- _scripts/   一次性脚本
+         |- tmp_*/      各版本验证截图与 APK
+
+.gitignore 已显式排除 /临时缓存/、/tmp_*/、*.apk，
+即使误放进来也不会被提交。

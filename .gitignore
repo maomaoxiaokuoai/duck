@@ -26,3 +26,10 @@ local.properties
 keystore.properties
 .env
 .env.*
+
+# Local scratch space: emulator screenshots, downloaded APKs, probe scripts.
+# Lives at ../临时缓存 (outside the repo) -- kept here so a stray copy never
+# gets committed.
+/临时缓存/
+/tmp_*/
+*.apk
