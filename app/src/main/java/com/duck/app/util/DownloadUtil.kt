@@ -539,12 +539,14 @@ object DownloadUtil {
 
         // Douyin exposes direct CDN URLs; yt-dlp needs cookies there, so download ourselves.
         if (videoInfo.extractor == "douyin") {
-            return DouyinDownloader.download(
-                videoInfo = videoInfo,
-                preferences = downloadPreferences,
-                taskId = taskId,
-                progressCallback = progressCallback
-            )
+            return kotlinx.coroutines.runBlocking {
+                DouyinDownloader.download(
+                    videoInfo = videoInfo,
+                    preferences = downloadPreferences,
+                    taskId = taskId,
+                    progressCallback = progressCallback
+                )
+            }
         }
 
         with(downloadPreferences) {
