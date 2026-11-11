@@ -325,28 +325,7 @@ fun DownloadPageImpl(
         downloaderState is Downloader.State.DownloadingPlaylist || downloaderState is Downloader.State.DownloadingVideo
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {}, modifier = Modifier.padding(horizontal = 8.dp), navigationIcon = {
-            TooltipBox(
-                state = rememberTooltipState(),
-                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                tooltip = {
-                    PlainTooltip {
-                        Text(text = stringResource(id = R.string.settings))
-                    }
-                }) {
-                IconButton(
-                    onClick = {
-                        view.slightHapticFeedback()
-                        navigateToSettings()
-                    },
-                    modifier = Modifier
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Settings,
-                        contentDescription = stringResource(id = R.string.settings)
-                    )
-                }
-            }
-
+            // intentionally empty: both actions live on the right
         }, actions = {
             TooltipBox(state = rememberTooltipState(),
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
@@ -365,6 +344,27 @@ fun DownloadPageImpl(
                     Icon(
                         imageVector = Icons.Outlined.Subscriptions,
                         contentDescription = stringResource(id = R.string.downloads_history)
+                    )
+                }
+            }
+            TooltipBox(
+                state = rememberTooltipState(),
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(text = stringResource(id = R.string.settings))
+                    }
+                }) {
+                IconButton(
+                    onClick = {
+                        view.slightHapticFeedback()
+                        navigateToSettings()
+                    },
+                    modifier = Modifier
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = stringResource(id = R.string.settings)
                     )
                 }
             }
