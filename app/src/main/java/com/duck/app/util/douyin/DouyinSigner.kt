@@ -45,6 +45,8 @@ object DouyinSigner {
                 (function() {
                   try {
                     if (!window.byted_acrawler) return '';
+                    // Reset the cookie jar so every call signs a fresh nonce.
+                    document.cookie = '__ac_nonce=' + '" + safeNonce + "';
                     window.byted_acrawler.init({ aid: 99999999, dfp: 0 });
                     var s = window.byted_acrawler.sign('', '" + safeNonce + "');
                     return s || '';
@@ -103,6 +105,9 @@ object DouyinSigner {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.userAgentString = DouyinParser.USER_AGENT
+            settings.allowFileAccess = true
             layoutParams = android.view.ViewGroup.LayoutParams(0, 0)
+            // about:blank gives a writable document.cookie for the local origin.
+            loadUrl("about:blank")
         }
 }
