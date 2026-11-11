@@ -17,16 +17,11 @@ import kotlin.coroutines.resume
  * The signature is produced by an obfuscated JS VM (acrawler.js) that expects a handful of
  * browser globals. A headless WebView is the only JavaScript runtime available on Android,
  * so the bundle is loaded there and byted_acrawler.sign is called directly.
- *
- * The WebView is created once and kept alive; building it costs a few hundred milliseconds
- * and Douyin asks for a new signature on every session anyway.
  */
 object DouyinSigner {
 
     private const val TAG = "DouyinSigner"
     private const val TIMEOUT_MS = 15_000L
-
-    /** Bundled at app/src/main/assets/douyin/acrawler.js */
     private const val ASSET_PATH = "douyin/acrawler.js"
 
     @Volatile private var webView: WebView? = null
@@ -41,30 +36,47 @@ object DouyinSigner {
                 return@withContext null
             }
             val safeNonce = nonce.replace("'", "")
-            val js = """
-                (function() {
-                  try {
-                    if (!window.byted_acrawler) return '';
-                    // Reset the cookie jar so every call signs a fresh nonce.
-                    document.cookie = '__ac_nonce=' + '" + safeNonce + "';
-                    window.byted_acrawler.init({ aid: 99999999, dfp: 0 });
-                    var s = window.byted_acrawler.sign('', '" + safeNonce + "');
-                    return s || '';
-                  } catch (e) { return 'ERR:' + e; }
-                })()
-            """.trimIndent()
 
-            withTimeoutOrNull(TIMEOUT_MS) {
-                suspendCancellableCoroutine { cont ->
-                    view.evaluateJavascript(js) { raw ->
-                        val value = raw?.trim()?.trim('"') ?: ""
-                        if (value.startsWith("ERR:")) {
-                            Log.w(TAG, "sign failed: " + value)
-                            cont.resume(null)
-                        } else {
-                            cont.resume(value.ifEmpty { null })
+            // Write the nonce into document.cookie, then sign. Both statements run in the
+            // same task so the VM observes the cookie we just set.
+            val js =
+                "(function(){" +
+                    "try{" +
+                    "document.cookie='__ac_nonce=" + safeNonce + "';" +
+                    "if(!window.byted_acrawler)return 'NO_VM';" +
+                    "window.byted_acrawler.init({aid:99999999,dfp:0});" +
+                    "var s=window.byted_acrawler.sign('','" + safeNonce + "');" +
+                    "return s||'EMPTY';" +
+                    "}catch(e){return 'ERR:'+e}" +
+                    "})()"
+
+            val result =
+                withTimeoutOrNull(TIMEOUT_MS) {
+                    suspendCancellableCoroutine { cont ->
+                        view.evaluateJavascript(js) { raw ->
+                            cont.resume(raw?.trim()?.trim('"') ?: "")
                         }
                     }
+                } ?: ""
+
+            Log.d(TAG, "sign raw=" + result)
+            when {
+                result.startsWith("ERR:") || result == "NO_VM" || result == "EMPTY" -> {
+                    Log.w(TAG, "sign failed: " + result)
+                    null
+                }
+                result.isEmpty() -> null
+                else -> result
+            }
+        }
+
+    /** Reads document.cookie from the headless view, for diagnostics. */
+    suspend fun readCookieJar(): String =
+        withContext(Dispatchers.Main) {
+            val view = webView ?: return@withContext ""
+            suspendCancellableCoroutine { cont ->
+                view.evaluateJavascript("(document.cookie||'')") { raw ->
+                    cont.resume(raw?.trim()?.trim('"') ?: "")
                 }
             }
         }
@@ -77,16 +89,19 @@ object DouyinSigner {
             val src = context.assets.open(ASSET_PATH).bufferedReader().use { it.readText() }
             view.evaluateJavascript(src) { }
 
-            // Give the VM a moment to register byted_acrawler.
             val deadline = System.currentTimeMillis() + 8_000
             var ready = false
             while (System.currentTimeMillis() < deadline) {
-                val has = suspendCancellableCoroutine<String?> { c ->
-                    view.evaluateJavascript("(typeof window.byted_acrawler)") { r ->
-                        c.resume(r?.trim()?.trim('"'))
+                val has =
+                    suspendCancellableCoroutine<String?> { c ->
+                        view.evaluateJavascript("(typeof window.byted_acrawler)") { r ->
+                            c.resume(r?.trim()?.trim('"'))
+                        }
                     }
+                if (has == "object") {
+                    ready = true
+                    break
                 }
-                if (has == "object") { ready = true; break }
                 delay(120)
             }
             bundleReady = ready
@@ -105,9 +120,6 @@ object DouyinSigner {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.userAgentString = DouyinParser.USER_AGENT
-            settings.allowFileAccess = true
             layoutParams = android.view.ViewGroup.LayoutParams(0, 0)
-            // about:blank gives a writable document.cookie for the local origin.
-            loadUrl("about:blank")
         }
 }
