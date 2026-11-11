@@ -59,7 +59,6 @@ class App : Application() {
 
         applicationScope.launch((Dispatchers.IO)) {
             try {
-            }
                 UpdateUtil.deleteOutdatedApk()
             } catch (th: Throwable) {
                 withContext(Dispatchers.Main) {
