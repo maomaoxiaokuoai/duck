@@ -89,7 +89,6 @@ import com.duck.app.ui.component.PreferenceSwitchWithDivider
 import com.duck.app.ui.component.DuckDialog
 import com.duck.app.ui.page.download.NotificationPermissionDialog
 import com.duck.app.util.CONFIGURE
-import com.duck.app.util.CUSTOM_COMMAND
 import com.duck.app.util.DEBUG
 import com.duck.app.util.DISABLE_PREVIEW
 import com.duck.app.util.DOWNLOAD_ARCHIVE
@@ -182,21 +181,12 @@ fun GeneralDownloadPreferences(
             )
         },
         content = {
-            val isCustomCommandEnabled by remember {
-                mutableStateOf(
-                    PreferenceUtil.getValue(CUSTOM_COMMAND)
-                )
-            }
             LazyColumn(
                 modifier = Modifier.padding(it)
             ) {
 //                item {
 //                    SettingTitle(text = stringResource(id = R.string.general_settings))
 //                }
-                if (isCustomCommandEnabled)
-                    item {
-                        PreferenceInfo(text = stringResource(id = R.string.custom_command_enabled_hint))
-                    }
                 item {
                     PreferenceSwitch(title = stringResource(id = R.string.download_notification),
                         description = stringResource(
@@ -248,7 +238,7 @@ fun GeneralDownloadPreferences(
                         description = stringResource(
                             id = R.string.create_thumbnail_summary
                         ),
-                        enabled = !isCustomCommandEnabled,
+                        
                         icon = Icons.Outlined.Image,
                         isChecked = thumbnailSwitch,
                         onClick = {
@@ -261,7 +251,7 @@ fun GeneralDownloadPreferences(
                         title = stringResource(R.string.print_details),
                         description = stringResource(R.string.print_details_desc),
                         icon = if (displayErrorReport) Icons.Outlined.Print else Icons.Outlined.PrintDisabled,
-                        enabled = !isCustomCommandEnabled,
+                        
                         onClick = {
                             displayErrorReport = !displayErrorReport
                             PreferenceUtil.updateValue(DEBUG, displayErrorReport)
@@ -280,7 +270,7 @@ fun GeneralDownloadPreferences(
                         description = stringResource(R.string.private_mode_desc),
                         icon = if (isPrivateModeEnabled) Icons.Outlined.HistoryToggleOff else Icons.Outlined.History,
                         isChecked = isPrivateModeEnabled,
-                        enabled = !isCustomCommandEnabled,
+                        
                         onClick = {
                             isPrivateModeEnabled = !isPrivateModeEnabled
                             PreferenceUtil.updateValue(
@@ -296,7 +286,7 @@ fun GeneralDownloadPreferences(
                         description = stringResource(R.string.disable_preview_desc),
                         icon = if (isPreviewDisabled) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                         isChecked = isPreviewDisabled,
-                        enabled = !isCustomCommandEnabled,
+                        
                         onClick = {
                             isPreviewDisabled = !isPreviewDisabled
                             PreferenceUtil.updateValue(
@@ -320,7 +310,7 @@ fun GeneralDownloadPreferences(
                             )
                         },
                         icon = Icons.Outlined.PlaylistAddCheck,
-                        enabled = !isCustomCommandEnabled,
+                        
                         description = stringResource(R.string.download_playlist_desc),
                         isChecked = downloadPlaylist
                     )
@@ -354,7 +344,7 @@ fun GeneralDownloadPreferences(
                             R.string.sponsorblock_desc
                         ),
                         icon = Icons.Outlined.MoneyOff,
-                        enabled = !isCustomCommandEnabled,
+                        
                         isChecked = isSponsorBlockEnabled,
                         onChecked = {
                             isSponsorBlockEnabled = !isSponsorBlockEnabled
