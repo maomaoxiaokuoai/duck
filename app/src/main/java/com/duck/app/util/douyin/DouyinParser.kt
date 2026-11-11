@@ -3,7 +3,6 @@ package com.duck.app.util.douyin
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,33 +11,44 @@ import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 /**
- * Douyin (douyin.com) extractor.
+ * Douyin extractor that needs no login and no signature.
  *
- * Douyin serves the post data inline in the HTML as a streamed React payload
- * (self.__pace_f.push). It only does that for requests carrying a valid __ac_signature
- * cookie, which [DouyinSigner] produces.
+ * The iesdouyin slidesinfo API serves full item details (author, stats, play URLs,
+ * covers) for regular videos with a plain mobile UA. That is the fast path and
+ * covers most posts.
+ *
+ * Notes (image posts) are filtered server-side with reason=8 on that endpoint, and
+ * their share page no longer embeds SSR data, so they fall through to
+ * [DouyinWebParser], which renders the real page in a WebView.
  */
 object DouyinParser {
 
     private const val TAG = "DouyinParser"
 
+    /** Mobile Safari UA: the API rejects desktop UAs outright. */
     const val USER_AGENT =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-            "(KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) " +
+            "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
-    private const val BASE = "https://www.douyin.com"
+    private const val SLIDES_API = "https://www.iesdouyin.com/web/api/v2/aweme/slidesinfo/"
 
     private val client =
         OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(12, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
             .followRedirects(true)
             .build()
 
     /** True when [url] points at a Douyin post. */
-    fun matches(url: String): Boolean =
-        url.contains("douyin.com", ignoreCase = true) &&
-            (url.contains("/video/") || url.contains("/note/") || url.contains("/share/"))
+    fun matches(url: String): Boolean {
+        val lower = url.lowercase()
+        if (!lower.contains("douyin.com")) return false
+        return lower.contains("/video/") ||
+            lower.contains("/note/") ||
+            lower.contains("/share/") ||
+            lower.contains("modal_id=") ||
+            lower.matches(Regex(".*v\\.douyin\\.com/\\w+.*"))
+    }
 
     /** Accepts a share link, a canonical URL or a bare id and returns the numeric post id. */
     fun extractId(url: String): String? {
@@ -47,6 +57,7 @@ object DouyinParser {
                 Regex("/video/(\\d+)"),
                 Regex("/note/(\\d+)"),
                 Regex("[?&]modal_id=(\\d+)"),
+                Regex("/share/(?:video|note|slides)/(\\d+)"),
                 Regex("^\\s*(\\d{15,})\\s*$"),
             )
         for (p in patterns) {
@@ -55,7 +66,7 @@ object DouyinParser {
         return null
     }
 
-    /** Resolves short (v.douyin.com) links to their final destination. */
+    /** Resolves v.douyin.com short links to their destination. */
     suspend fun resolveShortLink(url: String): String =
         withContext(Dispatchers.IO) {
             if (!url.contains("v.douyin.com")) return@withContext url
@@ -66,202 +77,133 @@ object DouyinParser {
         }
 
     /**
-     * Fetches and parses a post. Retries once with a fresh signature, since Douyin
-     * invalidates them aggressively.
+     * Fast unsigned path. Returns null when the API refuses the item (notes), so the
+     * caller can escalate to the WebView parser.
      */
-    suspend fun parse(context: Context, input: String): Result<DouyinPost> =
+    suspend fun parseViaApi(input: String): DouyinPost? =
         withContext(Dispatchers.IO) {
-            var lastError: Exception? = null
-            try {
+            runCatching {
                 val resolved = resolveShortLink(input)
-                val id = extractId(resolved) ?: throw IllegalArgumentException("链接里没有作品 ID")
-                Log.d(TAG, "parsing id " + id)
-
-                repeat(2) { attempt ->
-                    try {
-                        val nonce = fetchNonce(id)
-                        val signature = DouyinSigner.sign(context, nonce)
-                        Log.d(
-                            TAG,
-                            "nonce=" + nonce + " sig=" +
-                                (signature?.take(40) ?: "NULL") +
-                                " len=" + (signature?.length ?: 0)
-                        )
-
-                        val cookie =
-                            buildString {
-                                append("__ac_nonce=").append(nonce)
-                                if (signature != null) append("; __ac_signature=").append(signature)
-                            }
-                        val html = fetchHtml(id, cookie)
-                        val detail = parseSsr(html) ?: throw IllegalStateException("页面里没有作品数据")
-                        return@withContext Result.success(normalize(detail))
-                    } catch (e: Exception) {
-                        Log.w(TAG, "attempt " + (attempt + 1) + " failed: " + e.message)
-                        lastError = e
-                        delay(400)
+                val id = extractId(resolved) ?: return@runCatching null
+                val url = SLIDES_API + "?aweme_ids=%5B" + id + "]"
+                val request =
+                    Request.Builder()
+                        .url(url)
+                        .header("User-Agent", USER_AGENT)
+                        .header("Accept", "application/json")
+                        .header("Referer", "https://www.iesdouyin.com/share/video/" + id + "/")
+                        .build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@runCatching null
+                    val body = response.body.string()
+                    val root = runCatching { JSONObject(body) }.getOrNull() ?: return@runCatching null
+                    val details = root.optJSONArray("aweme_details") ?: return@runCatching null
+                    if (details.length() == 0) {
+                        val filter = root.optJSONArray("filter_list")
+                        val reason =
+                            if (filter != null && filter.length() > 0) {
+                                filter.optJSONObject(0)?.optInt("reason") ?: -1
+                            } else -1
+                        Log.i(TAG, "api refused item, reason=" + reason)
+                        return@runCatching null
                     }
+                    normalize(details.getJSONObject(0))
                 }
-            } catch (e: Exception) {
-                lastError = e
-            }
-            Result.failure(lastError ?: IllegalStateException("解析失败"))
+            }.getOrNull()
         }
 
-    /** Requests the page once and reads the __ac_nonce cookie Douyin hands out. */
-    private fun fetchNonce(id: String): String {
-        val request =
-            Request.Builder()
-                .url(BASE + "/note/" + id)
-                .header("User-Agent", USER_AGENT)
-                .header("Accept", "text/html,application/xhtml+xml")
-                .header("Accept-Encoding", "identity")
-                .build()
-        client.newCall(request).execute().use { response ->
-            val cookies = response.headers.values("Set-Cookie")
-            for (c in cookies) {
-                val m = Regex("__ac_nonce=([^;]+)").find(c)
-                if (m != null) return m.groupValues[1]
-            }
-        }
-        throw IllegalStateException("没有拿到 __ac_nonce")
-    }
-
-    private fun fetchHtml(id: String, cookie: String): String {
-        val request =
-            Request.Builder()
-                .url(BASE + "/note/" + id)
-                .header("User-Agent", USER_AGENT)
-                .header("Accept", "text/html,application/xhtml+xml")
-                .header("Accept-Language", "zh-CN,zh;q=0.9")
-                .header("Cookie", cookie)
-                .header("Referer", BASE + "/")
-                .header("Accept-Encoding", "identity")
-                .build()
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IllegalStateException("HTTP " + response.code)
-            val body = response.body.string()
-            Log.d(
-                TAG,
-                "html len=" + body.length +
-                    " pace_f=" + body.contains("self.__pace_f") +
-                    " awemeId=" + body.contains("awemeId") +
-                    " verify=" + (body.contains("验证") || body.contains("captcha")) +
-                    " head=" + body.take(180).replace("\n", " ")
-            )
-            return body
-        }
-    }
-
-    /** Pulls the aweme detail object out of the streamed SSR payload. */
-    private fun parseSsr(html: String): JSONObject? {
-        var start = html.indexOf("self.__pace_f.push([1,")
-        if (start < 0) return null
-
-        val payloadStart = html.indexOf("[1,\"", start)
-        if (payloadStart < 0) return null
-        val from = payloadStart + 4
-        val to = html.indexOf("])</script>", from)
-        if (to < 0) return null
-
-        var raw = html.substring(from, to)
-            .replace("\\\"", "\"")
-            .replace("\\\\", "\\")
-        val js = raw.indexOf('{')
-        val je = raw.lastIndexOf('}')
-        if (js < 0 || je < 0) return null
-        var json = raw.substring(js, je + 1)
-        json = json.replace("\"\$undefined\"", "null")
-        json = json.replace(Regex("\"\\\$L\\d+\""), "null")
-        json = json.replace(Regex("\"\\\$D[^\"]*\""), "null")
-
-        val candidates =
-            listOf(json, json.replace(Regex(",\\s*}"), "}").replace(Regex(",\\s*]"), "]"))
-        for (candidate in candidates) {
-            try {
-                val root = JSONObject(candidate)
-                val aweme = root.optJSONObject("aweme") ?: continue
-                val detail = aweme.optJSONObject("detail") ?: continue
-                return detail
-            } catch (ignored: Exception) {
-            }
-        }
-        return null
-    }
-
-    /** Maps Douyin's raw detail object onto [DouyinPost]. */
-    private fun normalize(detail: JSONObject): DouyinPost {
-        val authorJson = detail.optJSONObject("authorInfo")
+    /** Maps a raw aweme object onto [DouyinPost]. */
+    fun normalize(detail: JSONObject): DouyinPost {
+        val authorJson = detail.optJSONObject("author")
         val author =
             authorJson?.let {
+                val avatar = it.optJSONObject("avatar_thumb")?.optJSONArray("url_list")
                 DouyinAuthor(
-                    uid = it.optString("uid"),
-                    secUid = it.optString("secUid"),
+                    uid = it.optString("sec_uid"),
+                    secUid = it.optString("sec_uid"),
                     nickname = it.optString("nickname"),
                     signature = it.optString("signature"),
-                    followerCount = it.optLong("followerCount"),
-                    avatar = it.optString("avatarUri"),
+                    followerCount = it.optLong("follower_count"),
+                    avatar = avatar?.optString(0) ?: "",
                 )
             }
 
         val imagesJson = detail.optJSONArray("images")
-        val imageUrls = mutableListOf<String>()
+        val images = mutableListOf<String>()
         if (imagesJson != null) {
             for (i in 0 until imagesJson.length()) {
                 val img = imagesJson.optJSONObject(i) ?: continue
-                val list = img.optJSONArray("urlList") ?: img.optJSONArray("downloadUrlList")
-                if (list != null && list.length() > 0) {
-                    list.optString(0).takeIf { it.isNotEmpty() }?.let { imageUrls.add(it) }
+                val list = img.optJSONArray("url_list") ?: continue
+                // Prefer a non-webp variant; Douyin sometimes only ships webp.
+                var pick = ""
+                for (j in 0 until list.length()) {
+                    val u = list.optString(j)
+                    if (u.isNotEmpty() && !u.endsWith(".webp")) {
+                        pick = u
+                        break
+                    }
                 }
+                if (pick.isEmpty() && list.length() > 0) pick = list.optString(0)
+                if (pick.isNotEmpty()) images.add(pick)
             }
         }
 
         val videoJson = detail.optJSONObject("video")
         val videos = mutableListOf<DouyinVideo>()
         if (videoJson != null) {
-            val bitRates = videoJson.optJSONArray("bitRateList")
+            val playAddr = videoJson.optJSONObject("play_addr")
+            val direct = playAddr?.optJSONArray("url_list")
+            if (direct != null && direct.length() > 0) {
+                videos.add(
+                    DouyinVideo(
+                        url = direct.optString(0).replace("playwm", "play"),
+                        width = videoJson.optInt("width"),
+                        height = videoJson.optInt("height"),
+                        bitrate = videoJson.optInt("bit_rate"),
+                    )
+                )
+            }
+            // Additional renditions, best first.
+            val bitRates = videoJson.optJSONArray("bit_rate")
             if (bitRates != null) {
                 for (i in 0 until bitRates.length()) {
                     val br = bitRates.optJSONObject(i) ?: continue
-                    val url = firstSrc(br.optJSONArray("playAddr")) ?: continue
+                    val addr = br.optJSONObject("play_addr")?.optJSONArray("url_list") ?: continue
+                    val url = addr.optString(0)
+                    if (url.isEmpty() || videos.any { it.url == url }) continue
                     videos.add(
                         DouyinVideo(
-                            url = url,
+                            url = url.replace("playwm", "play"),
                             width = br.optInt("width"),
                             height = br.optInt("height"),
-                            size = br.optLong("dataSize"),
-                            bitrate = br.optInt("bitRate"),
+                            bitrate = br.optInt("bit_rate"),
                         )
                     )
                 }
             }
-            if (videos.isEmpty()) {
-                firstSrc(videoJson.optJSONArray("playAddr"))?.let {
-                    videos.add(
-                        DouyinVideo(
-                            url = it,
-                            width = videoJson.optInt("width"),
-                            height = videoJson.optInt("height"),
-                            size = videoJson.optLong("dataSize"),
-                        )
-                    )
-                }
-            }
-            videos.sortByDescending { it.size }
+            videos.sortByDescending { it.bitrate }
         }
 
-        val coverArray = videoJson?.optJSONArray("coverUrlList")
         val cover =
-            if (coverArray != null && coverArray.length() > 0) coverArray.optString(0) else null
+            videoJson?.optJSONObject("cover")?.optJSONArray("url_list")?.let { list ->
+                var pick = ""
+                for (j in 0 until list.length()) {
+                    val u = list.optString(j)
+                    if (u.isNotEmpty() && !u.endsWith(".webp")) {
+                        pick = u
+                        break
+                    }
+                }
+                pick.ifEmpty { list.optString(0) }
+            }
 
         val musicJson = detail.optJSONObject("music")
         val music =
             musicJson?.let {
-                val playUrl = it.optJSONObject("playUrl")?.optJSONArray("urlList")
                 DouyinMusic(
                     title = it.optString("title"),
                     author = it.optString("author"),
-                    url = playUrl?.optString(0) ?: "",
+                    url = it.optJSONObject("play_url")?.optJSONArray("url_list")?.optString(0) ?: "",
                     durationMs = it.optLong("duration"),
                 )
             }
@@ -269,29 +211,27 @@ object DouyinParser {
         val stats = detail.optJSONObject("statistics")
 
         return DouyinPost(
-            id = detail.optString("awemeId"),
+            id = detail.optString("aweme_id"),
             desc = detail.optString("desc"),
-            createTime = detail.optLong("createTime"),
-            type = if (imageUrls.isNotEmpty()) "note" else "video",
+            createTime = detail.optLong("create_time"),
+            type = if (images.isNotEmpty()) "note" else "video",
             author = author,
             cover = cover,
             videos = videos,
-            images = imageUrls,
+            images = images,
             music = music,
-            likeCount = stats?.optLong("diggCount") ?: 0,
-            commentCount = stats?.optLong("commentCount") ?: 0,
-            shareCount = stats?.optLong("shareCount") ?: 0,
+            likeCount = stats?.optLong("digg_count") ?: 0,
+            commentCount = stats?.optLong("comment_count") ?: 0,
+            shareCount = stats?.optLong("share_count") ?: 0,
             durationMs = videoJson?.optLong("duration") ?: 0,
         )
     }
 
-    private fun firstSrc(array: JSONArray?): String? {
-        if (array == null) return null
-        for (i in 0 until array.length()) {
-            val item = array.optJSONObject(i) ?: continue
-            val src = item.optString("src")
-            if (src.isNotEmpty()) return src
+    /** Entry point: API first, then the WebView renderer for notes. */
+    suspend fun parse(context: Context, input: String): Result<DouyinPost> =
+        withContext(Dispatchers.IO) {
+            parseViaApi(input)?.let { return@withContext Result.success(it) }
+            Log.i(TAG, "api path unavailable, falling back to WebView")
+            DouyinWebParser.parse(context, input)
         }
-        return null
-    }
 }
