@@ -12,4 +12,10 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
+
+    <!-- Splash shows the duck itself; no icon background colour, so no white plate. -->
+    <style name="Theme.Duck.Splashscreen" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.Duck</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+    </style>
 </resources>
