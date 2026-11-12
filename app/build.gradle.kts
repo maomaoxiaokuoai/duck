@@ -130,9 +130,9 @@ android {
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            val abi = output.getFilter(com.android.build.api.variant.FilterConfiguration.FilterType.ABI)
-            val suffix = abi?.identifier ?: "universal"
-            output.outputFileName = "duck-" + versionName + "-" + suffix + "-release.apk"
+            // FilterType.ABI.value is the string the API expects here.
+            val abi = output.getFilter("ABI") ?: "universal"
+            output.outputFileName = "duck-" + versionName + "-" + abi + "-release.apk"
         }
     }
 
