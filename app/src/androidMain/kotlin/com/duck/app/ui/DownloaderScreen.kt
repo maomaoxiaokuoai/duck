@@ -887,6 +887,7 @@ fun MainDownloaderTab(
         )
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1076,17 +1077,6 @@ fun MainDownloaderTab(
         // Full-screen progress, shown while a download is running.
     //
     // The download is a foreground activity of its own rather than a banner on the home
-    // screen: once the user taps download they are watching this, not browsing.
-    if (uiState is DownloadState.Downloading) {
-        val state = uiState as DownloadState.Downloading
-        DownloadProgressScreen(
-            state = state,
-            title = preview?.title ?: "下载中",
-            author = preview?.author ?: "",
-            onCancel = { viewModel.cancelDownload() },
-        )
-    }
-
     // Download action, shown only once a post has resolved.
         //
         // The bolt moves here from the floating bar: the button now sits with the post it
@@ -1268,6 +1258,23 @@ fun MainDownloaderTab(
             }
         }
     }
+ 
+        // Full-screen progress layer.
+        //
+        // It covers the home content rather than sitting inside it: while a download runs
+        // there is nothing else to do on this screen, and the overlay keeps the list from
+        // scrolling behind the progress ring.
+        if (uiState is DownloadState.Downloading) {
+            val state = uiState as DownloadState.Downloading
+            DownloadProgressScreen(
+                state = state,
+                title = preview?.title ?: "下载中",
+                author = preview?.author.orEmpty(),
+                onCancel = { viewModel.cancelDownload() },
+            )
+        }
+    }
+
 
     if (showSuccessDialog) {
         AlertDialog(
