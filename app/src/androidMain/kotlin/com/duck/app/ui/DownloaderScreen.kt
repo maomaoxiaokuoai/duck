@@ -104,6 +104,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Bolt
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -1069,7 +1073,21 @@ fun MainDownloaderTab(
                 }
             }
         }
-        // Download action, shown only once a post has resolved.
+        // Full-screen progress, shown while a download is running.
+    //
+    // The download is a foreground activity of its own rather than a banner on the home
+    // screen: once the user taps download they are watching this, not browsing.
+    if (uiState is DownloadState.Downloading) {
+        val state = uiState as DownloadState.Downloading
+        DownloadProgressScreen(
+            state = state,
+            title = preview?.title ?: "下载中",
+            author = preview?.author ?: "",
+            onCancel = { viewModel.cancelDownload() },
+        )
+    }
+
+    // Download action, shown only once a post has resolved.
         //
         // The bolt moves here from the floating bar: the button now sits with the post it
         // downloads, so there is no guessing which link it will act on.
@@ -1304,6 +1322,120 @@ fun MainDownloaderTab(
             },
             shape = RoundedCornerShape(28.dp),
         )
+    }
+}
+
+/**
+ * Full-screen download view.
+ *
+ * Shows a ring progress with the percentage in the middle, the item being fetched, and
+ * the transfer rate. Every string is Chinese, matching the rest of the app.
+ */
+@Composable
+private fun DownloadProgressScreen(
+    state: DownloadState.Downloading,
+    title: String,
+    author: String,
+    onCancel: () -> Unit,
+) {
+    val percent = (state.progress.coerceIn(0f, 1f) * 100).toInt()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    progress = { state.progress.coerceIn(0f, 1f) },
+                    modifier = Modifier.size(132.dp),
+                    strokeWidth = 8.dp,
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = percent.toString() + "%",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "已完成",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                textAlign = TextAlign.Center,
+            )
+
+            if (author.isNotBlank()) {
+                Text(
+                    text = author,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                ) {
+                    StatColumn("已下载", formatBytes(state.downloadedBytes))
+                    StatColumn("总大小", formatBytes(state.totalBytes))
+                    StatColumn("速度", formatBytes(state.speedBps) + "/s")
+                }
+            }
+
+            Text(
+                text = "保持应用在后台运行，下载不会中断。",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
+            TextButton(onClick = onCancel) {
+                Text("取消下载", color = MaterialTheme.colorScheme.error)
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatColumn(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** Renders a byte count the way a download manager would. */
+private fun formatBytes(bytes: Long): String {
+    if (bytes <= 0L) return "--"
+    val kb = bytes / 1024.0
+    val mb = kb / 1024.0
+    return when {
+        mb >= 1.0 -> (Math.round(mb * 10) / 10.0).toString() + " MB"
+        else -> Math.round(kb).toString() + " KB"
     }
 }
 
