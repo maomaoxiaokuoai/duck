@@ -326,6 +326,9 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private var currentDownloadJob: Job? = null
+
+    /** The in-flight preview request, cancelled when a newer one starts. */
+    private var currentPreviewJob: Job? = null
     private var lastNotificationId: Int? = null
 
     private val activeTempFiles = java.util.Collections.synchronizedList(mutableListOf<java.io.File>())
@@ -506,7 +509,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun fetchPreview(url: String, quality: String, mode: String = "auto", engine: String = "dynamic") {
-        viewModelScope.launch {
+        currentPreviewJob?.cancel()
+        currentPreviewJob = viewModelScope.launch {
             clearConsole()
             logToConsole("----------------------------------------")
             logToConsole("[SYSTEM] Fetching video metadata...")

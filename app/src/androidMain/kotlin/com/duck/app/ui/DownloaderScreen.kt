@@ -277,26 +277,8 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         }
 
         val hazeState = remember { HazeState() }
-        var showHelpFab by remember { mutableStateOf(true) }
-        LaunchedEffect(Unit) {
-            kotlinx.coroutines.delay(5000)
-            showHelpFab = false
-        }
         Scaffold(
             containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            floatingActionButton = {
-                if (showHelpFab && selectedTab == 0 && uiState !is DownloadState.Downloading) {
-                    FloatingActionButton(
-                        onClick = { showSupportedSitesDialog = true },
-                        shape = CircleShape,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(44.dp)
-                    ) {
-                        Icon(Icons.Default.HelpOutline, contentDescription = "Supported Sites", modifier = Modifier.size(22.dp))
-                    }
-                }
-            },
             bottomBar = {
                 if (!isExpanded) {
                     Row(
@@ -419,10 +401,12 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                 ) {
                                     FloatingActionButton(
                                         onClick = {
-                                            clipboardManager.getText()?.let { 
+                                            // Only start the download here. Previewing at the
+                                            // same time launched two coroutines that both
+                                            // wrote _uiState, which is what crashed.
+                                            clipboardManager.getText()?.let {
                                                 val text = it.text
                                                 url = text
-                                                viewModel.fetchPreview(text, quality, downloadMode, engine)
                                                 viewModel.downloadMedia(text, quality, downloadMode, engine)
                                             }
                                         },
@@ -1274,7 +1258,7 @@ fun MainDownloaderTab(
                 val modeCorner by animateDpAsState(if (modeExpanded) 100.dp else 8.dp)
                 FilledTonalButton(
                     onClick = { modeExpanded = true },
-                    shape = RoundedCornerShape(modeCorner),
+                    shape = RoundedCornerShape(100.dp),
                     colors = modeColors,
                                         modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 4.dp)
@@ -1311,7 +1295,7 @@ fun MainDownloaderTab(
                 val qualityInnerCorner by animateDpAsState(if (qualityExpanded) 100.dp else 8.dp)
                 FilledTonalButton(
                     onClick = { qualityExpanded = true },
-                    shape = RoundedCornerShape(topStart = qualityInnerCorner, bottomStart = qualityInnerCorner, topEnd = 100.dp, bottomEnd = 100.dp),
+                    shape = RoundedCornerShape(100.dp),
                     colors = qualityColors,
                                         modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 4.dp)
