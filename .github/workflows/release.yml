@@ -20,6 +20,9 @@ jobs:
   build:
     name: Build all ABIs
     runs-on: ubuntu-latest
+    # Needs write access to commit the bumped version and create the tag.
+    permissions:
+      contents: write
 
     # Signing secrets are only exposed to trusted refs. A pull_request from a fork can
     # modify build scripts, so it must never receive the keystore: PR runs build unsigned
