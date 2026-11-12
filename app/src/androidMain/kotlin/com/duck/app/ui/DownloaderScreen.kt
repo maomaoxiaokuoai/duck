@@ -2766,8 +2766,8 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
     val profileImageRequest = remember(context) {
         coil.request.ImageRequest.Builder(context)
             .data("https://avatars.githubusercontent.com/maomaoxiaokuoai")
-            .diskCacheKey("hotaro_avatar")
-            .memoryCacheKey("hotaro_avatar")
+            .diskCacheKey("duck_author_avatar")
+            .memoryCacheKey("duck_author_avatar")
             .diskCachePolicy(coil.request.CachePolicy.ENABLED)
             .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
             .crossfade(true)
@@ -2811,7 +2811,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                         )
                     }
                     Column {
-                        Text(stringResource(R.string.hotaro), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text("maomao", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                         Text(stringResource(R.string.building_crisp_fast_and_secure), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -2827,7 +2827,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                         Text(stringResource(R.string.github))
                     }
                     OutlinedButton(
-                        onClick = { Toast.makeText(context, "Discord: oi.hotaro", Toast.LENGTH_LONG).show() },
+                        onClick = { Toast.makeText(context, "GitHub: maomaoxiaokuoai", Toast.LENGTH_LONG).show() },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp)
                     ) {
