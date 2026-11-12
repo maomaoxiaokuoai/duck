@@ -6,7 +6,6 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.chaquo.python")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
@@ -77,8 +76,6 @@ kotlin {
             implementation("io.coil-kt:coil-video:2.6.0")
             
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-            implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.3")
-            implementation("com.squareup.okhttp3:okhttp:4.12.0")
             implementation("androidx.media3:media3-exoplayer:1.2.1")
             implementation("androidx.media3:media3-ui:1.2.1")
             
@@ -160,22 +157,6 @@ android {
 
 dependencies {
     add("kspAndroid", "androidx.room:room-compiler:2.6.1")
-}
-
-chaquopy {
-    defaultConfig {
-        version = "3.11"
-        // CI exposes the interpreter it installed; local builds fall back to PATH lookup.
-        val py = System.getenv("CHAQUOPY_BUILD_PYTHON")
-        if (!py.isNullOrEmpty()) {
-            buildPython(py)
-        }
-        pip {
-            install("pip")
-            install("yt-dlp")
-            install("gallery-dl")
-        }
-    }
 }
 
 compose.desktop {

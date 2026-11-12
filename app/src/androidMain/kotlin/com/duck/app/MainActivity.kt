@@ -23,8 +23,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duck.app.ui.DownloaderScreen
 import com.duck.app.ui.DownloaderViewModel
 import com.duck.app.ui.theme.ExpressiveTheme
-import com.chaquo.python.Python
-import com.chaquo.python.android.AndroidPlatform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,23 +51,9 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // All heavyweight setup runs off the main thread: Python bootstraps its
-        // interpreter, NewPipe builds downloader state and Coil allocates caches.
-        // Doing any of it inline added seconds to the first frame.
+        // All heavyweight setup runs off the main thread: Coil allocates caches,
+        // which would otherwise add to the first frame.
         CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                if (!Python.isStarted()) {
-                    Python.start(AndroidPlatform(this@MainActivity))
-                    val py = Python.getInstance()
-                    val customPath = java.io.File(filesDir, "python_packages").absolutePath
-                    py.getModule("sys").get("path")?.callAttr("insert", 0, customPath)
-                }
-            }
-
-            runCatching {
-                org.schabi.newpipe.extractor.NewPipe.init(com.duck.app.api.OkHttpDownloader())
-            }
-
             runCatching {
                 val imageLoader = coil.ImageLoader.Builder(this@MainActivity)
                     .components { add(coil.decode.VideoFrameDecoder.Factory()) }

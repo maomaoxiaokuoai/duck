@@ -1,83 +1,76 @@
 package com.duck.app.ui
 
-import android.app.PictureInPictureParams
-import android.os.Build
-import android.util.Rational
-import android.net.Uri
 import android.app.Activity
+import android.app.PictureInPictureParams
+import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.HeadsetOff
+import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.res.stringResource
-import com.duck.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import androidx.compose.ui.draw.clip
 import coil.compose.AsyncImage
+import com.duck.app.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.schabi.newpipe.extractor.NewPipe
-import org.schabi.newpipe.extractor.stream.StreamExtractor
 
+/**
+ * Plays a direct media URL.
+ *
+ * The screen used to resolve the URL through an extractor library; with the engines removed
+ * it only ever receives a direct link (already resolved by the caller), so playback starts
+ * from that link. Metadata is taken from the title/thumbnail the caller resolved.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
     url: String,
     onBack: () -> Unit,
-    onDownload: (String) -> Unit
+    onDownload: (String) -> Unit,
+    title: String? = null,
+    author: String? = null,
+    thumbnail: String? = null,
 ) {
     val context = LocalContext.current
-    var streamExtractor by remember { mutableStateOf<StreamExtractor?>(null) }
-    var streamUrl by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
 
     val exoPlayer = remember { ExoPlayer.Builder(context).build() }
 
     LaunchedEffect(url) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
             try {
-                val service = NewPipe.getServiceByUrl(url)
-                val extractor = service.getStreamExtractor(url)
-                extractor.fetchPage()
-                
-                val bestVideo = extractor.videoStreams.maxByOrNull { it.resolution.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0 }
-                
-                withContext(Dispatchers.Main) {
-                    streamExtractor = extractor
-                    streamUrl = bestVideo?.content
-                    if (streamUrl != null) {
-                        exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(streamUrl)))
-                        exoPlayer.prepare()
-                        exoPlayer.playWhenReady = true
-                    } else {
-                        errorMessage = "No playable stream found"
-                    }
-                    isLoading = false
+                if (url.isBlank()) {
+                    errorMessage = "没有可播放的直链"
+                } else {
+                    exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(url)))
+                    exoPlayer.prepare()
+                    exoPlayer.playWhenReady = true
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    errorMessage = e.message ?: "Failed to load video"
-                    isLoading = false
-                }
+                errorMessage = e.message ?: "无法播放该直链"
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -156,7 +149,7 @@ fun PlayerScreen(
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 IconButton(onClick = {
                                     (context as? Activity)?.enterPictureInPictureMode(
-                                        android.app.PictureInPictureParams.Builder()
+                                        PictureInPictureParams.Builder()
                                             .setAspectRatio(android.util.Rational(16, 9))
                                             .build()
                                     )
@@ -168,8 +161,8 @@ fun PlayerScreen(
                                 isMusicMode = !isMusicMode
                             }) {
                                 Icon(
-                                    if (isMusicMode) Icons.Default.Headset else Icons.Default.HeadsetOff, 
-                                    "Music Mode", 
+                                    if (isMusicMode) Icons.Default.Headset else Icons.Default.HeadsetOff,
+                                    "Music Mode",
                                     tint = if (isMusicMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
@@ -192,8 +185,9 @@ fun PlayerScreen(
                 if (!isMusicMode) {
                     AndroidView(
                         factory = { ctx ->
-                            val view = android.view.LayoutInflater.from(ctx).inflate(com.duck.app.R.layout.player_view_layout, null) as PlayerView
-                            view.apply {
+                            val playerView = android.view.LayoutInflater.from(ctx)
+                                .inflate(com.duck.app.R.layout.player_view_layout, null) as PlayerView
+                            playerView.apply {
                                 player = exoPlayer
                                 useController = !isInPipMode
                                 layoutParams = android.widget.FrameLayout.LayoutParams(
@@ -220,7 +214,7 @@ fun PlayerScreen(
                         Icon(Icons.Default.Headset, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
-                
+
                 if (isLandscape && !isMusicMode) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         Surface(
@@ -242,28 +236,28 @@ fun PlayerScreen(
                         }
                     }
                 }
-                
-                if (!hideUi) {
-                    streamExtractor?.let { ext ->
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(ext.name, style = MaterialTheme.typography.titleLarge)
-                            Spacer(Modifier.height(16.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                // Channel Info
-                                val avatarUrl = ext.uploaderAvatars?.firstOrNull()?.url
-                                if (avatarUrl != null) {
-                                    AsyncImage(
-                                        model = avatarUrl,
-                                        contentDescription = "Channel Avatar",
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(androidx.compose.foundation.shape.CircleShape),
-                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                        alignment = Alignment.Center
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                }
-                                Text(ext.uploaderName, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+
+                if (!hideUi && (!title.isNullOrBlank() || !author.isNullOrBlank())) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        if (!title.isNullOrBlank()) {
+                            Text(title, style = MaterialTheme.typography.titleLarge)
+                        }
+                        Spacer(Modifier.height(16.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (!thumbnail.isNullOrBlank()) {
+                                AsyncImage(
+                                    model = thumbnail,
+                                    contentDescription = "Thumbnail",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(androidx.compose.foundation.shape.CircleShape),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    alignment = Alignment.Center
+                                )
+                                Spacer(Modifier.width(12.dp))
+                            }
+                            if (!author.isNullOrBlank()) {
+                                Text(author, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }

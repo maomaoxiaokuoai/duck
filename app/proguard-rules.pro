@@ -1,7 +1,3 @@
-# Chaquopy rules
--keep class com.chaquo.python.** { *; }
--keep class com.chaquo.stdrc.** { *; }
-
 # Room rules
 -keep class * extends androidx.room.RoomDatabase
 -dontwarn androidx.room.**

@@ -11,7 +11,6 @@
     <string name="clear_all">全部清除</string>
     <string name="cancel">取消</string>
     <string name="home">首页</string>
-    <string name="newpipe">NewPipe</string>
     <string name="logs">日志</string>
     <string name="settings">设置</string>
     <string name="homepage">主页</string>
@@ -27,8 +26,6 @@
     <string name="close">关闭</string>
     <string name="help_me">帮助</string>
     <string name="downloading_tips">下载提示</string>
-    <string name="use_newpipe_for_youtube_downlo">• 请使用 NewPipe 下载 YouTube 视频。
-</string>
     <string name="got_it">明白了</string>
     <string name="duplicate_download">重复下载</string>
     <string name="you_have_already_downloaded_th">您已经下载了此媒体。要再次下载吗？</string>
@@ -44,9 +41,6 @@
     <string name="later">稍后</string>
     <string name="gabi">duck</string>
     <string name="search_or_paste_link">搜索或粘贴链接</string>
-    <string name="yt_dlp">yt-dlp</string>
-    <string name="gallery_dl">gallery-dl</string>
-    <string name="cobalt">Cobalt</string>
     <string name="terminal">终端</string>
     <string name="download_again">再次下载</string>
     <string name="customisation">个性化</string>
@@ -61,15 +55,10 @@
     <string name="theme_mode">主题模式</string>
     <string name="color_scheme">配色方案</string>
     <string name="terminal_theme">终端主题</string>
-    <string name="select_target_extractor">选择目标提取器</string>
-    <string name="which_extractor_do_you_want_to">您想为哪个提取器设置Cookie？</string>
     <string name="downloads">下载</string>
     <string name="download_repository">下载存储库</string>
     <string name="files_will_be_saved_in_your_se">文件将保存在您选择的文件夹中</string>
     <string name="default_movies_gabi">默认：Movies/duck</string>
-    <string name="extractors">提取器</string>
-    <string name="update_internal_components">更新内部组件</string>
-    <string name="update_yt_dlp_gallery_dl">更新 yt-dlp 和 gallery-dl</string>
     <string name="extraction_credentials">提取凭据</string>
     <string name="import_cookies_txt_for_private">导入 cookies.txt 用于私人内容</string>
     <string name="import_cookies_txt">导入 cookies.txt</string>
@@ -81,7 +70,6 @@
     <string name="github">GitHub</string>
     <string name="discord">Discord</string>
     <string name="app_info_updates">应用信息与更新</string>
-    <string name="powered_by_yt_dlp_gallery_dl_c">由 yt-dlp, gallery-dl &amp; Chaquopy 提供支持</string>
     <string name="auto_check_updates">自动检查更新</string>
     <string name="notify_on_launch_when_new_rele">启动时如果有新版本则通知</string>
     <string name="check_for_updates">检查更新</string>

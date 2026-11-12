@@ -105,6 +105,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
 
+/** Containers the preview renders as an image gallery rather than a video. */
+private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
+
+/** SharedPreferences key holding the imported Douyin cookie jar path. */
+private const val COOKIES_SETTING_KEY = "douyin_cookies_path"
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
@@ -118,7 +124,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
     var url by remember { mutableStateOf("") }
     var quality by remember { mutableStateOf("720") }
     var downloadMode by remember { mutableStateOf("auto") }
-    var engine by remember { mutableStateOf(viewModel.getSetting("selected_engine", "newpipe")) }
     var showClearLogsDialog by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
     val preview by viewModel.previewMetadata.collectAsState()
@@ -126,7 +131,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
     
     var showSupportedSitesDialog by remember { mutableStateOf(false) }
     var showTipsDialog by remember { mutableStateOf(false) }
-    var selectedHelpTab by remember { mutableStateOf("yt-dlp") }
     val externalUrl by viewModel.externalUrl.collectAsState()
     val clipboardManager = LocalClipboardManager.current
     
@@ -167,10 +171,10 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         }
     }
 
-    LaunchedEffect(url, engine) {
+    LaunchedEffect(url) {
         if (url.isNotBlank() && url.startsWith("http")) {
             delay(1000) // Debounce for 1 second
-            viewModel.fetchPreview(url, quality, downloadMode, engine)
+            viewModel.fetchPreview(url, quality, downloadMode)
         }
     }
 
@@ -407,7 +411,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                             clipboardManager.getText()?.let {
                                                 val text = it.text
                                                 url = text
-                                                viewModel.downloadMedia(text, quality, downloadMode, engine)
+                                                viewModel.downloadMedia(text, quality, downloadMode)
                                             }
                                         },
                                         modifier = Modifier
@@ -510,7 +514,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             onQualityChange = { quality = it },
                             downloadMode = downloadMode,
                             onModeChange = { downloadMode = it },
-                            engine = engine,
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
@@ -532,76 +535,25 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                 text = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            listOf("yt-dlp" to "yt-dlp", "gallery-dl" to "gallery-dl", "cobalt" to "Cobalt", "newpipe" to "NewPipe").forEach { (id, label) ->
-                                FilterChip(
-                                    selected = selectedHelpTab == id,
-                                    onClick = { selectedHelpTab = id },
-                                    label = { Text(label) },
-                                    shape = RoundedCornerShape(24.dp)
-                                )
-                            }
-                        }
-                        
-                        val sites = when (selectedHelpTab) {
-                            "newpipe" -> listOf(
-                                "YouTube (Videos, Audio, Shorts, Playlists)",
-                                "SoundCloud (Tracks, Playlists)",
-                                "Bandcamp (Tracks, Albums)",
-                                "PeerTube (Videos)",
-                                "media.ccc.de (Videos)"
-                            )
-                            "gallery-dl" -> listOf(
-                                "Pixiv (Artwork, Manga)",
-                                "Twitter/X (Images, Gifs)",
-                                "Instagram (Photos, Carousels)",
-                                "Reddit (Image posts)",
-                                "Pinterest (Pins, Boards)",
-                                "DeviantArt (Illustrations)",
-                                "ArtStation (Portfolios)",
-                                "Tumblr (Photo posts)",
-                                "Flickr (Photos, Albums)"
-                            )
-                            "cobalt" -> listOf(
-                                "YouTube (Videos, Shorts, Music)",
-                                "TikTok (Videos, Photos)",
-                                "Instagram (Reels, Stories, Posts)",
-                                "Twitter/X (Videos, Gifs)",
-                                "Reddit (Videos, Gifs)",
-                                "Facebook (Videos, Reels)",
-                                "Vimeo (Videos)",
-                                "SoundCloud (Audio tracks)",
-                                "Bilibili (Videos)",
-                                "Dailymotion (Videos)",
-                                "VK (Videos)"
-                            )
-                            else -> listOf(
-                                "YouTube (Videos, Audio, Playlists)",
-                                "TikTok (Videos, Audio, Slideshows)",
-                                "Instagram (Reels, Stories, TV)",
-                                "Twitter/X (Videos, Gifs)",
-                                "Reddit (Videos, Audio)",
-                                "Facebook (Videos, Reels)",
-                                "Twitch (Clips, VODs)",
-                                "SoundCloud (Tracks, Playlists)",
-                                "Vimeo (Videos)",
-                                "1000+ other websites..."
-                            )
-                        }
-                        
+                        Text(
+                            "当前版本仅支持抖音直链解析，其余平台已移除。",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(sites) { site ->
+                            items(listOf(
+                                "抖音（视频、图集）",
+                                "抖音短链 (v.douyin.com)",
+                                "抖音网页链接 (www.douyin.com)",
+                                "分享文案（自动提取链接）"
+                            )) { site ->
                                 Surface(
                                     shape = RoundedCornerShape(24.dp),
                                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -630,16 +582,16 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                 shape = RoundedCornerShape(28.dp)
             )
         }
-        
+
         if (showTipsDialog) {
             AlertDialog(
                 onDismissRequest = { showTipsDialog = false },
                 title = { Text(stringResource(R.string.downloading_tips)) },
                 text = {
-                    Text(stringResource(R.string.use_newpipe_for_youtube_downlo) +
-                        "• Use yt-dlp as a fallback (audio extraction might take some time, so be patient).\n" +
-                        "• For Pinterest and similar short-video/social sites, use Cobalt.\n" +
-                        "• For images and galleries, use gallery-dl.",
+                    Text(
+                        "• 复制抖音分享链接后粘贴到输入框即可自动解析。\n" +
+                        "• 视频会保存到下载目录，图集会保存到 Pictures/duck。\n" +
+                        "• 解析失败通常是因为作品被删除或需要登录，请换一个链接重试。",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 },
@@ -666,7 +618,6 @@ fun MainDownloaderTab(
     onQualityChange: (String) -> Unit,
     downloadMode: String,
     onModeChange: (String) -> Unit,
-    engine: String,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var qualityExpanded by remember { mutableStateOf(false) }
@@ -692,10 +643,6 @@ fun MainDownloaderTab(
         }
     }
 
-    LaunchedEffect(engine) {
-        viewModel.saveSetting("selected_engine", engine)
-    }
-
     LaunchedEffect(showTerminalCard) {
         viewModel.saveSetting("show_terminal_card", showTerminalCard.toString())
     }
@@ -709,7 +656,7 @@ fun MainDownloaderTab(
                 TextButton(onClick = {
                     val proceedUrl = duplicateWarningUrl!!
                     duplicateWarningUrl = null
-                    viewModel.downloadMedia(proceedUrl, quality, downloadMode, engine)
+                    viewModel.downloadMedia(proceedUrl, quality, downloadMode)
                 }) {
                     Text(stringResource(R.string.download_anyway))
                 }
@@ -879,14 +826,14 @@ fun MainDownloaderTab(
         val homeSearchStyle = viewModel.getSetting("home_search_style", "unified")
         val onKeyboardGo = {
             if (url.isNotBlank()) {
-                viewModel.fetchPreview(url, quality, downloadMode, engine)
+                viewModel.fetchPreview(url, quality, downloadMode)
             }
         }
 
         val performAction: () -> Unit = {
             clipboardManager.getText()?.let { 
                 onUrlChange(it.text)
-                viewModel.fetchPreview(it.text, quality, downloadMode, engine)
+                viewModel.fetchPreview(it.text, quality, downloadMode)
             }
         }
 
@@ -983,8 +930,7 @@ fun MainDownloaderTab(
         AnimatedVisibility(visible = preview != null) {
             preview?.let { meta ->
                 val isImageOrGallery = meta.is_gallery == true || 
-                                       meta.ext in listOf("jpg", "jpeg", "png", "webp", "gif") || 
-                                       engine == "gallery-dl"
+                                       meta.ext in IMAGE_EXTENSIONS
                 
                 Card(
                     onClick = { showPreviewSheet = true },
@@ -1093,7 +1039,7 @@ fun MainDownloaderTab(
         if (showPreviewSheet && preview != null) {
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             val meta = preview
-            val isImageOrGallery = meta.is_gallery == true || meta.ext in listOf("jpg", "jpeg", "png", "webp", "gif") || engine == "gallery-dl"
+            val isImageOrGallery = meta.is_gallery == true || meta.ext in IMAGE_EXTENSIONS
 
             ModalBottomSheet(
                 onDismissRequest = { showPreviewSheet = false },
@@ -1199,7 +1145,7 @@ fun MainDownloaderTab(
                     
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         val isAudio = downloadMode == "audio" || meta.ext == "mp3" || meta.ext == "m4a"
-                        val isImageOrGallery = downloadMode == "image" || meta.ext in listOf("jpg", "jpeg", "png", "webp", "gif") || engine == "gallery-dl"
+                        val isImageOrGallery = downloadMode == "image" || meta.ext in IMAGE_EXTENSIONS
                         
                         if (!isImageOrGallery) {
                             Button(
@@ -1221,7 +1167,7 @@ fun MainDownloaderTab(
                         Button(
                             onClick = { 
                                 showPreviewSheet = false
-                                viewModel.downloadMedia(url = url, quality = quality, mode = downloadMode, engine = engine)
+                                viewModel.downloadMedia(url = url, quality = quality, mode = downloadMode)
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(24.dp)
@@ -1403,7 +1349,7 @@ fun MainDownloaderTab(
                                 if (viewModel.hasDownloadedUrl(url)) {
                                     duplicateWarningUrl = url
                                 } else {
-                                    viewModel.downloadMedia(url, quality, downloadMode, engine)
+                                    viewModel.downloadMedia(url, quality, downloadMode)
                                 }
                             }
                         } 
@@ -1419,7 +1365,7 @@ fun MainDownloaderTab(
                                         if (viewModel.hasDownloadedUrl(url)) {
                                             duplicateWarningUrl = url
                                         } else {
-                                            viewModel.downloadMedia(url, quality, downloadMode, engine)
+                                            viewModel.downloadMedia(url, quality, downloadMode)
                                         }
                                     }
                                 }
@@ -2369,81 +2315,32 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         }
     }
 
-    var ytCookies by remember { mutableStateOf(viewModel.getSetting("yt_dlp_cookies_path", "").isNotEmpty()) }
-    var galleryCookies by remember { mutableStateOf(viewModel.getSetting("gallery_dl_cookies_path", "").isNotEmpty()) }
-    var targetEngineForCookies by remember { mutableStateOf<String?>(null) }
-    
-    var ytDlpVersion by remember { mutableStateOf("Fetching...") }
-    var galleryDlVersion by remember { mutableStateOf("Fetching...") }
-    var isUpdatingExtractors by remember { mutableStateOf(false) }
-    
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            try {
-                val versions = com.duck.app.api.PythonExtractor().getVersions()
-                if (versions["status"] == "success") {
-                    ytDlpVersion = versions["yt_dlp"] ?: "Unknown"
-                    galleryDlVersion = versions["gallery_dl"] ?: "Unknown"
-                } else {
-                    ytDlpVersion = "Failed"
-                    galleryDlVersion = "Failed"
-                }
-            } catch(e: Exception) {
-                ytDlpVersion = "Error"
-                galleryDlVersion = "Error"
-            }
-        }
+    var hasCookies by remember {
+        mutableStateOf(viewModel.getSetting(COOKIES_SETTING_KEY, "").isNotEmpty())
     }
-    
+
     val cookiesPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let {
-            val engine = targetEngineForCookies ?: return@let
             try {
-                val inputStream = context.contentResolver.openInputStream(it)
-                val cookiesFile = java.io.File(context.filesDir, "${engine}_cookies.txt")
-                inputStream?.use { input ->
-                    cookiesFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
+                val cookiesFile = java.io.File(context.filesDir, "douyin_cookies.txt")
+                context.contentResolver.openInputStream(it)?.use { input ->
+                    cookiesFile.outputStream().use { output -> input.copyTo(output) }
                 }
-                viewModel.saveSetting("${engine}_cookies_path", cookiesFile.absolutePath)
-                if (engine == "yt_dlp") ytCookies = true else galleryCookies = true
-                android.widget.Toast.makeText(context, "Cookies imported for $engine", android.widget.Toast.LENGTH_SHORT).show()
-            } catch(e: Exception) {
-                android.widget.Toast.makeText(context, "Failed to import cookies", android.widget.Toast.LENGTH_SHORT).show()
+                viewModel.saveSetting(COOKIES_SETTING_KEY, cookiesFile.absolutePath)
+                hasCookies = true
+                android.widget.Toast.makeText(context, "已导入抖音 Cookie", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(context, "导入 Cookie 失败", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
-    
-    var showEngineChooser by remember { mutableStateOf(false) }
-    if (showEngineChooser) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showEngineChooser = false },
-            title = { Text(stringResource(R.string.select_target_extractor)) },
-            text = { Text(stringResource(R.string.which_extractor_do_you_want_to)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showEngineChooser = false
-                    targetEngineForCookies = "yt_dlp"
-                    cookiesPickerLauncher.launch(arrayOf("text/plain"))
-                }) { Text(stringResource(R.string.yt_dlp)) }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showEngineChooser = false
-                    targetEngineForCookies = "gallery_dl"
-                    cookiesPickerLauncher.launch(arrayOf("text/plain"))
-                }) { Text(stringResource(R.string.gallery_dl)) }
-            }
-        )
-    }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            
+
             .padding(horizontal = 24.dp)
             .verticalScroll(rememberScrollState()).padding(top = 16.dp + contentPadding.calculateTopPadding(), bottom = 24.dp + contentPadding.calculateBottomPadding()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -2456,10 +2353,10 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
             Spacer(Modifier.width(16.dp))
             Text(stringResource(R.string.downloads), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         }
-        
+
         Text(stringResource(R.string.download_repository), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.files_will_be_saved_in_your_se), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        
+
         OutlinedCard(
             onClick = { folderPickerLauncher.launch(null) },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -2485,68 +2382,11 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         }
 
         Spacer(Modifier.height(16.dp))
-        Text(stringResource(R.string.extractors), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.update_internal_components), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        
-        OutlinedCard(
-            onClick = {
-                if (isUpdatingExtractors) return@OutlinedCard
-                isUpdatingExtractors = true
-                android.widget.Toast.makeText(context, "Updating extractors... Please wait", android.widget.Toast.LENGTH_LONG).show()
-                val targetPath = java.io.File(context.filesDir, "python_packages").absolutePath
-                kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-                    try {
-                        val result = com.duck.app.api.PythonExtractor().updateExtractors(targetPath)
-                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                            android.util.Log.e("ExtractorUpdate", "Result: $result")
-                            if (result["status"] == "success") {
-                                android.widget.Toast.makeText(context, "Extractors updated successfully! Please restart the app.", android.widget.Toast.LENGTH_LONG).show()
-                                val versions = com.duck.app.api.PythonExtractor().getVersions()
-                                if (versions["status"] == "success") {
-                                    ytDlpVersion = versions["yt_dlp"] ?: ytDlpVersion
-                                    galleryDlVersion = versions["gallery_dl"] ?: galleryDlVersion
-                                }
-                            } else {
-                                android.widget.Toast.makeText(context, "Update failed: ${result["message"]}", android.widget.Toast.LENGTH_LONG).show()
-                            }
-                            isUpdatingExtractors = false
-                        }
-                    } catch(e: Exception) {
-                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                            android.widget.Toast.makeText(context, "Error updating: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
-                            isUpdatingExtractors = false
-                        }
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (isUpdatingExtractors) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
-                } else {
-                    Icon(Icons.Default.SystemUpdate, null, tint = MaterialTheme.colorScheme.primary)
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.update_yt_dlp_gallery_dl), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                    Text("yt-dlp: $ytDlpVersion • gallery-dl: $galleryDlVersion", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.extraction_credentials), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.import_cookies_txt_for_private), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        
+
         OutlinedCard(
-            onClick = {
-                showEngineChooser = true
-            },
+            onClick = { cookiesPickerLauncher.launch(arrayOf("text/plain")) },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -2558,40 +2398,26 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
                 Icon(Icons.Default.VpnKey, null, tint = MaterialTheme.colorScheme.primary)
                 Column(modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.import_cookies_txt), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        if (ytCookies) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(modifier = Modifier.size(8.dp).background(Color.Green, CircleShape))
-                                Spacer(Modifier.width(4.dp))
-                                Text(stringResource(R.string.yt_dlp), style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
-                        if (galleryCookies) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(modifier = Modifier.size(8.dp).background(Color.Green, CircleShape))
-                                Spacer(Modifier.width(4.dp))
-                                Text(stringResource(R.string.gallery_dl), style = MaterialTheme.typography.bodySmall)
-                            }
+                    if (hasCookies) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(8.dp).background(Color.Green, CircleShape))
+                            Spacer(Modifier.width(4.dp))
+                            Text("抖音 Cookie 已导入", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
-                if (ytCookies || galleryCookies) {
+                if (hasCookies) {
                     IconButton(onClick = {
-                        val ytFile = java.io.File(context.filesDir, "yt_dlp_cookies.txt")
-                        val galFile = java.io.File(context.filesDir, "gallery_dl_cookies.txt")
-                        if (ytFile.exists()) ytFile.delete()
-                        if (galFile.exists()) galFile.delete()
-                        viewModel.saveSetting("yt_dlp_cookies_path", "")
-                        viewModel.saveSetting("gallery_dl_cookies_path", "")
-                        ytCookies = false
-                        galleryCookies = false
+                        val file = java.io.File(context.filesDir, "douyin_cookies.txt")
+                        if (file.exists()) file.delete()
+                        viewModel.saveSetting(COOKIES_SETTING_KEY, "")
+                        hasCookies = false
                     }) {
                         Icon(Icons.Default.Delete, contentDescription = "Remove cookies", tint = MaterialTheme.colorScheme.error)
                     }
                 }
             }
         }
-        
     }
 }
 
@@ -2686,7 +2512,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                     Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary)
                     Column(modifier = Modifier.weight(1f)) {
                         Text("duck v${com.duck.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-                        Text(stringResource(R.string.powered_by_yt_dlp_gallery_dl_c), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("纯 HTTP 直链下载 · 仅支持抖音", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
-import com.duck.app.api.PythonExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,16 +14,6 @@ class AndroidPlatformBridge(private val context: Context) : PlatformBridge {
 
     override fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-    }
-
-    override suspend fun extractMediaInfo(url: String): String {
-        return ""
-    }
-
-    override suspend fun downloadMedia(
-        url: String, quality: String, isAudioOnly: Boolean,
-        onProgress: (Float) -> Unit, onComplete: (String) -> Unit, onError: (String) -> Unit
-    ) {
     }
 
     override fun openSavedFolder(path: String) {

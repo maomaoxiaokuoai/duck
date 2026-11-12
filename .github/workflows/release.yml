@@ -46,19 +46,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # Chaquopy builds native wheels for yt-dlp and gallery-dl, and needs the
-      # matching CPython on the build host. ubuntu-latest ships 3.12, so add 3.11.
-      - name: Set up Python 3.11 for Chaquopy
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
-        with:
-          python-version: '3.11'
-
-      - name: Expose Python to Chaquopy
-        run: |
-          PY=$(python3.11 -c "import sys; print(sys.executable)")
-          echo "Chaquopy will use: $PY"
-          echo "CHAQUOPY_BUILD_PYTHON=$PY" >> "$GITHUB_ENV"
-
       - name: Prepare signing material
         if: env.KEYSTORE_BASE64 != ''
         run: |

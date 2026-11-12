@@ -7,14 +7,12 @@ import android.os.Build
 import android.os.Environment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.duck.app.api.CobaltRepository
 import com.duck.app.util.DownloadState
 import com.duck.app.util.FileDownloader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-import com.duck.app.api.PythonExtractor
 import io.ktor.client.HttpClient
 
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +29,7 @@ import com.duck.app.util.NotificationHelper
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import com.duck.app.api.DouyinParser
 import com.duck.app.api.ExtractionResult
 import com.duck.app.ui.theme.AppTheme
 
@@ -49,8 +48,7 @@ enum class TerminalTheme(
 }
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
-    private val extractor = PythonExtractor()
-    private val cobaltRepository = CobaltRepository()
+    private val douyinParser = DouyinParser()
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3)
         .fallbackToDestructiveMigration()
@@ -136,24 +134,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         terminalTheme.value = theme
         prefs.edit().putString("terminal_theme", theme.name).apply()
         logToConsole("Terminal theme changed to: ${theme.displayName}")
-    }
-
-    fun getDynamicEngine(url: String): String {
-        val lowerUrl = url.lowercase()
-        return when {
-            lowerUrl.contains("pinterest") || 
-            lowerUrl.contains("pin.it") ||
-            lowerUrl.contains("instagram.com") || 
-            lowerUrl.contains("pixiv.net") || 
-            lowerUrl.contains("deviantart.com") ||
-            lowerUrl.contains("artstation.com") ||
-            lowerUrl.contains("tumblr.com") ||
-            lowerUrl.contains("flickr.com") -> "gallery-dl"
-            
-            lowerUrl.contains("youtube.com") || lowerUrl.contains("youtu.be") || lowerUrl.contains("soundcloud.com") -> "newpipe"
-            
-            else -> "yt-dlp"
-        }
     }
 
     fun resetDownloadState() {
@@ -372,185 +352,52 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         _externalUrl.value = null
     }
 
-    private suspend fun performExtraction(url: String, quality: String, mode: String, engine: String): ExtractionResult {
-        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            if (engine == "cobalt") {
-                val cobaltMode = if (mode == "video") "auto" else mode
-                logToConsole("Calling Cobalt API...")
-                val cobaltRes = cobaltRepository.fetchMediaLink(
-                    url = url,
-                    quality = quality,
-                    downloadMode = cobaltMode
-                )
-                if (cobaltRes.status == "error") {
-                    logToConsole("Cobalt API returned error: ${cobaltRes.text}")
-                    com.duck.app.api.ExtractionResult(status = "error", message = cobaltRes.text ?: "Cobalt error")
+    /**
+     * Resolves [url] to direct media links.
+     *
+     * Douyin is the only supported source: resolution is pure HTTP via DouyinParser, and
+     * every other host is reported as unsupported. There is no engine selection and no
+     * fallback chain any more, so the URL is the only input that matters.
+     */
+    private suspend fun performExtraction(url: String): ExtractionResult =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            logToConsole("解析抖音链接: ${douyinParser.extractUrl(url)}")
+
+            val result = douyinParser.resolve(url, readCookieHeader())
+            if (result.status == "success") {
+                if (result.is_gallery == true) {
+                    logToConsole("解析成功：图集，共 ${result.urls?.size ?: 0} 个直链")
                 } else {
-                    val resolvedUrl = cobaltRes.url ?: cobaltRes.picker?.firstOrNull()?.url
-                    val path = resolvedUrl?.let { android.net.Uri.parse(it).path?.lowercase() } ?: ""
-                    val detectedExt = when {
-                        path.endsWith(".jpg") || path.endsWith(".jpeg") -> "jpg"
-                        path.endsWith(".png") -> "png"
-                        path.endsWith(".webp") -> "webp"
-                        path.endsWith(".gif") -> "gif"
-                        mode == "audio" -> "mp3"
-                        else -> "mp4"
-                    }
-                    val isImage = detectedExt in listOf("jpg", "jpeg", "png", "webp", "gif")
-                    logToConsole("Cobalt resolved URL successfully. Extracted format: $detectedExt")
-                    
-                    com.duck.app.api.ExtractionResult(
-                        status = "success",
-                        url = resolvedUrl,
-                        title = cobaltRes.filename ?: "Cobalt Download",
-                        author = "Cobalt API",
-                        thumbnail = cobaltRes.picker?.firstOrNull()?.thumb ?: resolvedUrl,
-                        ext = detectedExt
-                    )
-                }
-            } else if (engine == "newpipe") {
-                logToConsole("Executing NewPipeExtractor...")
-                try {
-                    val service = org.schabi.newpipe.extractor.NewPipe.getServiceByUrl(url)
-                    val urlObj = service.getStreamExtractor(url)
-                    urlObj.fetchPage()
-                    
-                    val videoOnlyStreams = urlObj.videoOnlyStreams
-                    val progressiveStreams = urlObj.videoStreams
-                    val qualityClean = quality.replace("p", "")
-
-                    val selectedVideo = if (mode == "audio") {
-                        null
-                    } else {
-                        val matchedVideoOnly = if (quality == "best" || quality.isBlank()) {
-                            videoOnlyStreams.maxByOrNull { it.resolution.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0 }
-                        } else {
-                            videoOnlyStreams.find { it.resolution.contains(qualityClean) }
-                        }
-                        
-                        val matchedProgressive = if (quality == "best" || quality.isBlank()) {
-                            progressiveStreams.maxByOrNull { it.resolution.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0 }
-                        } else {
-                            progressiveStreams.find { it.resolution.contains(qualityClean) }
-                        }
-                        
-                        val videoOnlyRes = matchedVideoOnly?.resolution?.replace(Regex("[^0-9]"), "")?.toIntOrNull() ?: 0
-                        val progressiveRes = matchedProgressive?.resolution?.replace(Regex("[^0-9]"), "")?.toIntOrNull() ?: 0
-                        
-                        if (videoOnlyRes > progressiveRes) {
-                            matchedVideoOnly
-                        } else {
-                            matchedProgressive ?: matchedVideoOnly ?: progressiveStreams.maxByOrNull { it.resolution.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0 }
-                        }
-                    }
-
-                    val m4aAudioStreams = urlObj.audioStreams.filter { it.getFormat()?.suffix == "m4a" }
-                    val englishAudio = m4aAudioStreams.filter { it.audioLocale?.language == "en" }
-                    val defaultAudio = m4aAudioStreams.filter { it.audioLocale == null }
-                    
-                    val bestAudio = englishAudio.maxByOrNull { it.averageBitrate }
-                        ?: defaultAudio.maxByOrNull { it.averageBitrate }
-                        ?: m4aAudioStreams.maxByOrNull { it.averageBitrate }
-                        ?: urlObj.audioStreams.maxByOrNull { it.averageBitrate }
-
-                    val isMuxingRequired = selectedVideo != null && videoOnlyStreams.contains(selectedVideo)
-                    
-                    val streamUrl = if (mode == "audio") bestAudio?.content else selectedVideo?.content ?: bestAudio?.content
-                    val audioUrl = if (isMuxingRequired) bestAudio?.content else null
-                    val ext = if (mode == "audio") "m4a" else selectedVideo?.getFormat()?.suffix ?: "mp4"
-                    
-                    val availableQuals = (videoOnlyStreams + progressiveStreams)
-                        .mapNotNull { it.resolution?.replace(Regex("[^0-9]"), "")?.toIntOrNull() }
-                        .distinct()
-                        .sortedDescending()
-                        .map { "${it}p" }
-                    
-                    val maxResInt = (videoOnlyStreams + progressiveStreams)
-                        .mapNotNull { it.resolution?.replace(Regex("[^0-9]"), "")?.toIntOrNull() }
-                        .maxOrNull()
-                    val maxResStr = if (maxResInt != null) "${maxResInt}p" else null
-
-                    if (streamUrl != null) {
-                        com.duck.app.api.ExtractionResult(
-                            status = "success",
-                            url = streamUrl,
-                            audio_url = audioUrl,
-                            title = urlObj.name,
-                            author = urlObj.uploaderName,
-                            thumbnail = urlObj.thumbnails?.firstOrNull()?.url ?: "",
-                            ext = ext,
-                            max_resolution = maxResStr,
-                            available_qualities = availableQuals
-                        )
-                    } else {
-                        com.duck.app.api.ExtractionResult(status = "error", message = "No streams found")
-                    }
-                } catch (e: Exception) {
-                    com.duck.app.api.ExtractionResult(status = "error", message = e.message ?: "NewPipe extraction failed")
+                    logToConsole("解析成功：直链已获取 (${result.ext})")
                 }
             } else {
-                logToConsole("Executing $engine extractor in Python...")
-                val engineKey = if (engine == "gallery-dl") "gallery_dl" else "yt_dlp"
-                val cookiesPath = prefs.getString("${engineKey}_cookies_path", null)
-                val webViewUa = android.webkit.WebSettings.getDefaultUserAgent(getApplication())
-                val res = extractor.extract(url, quality, mode, engine, cookiesPath, webViewUa)
-                if (res.status == "success") {
-                    if (res.is_gallery == true) {
-                        logToConsole("Python extractor found gallery with ${res.urls?.size ?: 0} items")
-                    } else {
-                        logToConsole("Python extractor resolved URL successfully. Format: ${res.ext}")
-                    }
-                } else {
-                    logToConsole("Python extractor failed: ${res.message}")
-                }
-                res
+                logToConsole("解析失败：${result.message}")
             }
+            result
         }
-    }
 
-    fun fetchPreview(url: String, quality: String, mode: String = "auto", engine: String = "dynamic") {
+    fun fetchPreview(url: String, quality: String, mode: String = "auto") {
         currentPreviewJob?.cancel()
         currentPreviewJob = viewModelScope.launch {
             clearConsole()
             logToConsole("----------------------------------------")
-            logToConsole("[SYSTEM] Fetching video metadata...")
+            logToConsole("[SYSTEM] 正在获取抖音作品信息...")
             logToConsole("[INFO] URL: $url")
-            logToConsole("[INFO] Preferred Quality: ${quality}p | Engine: $engine")
+            logToConsole("[INFO] 模式: $mode")
             logToConsole("----------------------------------------")
             try {
-                var result: com.duck.app.api.ExtractionResult? = null
-                val enginesToTry = if (engine == "dynamic") {
-                    val firstEngine = getDynamicEngine(url)
-                    val allEngines = listOf("cobalt", "yt-dlp", "gallery-dl", "newpipe")
-                    listOf(firstEngine) + allEngines.filter { it != firstEngine }
-                } else {
-                    listOf(engine)
-                }
+                val result = performExtraction(url)
 
-                for (currentEngine in enginesToTry) {
-                    logToConsole("[SYSTEM] Querying extractor: $currentEngine...")
-                    val currentResult = performExtraction(url, quality, mode, currentEngine)
-                    if (currentResult.status == "success") {
-                        result = currentResult
-                        break
-                    } else {
-                        logToConsole("[WARNING] Extractor $currentEngine failed. ${if (enginesToTry.last() != currentEngine) "Trying next candidate..." else "All candidates exhausted."}")
-                        result = currentResult
-                    }
-                }
-
-                if (result?.status == "success") {
-                    logToConsole("[SUCCESS] Metadata resolved successfully!")
-                    logToConsole("[INFO] Title: '${result?.title}'")
-                    logToConsole("[INFO] Author: ${result?.author}")
-                    result?.max_resolution?.let { maxRes ->
-                        logToConsole("Highest available resolution: $maxRes")
-                    }
+                if (result.status == "success") {
+                    logToConsole("[SUCCESS] 解析成功")
+                    logToConsole("[INFO] 标题: '${result.title}'")
+                    logToConsole("[INFO] 作者: ${result.author}")
+                    logToConsole("[INFO] 直链: ${result.url?.take(80)}...")
                 }
                 _previewMetadata.value = result
             } catch (e: Exception) {
-                logToConsole("Preview exception: ${e.message}")
-                _previewMetadata.value = com.duck.app.api.ExtractionResult(status = "error", message = e.message ?: "Extraction failed")
+                logToConsole("预览异常: ${e.message}")
+                _previewMetadata.value = ExtractionResult(status = "error", message = e.message ?: "解析失败")
             }
         }
     }
@@ -564,398 +411,248 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         _previewMetadata.value = result
     }
 
-    private fun muxVideoAudio(videoFile: java.io.File, audioFile: java.io.File, outputFile: java.io.File) {
-        val videoExtractor = android.media.MediaExtractor()
-        videoExtractor.setDataSource(videoFile.absolutePath)
-        
-        val audioExtractor = android.media.MediaExtractor()
-        audioExtractor.setDataSource(audioFile.absolutePath)
-        
-        val format = if (outputFile.absolutePath.endsWith(".webm", ignoreCase = true)) {
-            android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_WEBM
-        } else {
-            android.media.MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4
-        }
-        val muxer = android.media.MediaMuxer(outputFile.absolutePath, format)
-        
-        var videoTrackIndex = -1
-        for (i in 0 until videoExtractor.trackCount) {
-            val format = videoExtractor.getTrackFormat(i)
-            val mime = format.getString(android.media.MediaFormat.KEY_MIME) ?: ""
-            if (mime.startsWith("video/")) {
-                videoExtractor.selectTrack(i)
-                videoTrackIndex = muxer.addTrack(format)
-                break
-            }
-        }
-        
-        var audioTrackIndex = -1
-        for (i in 0 until audioExtractor.trackCount) {
-            val format = audioExtractor.getTrackFormat(i)
-            val mime = format.getString(android.media.MediaFormat.KEY_MIME) ?: ""
-            if (mime.startsWith("audio/")) {
-                audioExtractor.selectTrack(i)
-                audioTrackIndex = muxer.addTrack(format)
-                break
-            }
-        }
-        
-        if (videoTrackIndex == -1) {
-            videoExtractor.release()
-            audioExtractor.release()
-            throw java.io.IOException("Video track not found in source video stream")
-        }
-        if (audioTrackIndex == -1) {
-            videoExtractor.release()
-            audioExtractor.release()
-            throw java.io.IOException("Audio track not found in source audio stream")
-        }
-
-        muxer.start()
-        
-        val videoBuffer = java.nio.ByteBuffer.allocate(1024 * 1024)
-        val videoBufferInfo = android.media.MediaCodec.BufferInfo()
-        while (true) {
-            videoBufferInfo.offset = 0
-            videoBufferInfo.size = videoExtractor.readSampleData(videoBuffer, 0)
-            if (videoBufferInfo.size < 0) {
-                break
-            }
-            videoBufferInfo.presentationTimeUs = videoExtractor.sampleTime
-            videoBufferInfo.flags = videoExtractor.sampleFlags
-            muxer.writeSampleData(videoTrackIndex, videoBuffer, videoBufferInfo)
-            videoExtractor.advance()
-        }
-        
-        val audioBuffer = java.nio.ByteBuffer.allocate(1024 * 1024)
-        val audioBufferInfo = android.media.MediaCodec.BufferInfo()
-        while (true) {
-            audioBufferInfo.offset = 0
-            audioBufferInfo.size = audioExtractor.readSampleData(audioBuffer, 0)
-            if (audioBufferInfo.size < 0) {
-                break
-            }
-            audioBufferInfo.presentationTimeUs = audioExtractor.sampleTime
-            audioBufferInfo.flags = audioExtractor.sampleFlags
-            muxer.writeSampleData(audioTrackIndex, audioBuffer, audioBufferInfo)
-            audioExtractor.advance()
-        }
-        
-        muxer.stop()
-        muxer.release()
-        videoExtractor.release()
-        audioExtractor.release()
-    }
-
-    fun downloadMedia(url: String, quality: String, mode: String = "auto", engine: String = "dynamic") {
+    /**
+     * Resolves [url] with DouyinParser and streams the resulting direct links to disk.
+     *
+     * There is exactly one path now: parse, then plain HTTP download. A failed parse is
+     * reported to the user; nothing falls back to a removed engine.
+     */
+    fun downloadMedia(url: String, quality: String, mode: String = "auto") {
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
             _uiState.value = DownloadState.Downloading(0f)
             val notificationId = System.currentTimeMillis().toInt()
             lastNotificationId = notificationId
-            logToConsole("Starting download process for $url (Engine: $engine)")
-            
+            logToConsole("开始处理: $url")
+
             try {
-                logToConsole("Performing extraction for download...")
-                var result: com.duck.app.api.ExtractionResult? = null
-                if (result == null) {
-                    val enginesToTry = if (engine == "dynamic") {
-                        val firstEngine = getDynamicEngine(url)
-                        val allEngines = listOf("cobalt", "yt-dlp", "gallery-dl", "newpipe")
-                        listOf(firstEngine) + allEngines.filter { it != firstEngine }
-                    } else {
-                        listOf(engine)
-                    }
-
-                    for (currentEngine in enginesToTry) {
-                        logToConsole("Trying engine: $currentEngine")
-                        val currentResult = performExtraction(url, quality, mode, currentEngine)
-                        if (currentResult.status == "success") {
-                            result = currentResult
-                            break
-                        } else {
-                            logToConsole("Engine $currentEngine failed. ${if (enginesToTry.last() != currentEngine) "Trying next..." else "No more engines to try."}")
-                            result = currentResult
-                        }
-                    }
+                logToConsole("正在解析抖音直链...")
+                val result = performExtraction(url)
+                if (result.status != "success") {
+                    throw Exception(result.message ?: "抖音解析失败")
                 }
 
-                if (result == null || result.status != "success") {
-                    throw Exception(result?.message ?: "All extraction engines failed.")
-                }
-                
-                if (result?.status == "success") {
-                    val isGallery = result.is_gallery == true
-                    val urlsToDownload = result.urls ?: listOf(result.url ?: throw Exception("No download URL found"))
-                    val totalFiles = urlsToDownload.size
-                    
-                    if (isGallery && totalFiles > 1) {
-                        logToConsole("Gallery download started: downloading $totalFiles files...")
-                        var succeededCount = 0
-                        for ((index, downloadUrl) in urlsToDownload.withIndex()) {
-                            val extension = result.ext ?: "jpg"
-                            val title = result.title ?: "gallery"
-                            val sanitizedTitle = title.replace(Regex("[^a-zA-Z0-9]"), "_")
-                            val fileName = "${sanitizedTitle}_${index + 1}_${System.currentTimeMillis()}.$extension"
-                            
-                            // Automatically save galleries to Pictures/duck and audio to Music/duck
-                            val targetPath = when {
-                                isGallery && downloadPath.value == "Downloads/duck" -> "Pictures/duck"
-                                mode == "audio" && downloadPath.value == "Downloads/duck" -> "Music/duck"
-                                else -> downloadPath.value
-                            }
-                            logToConsole("Downloading file [${index + 1}/$totalFiles]: $fileName")
-                            
-                            downloader.downloadFile(
-                                url = downloadUrl,
-                                fileName = fileName,
-                                relativePath = targetPath,
-                                customFolderUri = selectedFolderUri.value,
-                                httpHeaders = result.http_headers
-                            ).collect { state ->
-                                if (state is DownloadState.Downloading) {
-                                    val fileProgress = state.progress
-                                    val overallProgress = (index + fileProgress) / totalFiles
-                                    _uiState.value = DownloadState.Downloading(overallProgress, state.downloadedBytes, state.totalBytes, state.speedBps)
-                                    notificationHelper.showProgressNotification(notificationId, "$title (${index + 1}/$totalFiles)", (overallProgress * 100).toInt())
-                                }
-                                if (state is DownloadState.Success) {
-                                    succeededCount++
-                                    val savedUri = Uri.parse(state.path)
-                                    downloader.finalizeFile(savedUri, fileName)
-                                    logToConsole("File [${index + 1}/$totalFiles] saved successfully")
-                                }
-                                if (state is DownloadState.Error) {
-                                    logToConsole("File [${index + 1}/$totalFiles] failed: ${state.message}")
-                                }
-                            }
-                        }
-                        
-                        if (succeededCount > 0) {
-                            _uiState.value = DownloadState.Success("")
-                            val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
-                            logDao.insertLog(DownloadLog(title = "${result.title ?: "Gallery"} ($succeededCount images)", url = url, status = "Success", thumbnailPath = cachedThumb, author = result.author))
-                            notificationHelper.showProgressNotification(notificationId, result.title ?: "Gallery", 100)
-                            logToConsole("Gallery download complete. Successfully saved $succeededCount/$totalFiles files.")
-                        } else {
-                            throw Exception("Failed to download gallery images")
-                        }
-                    } else {
-                        // Single file download
-                        val downloadUrl = urlsToDownload.first()
-                        val extension = result.ext ?: (if (isGallery) "jpg" else "mp4")
-                        val title = result.title ?: (if (isGallery) "image" else "video")
-                        val sanitizedTitle = title.replace(Regex("[^a-zA-Z0-9]"), "_")
-                        val fileName = "${sanitizedTitle}_${System.currentTimeMillis()}.$extension"
-                        
-                        val targetPath = when {
-                            isGallery && downloadPath.value == "Download/duck" -> "Pictures/duck"
-                            mode == "audio" && downloadPath.value == "Download/duck" -> "Music/duck"
-                            else -> downloadPath.value
-                        }
+                val isGallery = result.is_gallery == true
+                val urlsToDownload = result.urls?.takeIf { it.isNotEmpty() }
+                    ?: result.url?.let { listOf(it) }
+                    ?: throw Exception("未能解析出可下载的直链")
+                val totalFiles = urlsToDownload.size
 
-                        val audioUrl = result.audio_url
-                        
-                        suspend fun downloadTrack(trackUrl: String, destFile: java.io.File, trackName: String, progressOffset: Float, progressScale: Float): Boolean {
-                            if (trackUrl.contains(".m3u8")) {
-                                logToConsole("Downloading $trackName track with yt-dlp native downloader...")
-                                val engineKey = if (engine == "gallery-dl") "gallery_dl" else "yt_dlp"
-                                val cookiesPath = prefs.getString("${engineKey}_cookies_path", null)
-                                val pythonResult = extractor.downloadVideo(trackUrl, destFile.absolutePath, cookiesPath)
-                                if (pythonResult["status"] == "success") {
-                                    _uiState.value = DownloadState.Downloading(progressOffset + progressScale)
-                                    return true
-                                } else {
-                                    logToConsole("$trackName download failed: ${pythonResult["message"]}")
-                                    return false
-                                }
-                            } else {
-                                logToConsole("Downloading $trackName track via Ktor: $trackUrl")
-                                var success = false
-                                downloader.downloadFileToPath(trackUrl, destFile, result.http_headers).collect { state ->
-                                    if (state is DownloadState.Downloading) {
-                                        val progress = progressOffset + (state.progress * progressScale)
-                                        _uiState.value = DownloadState.Downloading(progress, state.downloadedBytes, state.totalBytes, state.speedBps)
-                                        notificationHelper.showProgressNotification(notificationId, "$title ($trackName)", (progress * 100).toInt())
-                                    }
-                                    if (state is DownloadState.Success) {
-                                        success = true
-                                    }
-                                    if (state is DownloadState.Error) {
-                                        logToConsole("$trackName download failed: ${state.message}")
-                                    }
-                                }
-                                return success
-                            }
-                        }
-
-                        if (audioUrl != null) {
-                            logToConsole("Split video and audio streams detected. Starting downloads...")
-                            val cacheDir = getApplication<Application>().cacheDir
-                            val tempVideoFile = java.io.File(cacheDir, "temp_video_${System.currentTimeMillis()}.$extension")
-                            val tempAudioFile = java.io.File(cacheDir, "temp_audio_${System.currentTimeMillis()}.m4a")
-                            val tempMuxedFile = java.io.File(cacheDir, "temp_muxed_${System.currentTimeMillis()}.$extension")
-
-                            try {
-                                val videoSuccess = downloadTrack(downloadUrl, tempVideoFile, "Video", 0f, 0.5f)
-                                if (!videoSuccess) throw Exception("Failed to download video track")
-
-                                val audioSuccess = downloadTrack(audioUrl, tempAudioFile, "Audio", 0.5f, 0.5f)
-                                if (!audioSuccess) throw Exception("Failed to download audio track")
-
-                                logToConsole("Muxing video and audio tracks...")
-                                _uiState.value = DownloadState.Downloading(0.99f)
-                                notificationHelper.showProgressNotification(notificationId, "$title (Muxing...)", 99)
-                                
-                                muxVideoAudio(tempVideoFile, tempAudioFile, tempMuxedFile)
-                                logToConsole("Muxing completed successfully!")
-
-                                val targetUri = if (selectedFolderUri.value != null) {
-                                    downloader.createSafUri(Uri.parse(selectedFolderUri.value), fileName)
-                                } else {
-                                    downloader.createMediaStoreUri(fileName, targetPath)
-                                } ?: throw Exception("Could not create destination file")
-
-                                getApplication<Application>().contentResolver.openOutputStream(targetUri)?.use { outStream ->
-                                    tempMuxedFile.inputStream().use { inStream ->
-                                        inStream.copyTo(outStream)
-                                    }
-                                }
-
-                                downloader.finalizeFile(targetUri, fileName)
-                                val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, targetUri.toString())
-                                logDao.insertLog(DownloadLog(title = title, url = url, status = "Success", path = targetUri.toString(), thumbnailPath = cachedThumb, author = result.author))
-                                logToConsole("File saved successfully to $targetPath/$fileName")
-                                
-                                _uiState.value = DownloadState.Success(targetUri.toString())
-
-                                val folderUri = if (selectedFolderUri.value != null) {
-                                    Uri.parse(selectedFolderUri.value)
-                                } else {
-                                    val mediaDir = when {
-                                        targetPath.startsWith("Pictures") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                                        targetPath.startsWith("Music") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-                                        targetPath.startsWith("Downloads") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                        else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                                    }
-                                    Uri.parse("content://media/external/file/").buildUpon()
-                                        .appendQueryParameter("path", mediaDir.absolutePath + "/" + targetPath)
-                                        .build()
-                                }
-                                notificationHelper.showProgressNotification(notificationId, title, 100, folderUri)
-                            } finally {
-                                if (tempVideoFile.exists()) tempVideoFile.delete()
-                                if (tempAudioFile.exists()) tempAudioFile.delete()
-                                if (tempMuxedFile.exists()) tempMuxedFile.delete()
-                            }
-                        } else if (downloadUrl.contains(".m3u8")) {
-                            logToConsole("Single HLS stream detected. Starting native download...")
-                            val cacheDir = getApplication<Application>().cacheDir
-                            val tempFinalFile = java.io.File(cacheDir, "temp_single_${System.currentTimeMillis()}.$extension")
-                            
-                            try {
-                                val success = downloadTrack(downloadUrl, tempFinalFile, "Media", 0f, 1f)
-                                if (!success) throw Exception("Failed to download HLS stream")
-                                
-                                val targetUri = if (selectedFolderUri.value != null) {
-                                    downloader.createSafUri(Uri.parse(selectedFolderUri.value), fileName)
-                                } else {
-                                    downloader.createMediaStoreUri(fileName, targetPath)
-                                } ?: throw Exception("Could not create destination file")
-                                
-                                getApplication<Application>().contentResolver.openOutputStream(targetUri)?.use { outStream ->
-                                    tempFinalFile.inputStream().use { inStream ->
-                                        inStream.copyTo(outStream)
-                                    }
-                                }
-                                
-                                downloader.finalizeFile(targetUri, fileName)
-                                val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, targetUri.toString())
-                                logDao.insertLog(DownloadLog(title = title, url = url, status = "Success", path = targetUri.toString(), thumbnailPath = cachedThumb))
-                                logToConsole("File saved successfully to $targetPath/$fileName")
-                                _uiState.value = DownloadState.Success(targetUri.toString())
-                                
-                                val folderUri = if (selectedFolderUri.value != null) {
-                                    Uri.parse(selectedFolderUri.value)
-                                } else {
-                                    val mediaDir = when {
-                                        targetPath.startsWith("Pictures") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                                        targetPath.startsWith("Music") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-                                        targetPath.startsWith("Downloads") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                        else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                                    }
-                                    Uri.parse("content://media/external/file/").buildUpon()
-                                        .appendQueryParameter("path", mediaDir.absolutePath + "/" + targetPath)
-                                        .build()
-                                }
-                                notificationHelper.showProgressNotification(notificationId, title, 100, folderUri)
-                            } finally {
-                                if (tempFinalFile.exists()) tempFinalFile.delete()
-                            }
-                        } else {
-                            logToConsole("Downloading file: $fileName")
-                            downloader.downloadFile(
-                                url = downloadUrl, 
-                                fileName = fileName, 
-                                relativePath = targetPath,
-                                customFolderUri = selectedFolderUri.value,
-                                httpHeaders = result.http_headers
-                            ).collect { state ->
-                                _uiState.value = state
-                                if (state is DownloadState.Downloading) {
-                                    notificationHelper.showProgressNotification(notificationId, title, (state.progress * 100).toInt())
-                                }
-                                if (state is DownloadState.Success) {
-                                    val savedUri = Uri.parse(state.path)
-                                    downloader.finalizeFile(savedUri, fileName)
-                                    val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, state.path)
-                                    logDao.insertLog(DownloadLog(title = title, url = url, status = "Success", path = state.path, thumbnailPath = cachedThumb))
-                                    logToConsole("File saved successfully to $targetPath/$fileName")
-                                    
-                                    val folderUri = if (selectedFolderUri.value != null) {
-                                        Uri.parse(selectedFolderUri.value)
-                                    } else {
-                                        val mediaDir = when {
-                                            targetPath.startsWith("Pictures") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                                            targetPath.startsWith("Music") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-                                            targetPath.startsWith("Downloads") -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                                            else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                                        }
-                                        Uri.parse("content://media/external/file/").buildUpon()
-                                            .appendQueryParameter("path", mediaDir.absolutePath + "/" + targetPath)
-                                            .build()
-                                    }
-                                    notificationHelper.showProgressNotification(notificationId, title, 100, folderUri)
-                                }
-                                if (state is DownloadState.Error) {
-                                    logToConsole("File download failed: ${state.message}")
-                                }
-                            }
-                        }
-                    }
+                if (isGallery && totalFiles > 1) {
+                    downloadGallery(
+                        urls = urlsToDownload,
+                        result = result,
+                        sourceUrl = url,
+                        mode = mode,
+                        notificationId = notificationId
+                    )
                 } else {
-                    val errorMsg = result?.message ?: "Extraction failed"
-                    _uiState.value = DownloadState.Error(errorMsg)
-                    val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
-                    logDao.insertLog(DownloadLog(title = "Failed Download", url = url, status = "Error: $errorMsg", thumbnailPath = cachedThumb))
-                    logToConsole("Download failed: $errorMsg")
+                    downloadSingle(
+                        downloadUrl = urlsToDownload.first(),
+                        result = result,
+                        sourceUrl = url,
+                        mode = mode,
+                        notificationId = notificationId
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 if (e is kotlinx.coroutines.CancellationException) {
                     _uiState.value = DownloadState.Idle
                     lastNotificationId?.let { notificationHelper.cancelNotification(it) }
-                    logToConsole("Download cancelled")
+                    logToConsole("下载已取消")
                 } else {
-                    val errorMsg = e.message ?: "Unknown error"
+                    val errorMsg = e.message ?: "未知错误"
                     _uiState.value = DownloadState.Error(errorMsg)
                     val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
-                    logDao.insertLog(DownloadLog(title = "Failed Download", url = url, status = "Error: $errorMsg", thumbnailPath = cachedThumb))
-                    logToConsole("Download exception: $errorMsg")
+                    logDao.insertLog(
+                        DownloadLog(
+                            title = "下载失败",
+                            url = url,
+                            status = "Error: $errorMsg",
+                            thumbnailPath = cachedThumb
+                        )
+                    )
+                    logToConsole("下载失败: $errorMsg")
                 }
             }
         }
     }
+
+    /** Downloads every image of a Douyin slideshow post into Pictures/duck. */
+    private suspend fun downloadGallery(
+        urls: List<String>,
+        result: ExtractionResult,
+        sourceUrl: String,
+        mode: String,
+        notificationId: Int
+    ) {
+        val title = result.title ?: "抖音图集"
+        val extension = result.ext ?: "jpg"
+        val targetPath = galleryTargetPath(mode)
+        val sanitizedTitle = sanitizeFileName(title)
+        var succeededCount = 0
+
+        logToConsole("开始下载图集，共 ${urls.size} 个文件...")
+
+        urls.forEachIndexed { index, downloadUrl ->
+            val fileName = "${sanitizedTitle}_${index + 1}_${System.currentTimeMillis()}.$extension"
+
+            downloader.downloadFile(
+                url = downloadUrl,
+                fileName = fileName,
+                relativePath = targetPath,
+                customFolderUri = selectedFolderUri.value,
+                httpHeaders = result.http_headers
+            ).collect { state ->
+                if (state is DownloadState.Downloading) {
+                    val overallProgress = (index + state.progress) / urls.size
+                    _uiState.value = DownloadState.Downloading(
+                        overallProgress,
+                        state.downloadedBytes,
+                        state.totalBytes,
+                        state.speedBps
+                    )
+                    notificationHelper.showProgressNotification(
+                        notificationId,
+                        "$title (${index + 1}/${urls.size})",
+                        (overallProgress * 100).toInt()
+                    )
+                }
+                if (state is DownloadState.Success) {
+                    succeededCount++
+                    downloader.finalizeFile(Uri.parse(state.path), fileName)
+                    logToConsole("文件 ${index + 1}/${urls.size} 已保存")
+                }
+                if (state is DownloadState.Error) {
+                    logToConsole("文件 ${index + 1}/${urls.size} 下载失败: ${state.message}")
+                }
+            }
+        }
+
+        if (succeededCount == 0) {
+            throw Exception("图集下载失败，未能保存任何文件")
+        }
+
+        _uiState.value = DownloadState.Success("")
+        val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
+        logDao.insertLog(
+            DownloadLog(
+                title = "$title ($succeededCount 张)",
+                url = sourceUrl,
+                status = "Success",
+                thumbnailPath = cachedThumb,
+                author = result.author
+            )
+        )
+        notificationHelper.showProgressNotification(notificationId, title, 100)
+        logToConsole("图集下载完成: $succeededCount/${urls.size}")
+    }
+
+    /** Downloads a single direct link. */
+    private suspend fun downloadSingle(
+        downloadUrl: String,
+        result: ExtractionResult,
+        sourceUrl: String,
+        mode: String,
+        notificationId: Int
+    ) {
+        val isImage = result.ext in IMAGE_EXTENSIONS
+        val extension = result.ext ?: if (isImage) "jpg" else "mp4"
+        val title = result.title ?: "抖音作品"
+        val targetPath = galleryTargetPath(mode, isImage)
+        val fileName = "${sanitizeFileName(title)}_${System.currentTimeMillis()}.$extension"
+
+        logToConsole("正在下载: $fileName")
+        logToConsole("保存目录: $targetPath")
+
+        downloader.downloadFile(
+            url = downloadUrl,
+            fileName = fileName,
+            relativePath = targetPath,
+            customFolderUri = selectedFolderUri.value,
+            httpHeaders = result.http_headers
+        ).collect { state ->
+            _uiState.value = state
+            if (state is DownloadState.Downloading) {
+                notificationHelper.showProgressNotification(
+                    notificationId,
+                    title,
+                    (state.progress * 100).toInt()
+                )
+            }
+            if (state is DownloadState.Success) {
+                val savedUri = Uri.parse(state.path)
+                downloader.finalizeFile(savedUri, fileName)
+                val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, state.path)
+                logDao.insertLog(
+                    DownloadLog(
+                        title = title,
+                        url = sourceUrl,
+                        status = "Success",
+                        path = state.path,
+                        thumbnailPath = cachedThumb,
+                        author = result.author
+                    )
+                )
+                logToConsole("文件已保存: $targetPath/$fileName")
+                notificationHelper.showProgressNotification(
+                    notificationId,
+                    title,
+                    100,
+                    folderUriFor(targetPath)
+                )
+            }
+            if (state is DownloadState.Error) {
+                logToConsole("下载失败: ${state.message}")
+            }
+        }
+    }
+
+    /** Picks the MediaStore bucket for a download, keeping galleries in Pictures. */
+    private fun galleryTargetPath(mode: String, isImage: Boolean = true): String {
+        val configured = downloadPath.value
+        return when {
+            !isImage -> configured
+            configured.contains("Picture", ignoreCase = true) -> configured
+            mode == "audio" -> "Music/duck"
+            else -> "Pictures/duck"
+        }
+    }
+
+    private fun folderUriFor(targetPath: String): Uri {
+        selectedFolderUri.value?.let { return Uri.parse(it) }
+
+        val mediaDir = when {
+            targetPath.startsWith("Pictures") ->
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            targetPath.startsWith("Music") ->
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+            targetPath.startsWith("Download", ignoreCase = true) ->
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            else ->
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+        }
+        return Uri.parse("content://media/external/file/").buildUpon()
+            .appendQueryParameter("path", mediaDir.absolutePath + "/" + targetPath)
+            .build()
+    }
+
+    /**
+     * Reads the cookie jar imported from Downloads settings, if the user provided one.
+     * Douyin serves some posts only to logged-in visitors; without a jar the request simply
+     * goes out anonymous and the parser reports whatever it could resolve.
+     */
+    private fun readCookieHeader(): String? {
+        val path = prefs.getString(COOKIE_SETTING_KEY, null)
+        if (path.isNullOrBlank()) return null
+        return runCatching {
+            java.io.File(path).takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.isNotEmpty() }
+        }.getOrNull()
+    }
+
+    private fun sanitizeFileName(title: String): String =
+        title.replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_").take(60)
 
     fun openSavedFolder() {
         try {
@@ -1027,5 +724,12 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
 
     fun resetState() {
         _uiState.value = DownloadState.Idle
+    }
+
+    private companion object {
+        /** Must match the key used by the Downloads settings screen. */
+        const val COOKIE_SETTING_KEY = "douyin_cookies_path"
+
+        val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
     }
 }
