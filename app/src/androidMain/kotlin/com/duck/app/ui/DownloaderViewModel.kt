@@ -323,7 +323,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     else -> out.append(c)
                 }
                 escaped = false
-            } else if (c == '\') {
+            } else if (c == '\\') {
                 escaped = true
             } else if (c == '"') {
                 break
