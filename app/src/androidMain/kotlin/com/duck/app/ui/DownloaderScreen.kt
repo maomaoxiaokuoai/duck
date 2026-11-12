@@ -530,9 +530,9 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             url = url,
                             onUrlChange = { url = it },
                             quality = quality,
-                            onQualityChange = { quality = it },
+                            onQualityChange = { },
                             downloadMode = downloadMode,
-                            onModeChange = { downloadMode = it },
+                            onModeChange = { },
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
