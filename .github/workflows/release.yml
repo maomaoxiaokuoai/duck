@@ -94,7 +94,7 @@ jobs:
       - name: Upload APKs
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: duck-apk-${{ github.ref_name }}
+          name: duck-apk
           path: artifacts/*.apk
           if-no-files-found: error
 
@@ -113,7 +113,7 @@ jobs:
       - name: Download APKs
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
-          name: duck-apk-${{ github.ref_name }}
+          name: duck-apk
           path: artifacts
 
       # Turn the matching CHANGELOG section into the release body.
@@ -148,6 +148,86 @@ jobs:
         with:
           files: artifacts/*.apk
           body_path: body.md
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Every push to main becomes a release.
+  #
+  # The version is bumped here rather than by hand: the branch name carries no version,
+  # so the job reads the current one from build.gradle.kts, increments the patch part,
+  # commits that, tags it, and then lets the normal tag path publish the APKs.
+  auto-tag:
+    name: Bump version and tag
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Work out the next version
+        id: ver
+        run: |
+          python3 - <<'PYEOF' > version.env
+          import re
+          src = open('app/build.gradle.kts', encoding='utf-8').read()
+
+          name = re.search(r'versionName\s*=\s*"([^"]+)"', src).group(1)
+          code = int(re.search(r'versionCode\s*=\s*(\d+)', src).group(1))
+
+          parts = name.split(".")
+          parts[-1] = str(int(parts[-1]) + 1)
+          new_name = ".".join(parts)
+          new_code = code + 1
+
+          src = re.sub(r'versionName\s*=\s*"[^"]+"', 'versionName = "' + new_name + '"', src)
+          src = re.sub(r'versionCode\s*=\s*\d+', 'versionCode = ' + str(new_code), src)
+          open('app/build.gradle.kts', 'w', encoding='utf-8').write(src)
+
+          print("VERSION=" + new_name)
+          print("CODE=" + str(new_code))
+          PYEOF
+          cat version.env >> $GITHUB_ENV
+          echo "next: $VERSION ($CODE)"
+
+      - name: Add a placeholder changelog entry
+        run: |
+          python3 - "$VERSION" <<'PYEOF'
+          import sys
+          ver = sys.argv[1]
+          path = "CHANGELOG.md"
+          text = open(path, encoding="utf-8").read()
+          entry = "## v" + ver + " — 自动发布\n\n本次更新为自动构建，详见提交记录。\n\n"
+          open(path, "w", encoding="utf-8").write(entry + text)
+          PYEOF
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/build.gradle.kts CHANGELOG.md
+          git commit -m "chore: release v$VERSION"
+          git tag -a "v$VERSION" -m "duck $VERSION"
+          git push origin HEAD:main
+          git push origin "v$VERSION"
+
+      - name: Publish this release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          body: |
+            本次更新为自动构建。
+
+            提交记录见 ${{ github.server_url }}/${{ github.repository }}/commits/main
+          files: artifacts/*.apk
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
