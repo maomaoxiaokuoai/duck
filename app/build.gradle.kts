@@ -165,6 +165,11 @@ dependencies {
 chaquopy {
     defaultConfig {
         version = "3.11"
+        // CI exposes the interpreter it installed; local builds fall back to PATH lookup.
+        val py = System.getenv("CHAQUOPY_BUILD_PYTHON")
+        if (!py.isNullOrEmpty()) {
+            buildPython(py)
+        }
         pip {
             install("pip")
             install("yt-dlp")
