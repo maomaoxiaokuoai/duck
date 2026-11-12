@@ -1,0 +1,26 @@
+package com.duck.app.db
+
+import com.duck.app.model.DownloadLog
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+
+class DesktopDownloadLogRepository : DownloadLogRepository {
+    private val logs = MutableStateFlow<List<DownloadLog>>(emptyList())
+    override fun getAllLogs(): Flow<List<DownloadLog>> = logs
+    override suspend fun insertLog(log: DownloadLog) {
+        val current = logs.value.toMutableList()
+        current.add(log)
+        logs.value = current
+    }
+    override suspend fun deleteLog(log: DownloadLog) {
+        val current = logs.value.toMutableList()
+        current.remove(log)
+        logs.value = current
+    }
+    override suspend fun deleteAllLogs() {
+        logs.value = emptyList()
+    }
+    override suspend fun hasUrl(url: String): Boolean {
+        return logs.value.any { it.url == url }
+    }
+}
