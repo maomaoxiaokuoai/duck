@@ -41,7 +41,7 @@ Um diese Funktion zu nutzen, installieren Sie bitte die offizielle Google-App od
     <string name="no">Nein</string>
     <string name="downloading">Wird heruntergeladen...</string>
     <string name="cancel_download_1">Download abbrechen</string>
-    <string name="a_new_version_of_gabi_is_avail">Eine neue Version von Gabi ist auf GitHub verfügbar. Möchten Sie sie herunterladen und installieren?</string>
+    <string name="a_new_version_of_gabi_is_avail">Eine neue Version von duck ist auf GitHub verfügbar. Möchten Sie sie herunterladen und installieren?</string>
     <string name="update_now">Jetzt aktualisieren</string>
     <string name="later">Später</string>
     <string name="gabi">duck</string>
@@ -93,8 +93,8 @@ Um diese Funktion zu nutzen, installieren Sie bitte die offizielle Google-App od
     <string name="support_on_ko_fi">Auf Ko-fi unterstützen</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">Unterstützung</string>
-    <string name="support_gabi_development">Gabi-Entwicklung unterstützen</string>
-    <string name="help_keep_gabi_alive_and_fast">Helfen Sie mit, Gabi lebendig und schnell zu halten. Ihre Unterstützung über UPI hilft, das Projekt aufrechtzuerhalten.</string>
+    <string name="support_gabi_development">duck-Entwicklung unterstützen</string>
+    <string name="help_keep_gabi_alive_and_fast">Helfen Sie mit, duck lebendig und schnell zu halten. Ihre Unterstützung über UPI hilft, das Projekt aufrechtzuerhalten.</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">Das Projekt mit einem Stern markieren</string>

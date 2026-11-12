@@ -38,7 +38,7 @@
     <string name="no">Xeyr</string>
     <string name="downloading">Endirilir...</string>
     <string name="cancel_download_1">Endirməni ləğv et</string>
-    <string name="a_new_version_of_gabi_is_avail">Gabi-nin yeni versiyası GitHub-da mövcuddur. Onu endirib quraşdırmaq istəyirsiniz?</string>
+    <string name="a_new_version_of_gabi_is_avail">duck-nin yeni versiyası GitHub-da mövcuddur. Onu endirib quraşdırmaq istəyirsiniz?</string>
     <string name="update_now">İndi yenilə</string>
     <string name="later">Sonra</string>
     <string name="gabi">duck</string>
@@ -90,8 +90,8 @@
     <string name="support_on_ko_fi">Ko-fi üzərindən dəstəklə</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">Dəstək</string>
-    <string name="support_gabi_development">Gabi-nin inkişafını dəstəklə</string>
-    <string name="help_keep_gabi_alive_and_fast">Gabi-nin işləməsinə və sürətli qalmasına kömək edin. UPI vasitəsilə dəstəyiniz layihənin davamına kömək edir.</string>
+    <string name="support_gabi_development">duck-nin inkişafını dəstəklə</string>
+    <string name="help_keep_gabi_alive_and_fast">duck-nin işləməsinə və sürətli qalmasına kömək edin. UPI vasitəsilə dəstəyiniz layihənin davamına kömək edir.</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">Layihəyə ulduz ver</string>

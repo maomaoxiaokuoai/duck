@@ -41,7 +41,7 @@
     <string name="no">Нет</string>
     <string name="downloading">Загрузка...</string>
     <string name="cancel_download_1">Отменить загрузку</string>
-    <string name="a_new_version_of_gabi_is_avail">Новая версия Gabi доступна на GitHub. Хотите скачать и установить её?</string>
+    <string name="a_new_version_of_gabi_is_avail">Новая версия duck доступна на GitHub. Хотите скачать и установить её?</string>
     <string name="update_now">Обновить сейчас</string>
     <string name="later">Позже</string>
     <string name="gabi">duck</string>
@@ -93,8 +93,8 @@
     <string name="support_on_ko_fi">Поддержать на Ko-fi</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">Поддержка</string>
-    <string name="support_gabi_development">Поддержите разработку Gabi</string>
-    <string name="help_keep_gabi_alive_and_fast">Помогите сохранить Gabi. Ваша поддержка помогает.</string>
+    <string name="support_gabi_development">Поддержите разработку duck</string>
+    <string name="help_keep_gabi_alive_and_fast">Помогите сохранить duck. Ваша поддержка помогает.</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">Поставить звезду проекту</string>

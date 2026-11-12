@@ -38,7 +38,7 @@
     <string name="no">Hayır</string>
     <string name="downloading">İndiriliyor...</string>
     <string name="cancel_download_1">İndirmeyi İptal Et</string>
-    <string name="a_new_version_of_gabi_is_avail">Gabi\'nin yeni bir sürümü GitHub\'da mevcut. İndirip yüklemek ister misiniz?</string>
+    <string name="a_new_version_of_gabi_is_avail">duck\'nin yeni bir sürümü GitHub\'da mevcut. İndirip yüklemek ister misiniz?</string>
     <string name="update_now">Şimdi Güncelle</string>
     <string name="later">Daha Sonra</string>
     <string name="gabi">duck</string>
@@ -90,8 +90,8 @@
     <string name="support_on_ko_fi">Ko-fi Üzerinden Destek Olun</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">Destek</string>
-    <string name="support_gabi_development">Gabi Geliştirmesini Destekleyin</string>
-    <string name="help_keep_gabi_alive_and_fast">Gabi\'nin güncel ve hızlı kalmasına katkıda bulunun. UPI üzerinden desteğiniz projenin sürdürülmesine yardımcı olur.</string>
+    <string name="support_gabi_development">duck Geliştirmesini Destekleyin</string>
+    <string name="help_keep_gabi_alive_and_fast">duck\'nin güncel ve hızlı kalmasına katkıda bulunun. UPI üzerinden desteğiniz projenin sürdürülmesine yardımcı olur.</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">Projeye Yıldız Verin</string>

@@ -41,7 +41,7 @@
     <string name="no">नहीं</string>
     <string name="downloading">डाउनलोड हो रहा है...</string>
     <string name="cancel_download_1">डाउनलोड रद्द करें</string>
-    <string name="a_new_version_of_gabi_is_avail">Gabi का एक नया संस्करण GitHub पर उपलब्ध है। क्या आप इसे डाउनलोड और इंस्टॉल करना चाहेंगे?</string>
+    <string name="a_new_version_of_gabi_is_avail">duck का एक नया संस्करण GitHub पर उपलब्ध है। क्या आप इसे डाउनलोड और इंस्टॉल करना चाहेंगे?</string>
     <string name="update_now">अभी अपडेट करें</string>
     <string name="later">बाद में</string>
     <string name="gabi">duck</string>
@@ -93,8 +93,8 @@
     <string name="support_on_ko_fi">Ko-fi पर समर्थन करें</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">समर्थन</string>
-    <string name="support_gabi_development">Gabi विकास का समर्थन करें</string>
-    <string name="help_keep_gabi_alive_and_fast">Gabi को जीवित और तेज़ रखने में मदद करें। UPI के माध्यम से आपका समर्थन प्रोजेक्ट को बनाए रखने में मदद करता है।</string>
+    <string name="support_gabi_development">duck विकास का समर्थन करें</string>
+    <string name="help_keep_gabi_alive_and_fast">duck को जीवित और तेज़ रखने में मदद करें। UPI के माध्यम से आपका समर्थन प्रोजेक्ट को बनाए रखने में मदद करता है।</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">प्रोजेक्ट को स्टार दें</string>
