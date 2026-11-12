@@ -172,7 +172,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         connection.connectTimeout = CONNECT_TIMEOUT_MS
         connection.readTimeout = READ_TIMEOUT_MS
         connection.instanceFollowRedirects = true
-        connection.setRequestProperty("User-Agent", MOBILE_USER_AGENT)
+        connection.setRequestProperty("User-Agent", DESKTOP_USER_AGENT)
         connection.setRequestProperty("Referer", "https://www.douyin.com/")
         connection.setRequestProperty("Accept", "text/html,application/json,*/*")
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9")
@@ -480,9 +480,11 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         const val MAX_REDIRECTS = 5
         const val SLIDES_INFO_ENDPOINT = "https://www.iesdouyin.com/web/api/v2/aweme/slidesinfo/"
 
-        const val MOBILE_USER_AGENT =
-            "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) " +
-                "Chrome/124.0.0.0 Mobile Safari/537.36"
+        // Douyin serves a trimmed share page to mobile agents; the full SSR payload that
+        // carries __pace_f is only rendered for a desktop browser string.
+        const val DESKTOP_USER_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 
         val KNOWN_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif", "mp4", "m4a", "mp3", "webm")
     }

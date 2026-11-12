@@ -169,8 +169,9 @@ class DouyinSigner(private val context: Context) {
     private companion object {
         const val TAG = "DouyinSigner"
         const val LOAD_TIMEOUT_SECONDS = 25L
+        // Match the agent the parser sends: the signature is bound to it.
         const val USER_AGENT =
-            "Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 " +
-                "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     }
 }
