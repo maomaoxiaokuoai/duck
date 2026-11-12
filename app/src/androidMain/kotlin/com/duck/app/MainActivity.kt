@@ -93,13 +93,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (!viewModel.isOnboardingCompleted.value) {
-                        com.duck.app.ui.OnboardingScreen(
-                            onComplete = { viewModel.setOnboardingCompleted() }
-                        )
-                    } else {
-                        DownloaderScreen(viewModel)
-                    }
+                    DownloaderScreen(viewModel)
                 }
             }
         }

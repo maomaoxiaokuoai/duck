@@ -33,9 +33,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.viewinterop.AndroidView
-import android.webkit.CookieManager
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -58,7 +55,6 @@ import androidx.compose.ui.res.painterResource
 import com.duck.app.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import org.burnoutcrew.reorderable.*
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.draw.scale
 import androidx.compose.material3.*
@@ -67,7 +63,6 @@ import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.draw.clip
@@ -143,7 +138,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         label = "instant_scale"
     )
     
-    var showSpeechNotSupportedDialog by remember { mutableStateOf(false) }
     var isSettingsSearchActive by remember { mutableStateOf(false) }
     var settingsSearchQuery by remember { mutableStateOf("") }
     val searchInteractionSource = remember { MutableInteractionSource() }
@@ -153,26 +147,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "search_scale"
     )
-    val speechRecognizerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val data = result.data
-            val matches = data?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
-            if (!matches.isNullOrEmpty()) {
-                viewModel.voiceSearchEvent.tryEmit(matches[0])
-            }
-        }
-    }
-
-    val voiceInteractionSource = remember { MutableInteractionSource() }
-    val isVoicePressed by voiceInteractionSource.collectIsPressedAsState()
-    val voiceScale by animateFloatAsState(
-        targetValue = if (isVoicePressed) 1.08f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "voice_scale"
-    )
-
     val clearLogsInteractionSource = remember { MutableInteractionSource() }
     val isClearLogsPressed by clearLogsInteractionSource.collectIsPressedAsState()
     val clearLogsCorner by animateDpAsState(
@@ -222,21 +196,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         )
     }
 
-    var playingUrl by remember { mutableStateOf<String?>(null) }
-    
-    if (playingUrl != null) {
-        PlayerScreen(
-            url = playingUrl!!,
-            onBack = { playingUrl = null },
-            onDownload = { dlUrl ->
-                playingUrl = null
-                url = dlUrl
-                engine = "newpipe"
-                selectedTab = 0
-            }
-        )
-        return
-    }
 
     Row(modifier = Modifier.fillMaxSize()) {
         if (isExpanded) {
@@ -266,28 +225,8 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
                     icon = { 
-                        val scale by animateFloatAsState(
-                            targetValue = if (selectedTab == 1) 1.2f else 1.0f,
-                            animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
-                            label = "newpipe_scale"
-                        )
-                        Icon(
-                            Icons.Default.PlayArrow, 
-                            null,
-                            modifier = Modifier.graphicsLayer {
-                                scaleX = scale
-                                scaleY = scale
-                            }
-                        ) 
-                    },
-                    label = { Text(stringResource(R.string.newpipe)) }
-                )
-                NavigationRailItem(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    icon = { 
                         val rotation by animateFloatAsState(
-                            targetValue = if (selectedTab == 2) 360f else 0f,
+                            targetValue = if (selectedTab == 1) 360f else 0f,
                             animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
                             label = "rotation"
                         )
@@ -309,16 +248,16 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                     label = { Text(stringResource(R.string.logs)) }
                 )
                 NavigationRailItem(
-                    selected = selectedTab == 3,
-                    onClick = { selectedTab = 3 },
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
                     icon = { 
                         val rotation by animateFloatAsState(
-                            targetValue = if (selectedTab == 3) 360f else 0f,
+                            targetValue = if (selectedTab == 2) 360f else 0f,
                             animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
                             label = "rotation"
                         )
                         val scale by animateFloatAsState(
-                            targetValue = if (selectedTab == 3) 1.2f else 1.0f,
+                            targetValue = if (selectedTab == 2) 1.2f else 1.0f,
                             animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
                             label = "scale"
                         )
@@ -418,7 +357,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             val pad1 by animateDpAsState(if (selectedTab == 1) 24.dp else 10.dp, tween(300, easing = FastOutSlowInEasing), label = "")
                             TooltipBox(
                                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.media)) } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.history)) } },
                                 state = rememberTooltipState()
                             ) {
                                 Box(
@@ -433,8 +372,9 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                     }.padding(horizontal = pad1, vertical = 10.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    val scale by animateFloatAsState(if (selectedTab == 1) 1.2f else 1.0f, tween(600, easing = FastOutSlowInEasing), label = "newpipe_scale")
-                                    Icon(Icons.Default.PlayArrow, null, modifier = Modifier.graphicsLayer { scaleX = scale; scaleY = scale }, tint = color1)
+                                    val rotation by animateFloatAsState(if (selectedTab == 1) 360f else 0f, tween(800, easing = FastOutSlowInEasing), label = "rotation")
+                                    val scale by animateFloatAsState(if (selectedTab == 1) 1.2f else 1.0f, tween(600, easing = FastOutSlowInEasing), label = "scale")
+                                    Icon(Icons.Default.History, null, modifier = Modifier.graphicsLayer { rotationZ = rotation; scaleX = scale; scaleY = scale }, tint = color1)
                                 }
                             }
 
@@ -443,7 +383,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             val pad2 by animateDpAsState(if (selectedTab == 2) 24.dp else 10.dp, tween(300, easing = FastOutSlowInEasing), label = "")
                             TooltipBox(
                                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.history)) } },
+                                tooltip = { PlainTooltip { Text(stringResource(R.string.settings)) } },
                                 state = rememberTooltipState()
                             ) {
                                 Box(
@@ -460,33 +400,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                 ) {
                                     val rotation by animateFloatAsState(if (selectedTab == 2) 360f else 0f, tween(800, easing = FastOutSlowInEasing), label = "rotation")
                                     val scale by animateFloatAsState(if (selectedTab == 2) 1.2f else 1.0f, tween(600, easing = FastOutSlowInEasing), label = "scale")
-                                    Icon(Icons.Default.History, null, modifier = Modifier.graphicsLayer { rotationZ = rotation; scaleX = scale; scaleY = scale }, tint = color2)
-                                }
-                            }
-
-                            val bg3 by animateColorAsState(if (selectedTab == 3) MaterialTheme.colorScheme.primaryContainer else Color.Transparent, label = "")
-                            val color3 by animateColorAsState(if (selectedTab == 3) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant, label = "")
-                            val pad3 by animateDpAsState(if (selectedTab == 3) 24.dp else 10.dp, tween(300, easing = FastOutSlowInEasing), label = "")
-                            TooltipBox(
-                                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                tooltip = { PlainTooltip { Text(stringResource(R.string.settings)) } },
-                                state = rememberTooltipState()
-                            ) {
-                                Box(
-                                    modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (selectedTab == 3 && viewModel.isNavBarTrueGlass.value) {
-                                            m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
-                                        } else {
-                                            m.background(bg3)
-                                        }
-                                    }.clickable {
-                                        selectedTab = 3
-                                    }.padding(horizontal = pad3, vertical = 10.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    val rotation by animateFloatAsState(if (selectedTab == 3) 360f else 0f, tween(800, easing = FastOutSlowInEasing), label = "rotation")
-                                    val scale by animateFloatAsState(if (selectedTab == 3) 1.2f else 1.0f, tween(600, easing = FastOutSlowInEasing), label = "scale")
-                                    Icon(Icons.Default.Settings, null, modifier = Modifier.graphicsLayer { rotationZ = rotation; scaleX = scale; scaleY = scale }, tint = color3)
+                                    Icon(Icons.Default.Settings, null, modifier = Modifier.graphicsLayer { rotationZ = rotation; scaleX = scale; scaleY = scale }, tint = color2)
                                 }
                             }
                         }
@@ -529,47 +443,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             }
                         }
                         
-                        val isVoiceVisible = selectedTab == 1
-                        val voiceFabSize by animateDpAsState(if (isVoiceVisible) 52.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
-                        val voiceSpacerSize by animateDpAsState(if (isVoiceVisible) 10.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
-                        
-                        if (voiceFabSize > 0.dp) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(Modifier.width(voiceSpacerSize))
-                                TooltipBox(
-                                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                                    tooltip = { PlainTooltip { Text(stringResource(R.string.voice_search)) } },
-                                    state = rememberTooltipState()
-                                ) {
-                                    FloatingActionButton(
-                                        onClick = {
-                                            val intent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                                putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                                            }
-                                            try {
-                                                speechRecognizerLauncher.launch(intent)
-                                            } catch (e: android.content.ActivityNotFoundException) {
-                                                showSpeechNotSupportedDialog = true
-                                            }
-                                        },
-                                        modifier = Modifier
-                                            .size(voiceFabSize)
-                                            .graphicsLayer {
-                                                scaleX = voiceScale
-                                                scaleY = voiceScale
-                                            },
-                                        interactionSource = voiceInteractionSource,
-                                        shape = CircleShape,
-                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                                    ) {
-                                        Icon(Icons.Default.Mic, contentDescription = "Voice Search")
-                                    }
-                                }
-                            }
-                        }
-                        
-                        val isBinVisible = selectedTab == 2
+                        val isBinVisible = selectedTab == 1
                         val context = androidx.compose.ui.platform.LocalContext.current
                         val binFabSize by animateDpAsState(if (isBinVisible) 52.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
                         val binSpacerSize by animateDpAsState(if (isBinVisible) 10.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
@@ -600,7 +474,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                 }
                             }
                         }
-                        val isSearchVisible = selectedTab == 3
+                        val isSearchVisible = selectedTab == 2
                         val searchFabSize by animateDpAsState(if (isSearchVisible) 52.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
                         val searchSpacerSize by animateDpAsState(if (isSearchVisible) 10.dp else 0.dp, androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
 
@@ -655,46 +529,18 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             engine = engine,
                             onEngineChange = { engine = it },
                             contentPadding = padding,
-                            onYoutubeSearch = {
-                                selectedTab = 1
-                                viewModel.performNewPipeSearch(viewModel.newPipeQuery.value)
-                            }
                         )
-                        1 -> NewPipeTab(
-                            viewModel = viewModel,
-                            contentPadding = padding,
-                            onUrlSelected = { selectedUrl ->
-                                url = selectedUrl
-                                engine = "newpipe"
-                                selectedTab = 0
-                            },
-                            onWatchSelected = { selectedUrl ->
-                                playingUrl = selectedUrl
-                            }
-                        )
-                        2 -> LogsTab(
+                        1 -> LogsTab(
                             history = history, 
                             onDelete = viewModel::deleteLog,
                             contentPadding = padding
                         )
-                        3 -> SettingsTab(viewModel, contentPadding = padding, isSearchActive = isSettingsSearchActive, searchQuery = settingsSearchQuery, onQueryChange = { settingsSearchQuery = it })
+                        2 -> SettingsTab(viewModel, contentPadding = padding, isSearchActive = isSettingsSearchActive, searchQuery = settingsSearchQuery, onQueryChange = { settingsSearchQuery = it })
                     }
                 }
             }
         }
 
-        if (showSpeechNotSupportedDialog) {
-            AlertDialog(
-                onDismissRequest = { showSpeechNotSupportedDialog = false },
-                title = { Text(stringResource(R.string.voice_search_not_supported)) },
-                text = { Text(stringResource(R.string.your_device_does_not_have_a_bu)) },
-                confirmButton = {
-                    TextButton(onClick = { showSpeechNotSupportedDialog = false }) {
-                        Text(stringResource(R.string.ok))
-                    }
-                }
-            )
-        }
 
         if (showSupportedSitesDialog) {
             AlertDialog(
@@ -840,14 +686,12 @@ fun MainDownloaderTab(
     engine: String,
     onEngineChange: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    onYoutubeSearch: () -> Unit = {}
 ) {
     var qualityExpanded by remember { mutableStateOf(false) }
     var modeExpanded by remember { mutableStateOf(false) }
     var engineExpanded by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showFullscreenLogs by remember { mutableStateOf(false) }
-    var isYoutubeSearchMode by remember { mutableStateOf(false) }
     var showPreviewSheet by remember { mutableStateOf(false) }
     var showTerminalCard by remember { mutableStateOf(viewModel.getSetting("show_terminal_card", "true").toBoolean()) }
     var duplicateWarningUrl by remember { mutableStateOf<String?>(null) }
@@ -1052,57 +896,16 @@ fun MainDownloaderTab(
         )
 
         val homeSearchStyle = viewModel.getSetting("home_search_style", "unified")
-        
-        val actionButtonContent: @Composable () -> Unit = {
-            val icon = if (isYoutubeSearchMode) Icons.Default.Search else Icons.Default.ContentPaste
-            val tint = MaterialTheme.colorScheme.onPrimaryContainer
-            androidx.compose.animation.AnimatedContent(targetState = icon, label = "icon_anim") { targetIcon ->
-                Icon(targetIcon, contentDescription = "Action", tint = tint)
-            }
-        }
-        
         val onKeyboardGo = {
-            if (isYoutubeSearchMode) {
-                if (url.isNotBlank()) {
-                    viewModel.newPipeQuery.value = url
-                    onYoutubeSearch()
-                }
-            } else {
-                if (url.isNotBlank()) {
-                    viewModel.fetchPreview(url, quality, downloadMode, engine)
-                }
+            if (url.isNotBlank()) {
+                viewModel.fetchPreview(url, quality, downloadMode, engine)
             }
         }
-        
+
         val performAction: () -> Unit = {
-            if (isYoutubeSearchMode) {
-                if (url.isNotBlank()) {
-                    viewModel.newPipeQuery.value = url
-                    // To switch tab, we need a way, but since we can't easily here without callback, 
-                    // let's just trigger newPipe search in background or show a toast if we can't switch tab.
-                    // Wait, we can use the Event bus or just viewModel to trigger tab switch!
-                    // Let's add a trigger to DownloaderScreen.
-                    onYoutubeSearch()
-                }
-            } else {
-                clipboardManager.getText()?.let { 
-                    onUrlChange(it.text)
-                    viewModel.fetchPreview(it.text, quality, downloadMode, engine)
-                }
-            }
-        }
-        
-        var hasSwiped by remember { mutableStateOf(false) }
-        val dragModifier = Modifier.pointerInput(Unit) {
-            detectVerticalDragGestures(
-                onDragStart = { hasSwiped = false },
-                onDragEnd = { hasSwiped = false },
-                onDragCancel = { hasSwiped = false }
-            ) { change, dragAmount ->
-                if (!hasSwiped && (dragAmount > 20 || dragAmount < -20)) {
-                    isYoutubeSearchMode = !isYoutubeSearchMode
-                    hasSwiped = true
-                }
+            clipboardManager.getText()?.let { 
+                onUrlChange(it.text)
+                viewModel.fetchPreview(it.text, quality, downloadMode, engine)
             }
         }
 
@@ -1140,9 +943,9 @@ fun MainDownloaderTab(
                 
                 IconButton(
                     onClick = performAction,
-                    modifier = Modifier.size(56.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape).then(dragModifier)
+                    modifier = Modifier.size(56.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape)
                 ) {
-                    actionButtonContent()
+                    Icon(Icons.Default.ContentPaste, contentDescription = "Action")
                 }
             }
         } else {
@@ -1187,9 +990,9 @@ fun MainDownloaderTab(
 
                     IconButton(
                         onClick = performAction,
-                        modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape).then(dragModifier)
+                        modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape)
                     ) {
-                        actionButtonContent()
+                        Icon(Icons.Default.ContentPaste, contentDescription = "Action")
                     }
                 }
             }
@@ -2170,7 +1973,7 @@ fun SettingsListItem(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsTab(viewModel: DownloaderViewModel, contentPadding: PaddingValues = PaddingValues(0.dp),
-    onYoutubeSearch: () -> Unit = {}, isSearchActive: Boolean = false, searchQuery: String = "", onQueryChange: (String) -> Unit = {}) {
+    isSearchActive: Boolean = false, searchQuery: String = "", onQueryChange: (String) -> Unit = {}) {
     var currentScreen by remember { mutableStateOf("Main") }
 
     BackHandler(enabled = currentScreen != "Main") {
@@ -2213,9 +2016,7 @@ fun SettingsTab(viewModel: DownloaderViewModel, contentPadding: PaddingValues = 
             )
             "Customisation" -> CustomisationScreen(viewModel, onBack = { currentScreen = "Main" }, contentPadding, target)
             "Downloads" -> DownloadsSettingsScreen(viewModel, onBack = { currentScreen = "Main" }, contentPadding, target)
-            "Cookies" -> CookiesSettingsScreen(viewModel, onBack = { currentScreen = "Main" }, contentPadding, target)
             "Developer" -> DeveloperScreen(viewModel = viewModel, onBack = { currentScreen = "Main" }, contentPadding, target)
-            "Support" -> SupportScreen(onBack = { currentScreen = "Main" }, contentPadding, target)
         }
     }
 }
@@ -2240,9 +2041,7 @@ fun SettingsMainList(
             Triple("Language", "Change app language", "Customisation?target=Language"),
             Triple("Download Repository", "Files will be saved in your selected folder", "Downloads?target=Download Repository"),
             Triple("Extractors", "Update internal components", "Downloads?target=Extractors"),
-            Triple("Cookies", "Extraction Credentials", "Cookies?target=Cookies"),
-            Triple("Check for Updates", "Check latest GitHub release", "Developer?target=Check for Updates"),
-            Triple("Support", "Support on Ko-fi, UPI, GitHub", "Support?target=Support")
+            Triple("Check for Updates", "Check latest GitHub release", "Developer?target=Check for Updates")
         )
     }
 
@@ -2346,49 +2145,17 @@ fun SettingsMainList(
             }
 
             SegmentCard(
-                onClick = { onNavigate("Cookies") },
-                defaultTopStart = 4.dp,
-                defaultTopEnd = 4.dp,
-                defaultBottomStart = 4.dp,
-                defaultBottomEnd = 4.dp
-            ) {
-                SettingsListItem(
-                    icon = Icons.Default.Cookie,
-                    iconColor = Color(0xFFD4A373), // Cookie color
-                    title = "Cookies",
-                    subtitle = "Manage authentication cookies",
-                    useMaterialShapes = viewModel.isMaterialShapesEnabled.value
-                )
-            }
-
-            SegmentCard(
                 onClick = { onNavigate("Developer") },
-                defaultTopStart = 4.dp,
-                defaultTopEnd = 4.dp,
-                defaultBottomStart = 4.dp,
-                defaultBottomEnd = 4.dp
-            ) {
-                SettingsListItem(
-                    icon = Icons.Default.Code,
-                    iconColor = Color(0xFF4C6B8B), // Slate blue
-                    title = "Developer",
-                    subtitle = "App Info, Platforms, Licenses",
-                    useMaterialShapes = viewModel.isMaterialShapesEnabled.value
-                )
-            }
-
-            SegmentCard(
-                onClick = { onNavigate("Support") },
                 defaultTopStart = 4.dp,
                 defaultTopEnd = 4.dp,
                 defaultBottomStart = 24.dp,
                 defaultBottomEnd = 24.dp
             ) {
                 SettingsListItem(
-                    icon = Icons.Default.Favorite,
-                    iconColor = Color(0xFF7A4F5C), // Burgundy
-                    title = "Support",
-                    subtitle = "Help keep Gabi alive",
+                    icon = Icons.Default.Code,
+                    iconColor = Color(0xFF4C6B8B), // Slate blue
+                    title = "Developer",
+                    subtitle = "App Info, Platforms, Licenses",
                     useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
@@ -2401,6 +2168,7 @@ fun SettingsMainList(
 @Composable
 fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     val positions = remember { mutableMapOf<String, Float>() }
 
     LaunchedEffect(target) {
@@ -2521,7 +2289,7 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
                                     onClick = {
                                         // Remember the pick so the forced Chinese default
                                         // in MainActivity does not override it next launch.
-                                        val prefs = androidx.compose.ui.platform.LocalContext.current
+                                        val prefs = context
                                             .getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
                                         prefs.edit().putBoolean("language_chosen", true).apply()
                                         androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
@@ -2817,32 +2585,7 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         }
     }
     
-    var showCookieExtractor by remember { mutableStateOf(false) }
-
-    if (showCookieExtractor && targetEngineForCookies != null) {
-        CookieExtractorDialog(
-            fileName = "${targetEngineForCookies}_cookies.txt",
-            onDismiss = { showCookieExtractor = false },
-            onCookiesExtracted = { extractedUrl, cookies ->
-                val engine = targetEngineForCookies!!
-                val uri = android.net.Uri.parse(extractedUrl)
-                val domain = uri.host ?: "Unknown Site"
-                val session = com.duck.app.model.CookieSession(
-                    id = java.util.UUID.randomUUID().toString(),
-                    domain = domain,
-                    cookieString = cookies,
-                    engine = engine
-                )
-                viewModel.addCookieSession(session)
-                if (engine == "yt_dlp") ytCookies = true else galleryCookies = true
-                android.widget.Toast.makeText(context, "Cookies extracted for $engine", android.widget.Toast.LENGTH_SHORT).show()
-            }
-        )
-    }
-    
     var showEngineChooser by remember { mutableStateOf(false) }
-    var chooserAction by remember { mutableStateOf("") }
-    
     if (showEngineChooser) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showEngineChooser = false },
@@ -2852,16 +2595,14 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
                 TextButton(onClick = {
                     showEngineChooser = false
                     targetEngineForCookies = "yt_dlp"
-                    if (chooserAction == "import") cookiesPickerLauncher.launch(arrayOf("text/plain"))
-                    else showCookieExtractor = true
+                    cookiesPickerLauncher.launch(arrayOf("text/plain"))
                 }) { Text(stringResource(R.string.yt_dlp)) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showEngineChooser = false
                     targetEngineForCookies = "gallery_dl"
-                    if (chooserAction == "import") cookiesPickerLauncher.launch(arrayOf("text/plain"))
-                    else showCookieExtractor = true
+                    cookiesPickerLauncher.launch(arrayOf("text/plain"))
                 }) { Text(stringResource(R.string.gallery_dl)) }
             }
         )
@@ -2972,7 +2713,6 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         
         OutlinedCard(
             onClick = {
-                chooserAction = "import"
                 showEngineChooser = true
             },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -3020,117 +2760,9 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
             }
         }
         
-        OutlinedCard(
-            onClick = {
-                chooserAction = "extract"
-                showEngineChooser = true
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(Icons.Default.Web, null, tint = MaterialTheme.colorScheme.primary)
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.extract_from_web_login), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                    Text(stringResource(R.string.login_to_sites_to_get_cookies), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
     }
 }
 
-fun saveCookiesToNetscapeFormat(context: android.content.Context, url: String, cookieString: String?, fileName: String): String {
-    if (cookieString.isNullOrEmpty()) return ""
-    val uri = android.net.Uri.parse(url)
-    val domain = uri.host ?: return ""
-    val cookiesFile = java.io.File(context.filesDir, fileName)
-    val out = StringBuilder()
-    if (!cookiesFile.exists()) {
-        out.append("# Netscape HTTP Cookie File\n\n")
-    } else {
-        out.append(cookiesFile.readText())
-    }
-    
-    val cookies = cookieString.split(";")
-    for (cookie in cookies) {
-        val parts = cookie.trim().split("=", limit = 2)
-        if (parts.size == 2) {
-            val name = parts[0]
-            val value = parts[1]
-            val domainWithDot = if (domain.startsWith(".")) domain else ".$domain"
-            out.append("$domainWithDot\tTRUE\t/\tFALSE\t2147483647\t$name\t$value\n")
-        }
-    }
-    cookiesFile.writeText(out.toString())
-    return cookiesFile.absolutePath
-}
-
-@Composable
-fun CookieExtractorDialog(initialUrl: String = "https://youtube.com", fileName: String, onDismiss: () -> Unit, onCookiesExtracted: (String, String) -> Unit) {
-    var url by remember { mutableStateOf(initialUrl) }
-    var currentUrl by remember { mutableStateOf(initialUrl) }
-    val context = LocalContext.current
-    
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-                    IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Close") }
-                    OutlinedTextField(
-                        value = url,
-                        onValueChange = { url = it },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Go),
-                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onGo = { currentUrl = url })
-                    )
-                    IconButton(onClick = { currentUrl = url }) { Icon(Icons.Default.Search, "Go") }
-                }
-                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                    AndroidView(
-                        factory = { ctx ->
-                            WebView(ctx).apply {
-                                layoutParams = android.view.ViewGroup.LayoutParams(
-                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
-                                )
-                                settings.javaScriptEnabled = true
-                                settings.domStorageEnabled = true
-                                webViewClient = object : WebViewClient() {
-                                    override fun onPageFinished(view: WebView?, loadedUrl: String?) {
-                                        super.onPageFinished(view, loadedUrl)
-                                        loadedUrl?.let { url = it }
-                                    }
-                                }
-                                loadUrl(currentUrl)
-                            }
-                        },
-                        update = { it.loadUrl(currentUrl) }
-                    )
-                }
-                Button(
-                    onClick = {
-                        val cookieManager = CookieManager.getInstance()
-                        val cookies = cookieManager.getCookie(currentUrl)
-                        if (!cookies.isNullOrEmpty()) {
-                            onCookiesExtracted(currentUrl, cookies)
-                            onDismiss()
-                        } else {
-                            android.widget.Toast.makeText(context, "No cookies found", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(16.dp)
-                ) {
-                    Text(stringResource(R.string.extract_save_cookies))
-                }
-            }
-        }
-    }
-}
 @Composable
 fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
     val context = LocalContext.current
@@ -3271,171 +2903,13 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
     }
 }
 
-@Composable
-fun SupportScreen(onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
-    val context = LocalContext.current
-    val myUpiId = "9693703723@fam"
-    var showKofiDialog by androidx.compose.runtime.remember { mutableStateOf(false) }
-    
-    if (showKofiDialog) {
-        AlertDialog(
-            onDismissRequest = { showKofiDialog = false },
-            title = { Text("Support via Coffee", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold) },
-            text = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    androidx.compose.foundation.Image(
-                        painter = painterResource(id = R.drawable.kofi_qr),
-                        contentDescription = "Ko-fi QR Code",
-                        modifier = Modifier.size(200.dp).clip(RoundedCornerShape(16.dp))
-                    )
-                    OutlinedCard(
-                        onClick = {
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/oi.hotaro")))
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(Icons.Default.Link, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.ko_fi_com_oi_hotaro), fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showKofiDialog = false }) { Text(stringResource(R.string.close)) }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(24.dp)
-        )
-    }
-    
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            
-            .padding(horizontal = 24.dp)
-            .verticalScroll(rememberScrollState()).padding(top = 16.dp + contentPadding.calculateTopPadding(), bottom = 24.dp + contentPadding.calculateBottomPadding()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-            ) { Icon(Icons.Default.ArrowBack, "Back") }
-            Spacer(Modifier.width(16.dp))
-            Text(stringResource(R.string.support), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        }
-        
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-        ) {
-            Column(Modifier.padding(20.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Favorite, null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(12.dp))
-                    Text(stringResource(R.string.support_gabi_development), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.help_keep_gabi_alive_and_fast),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        onClick = {
-                            val payeeName = "Hotaro"
-                            val transactionNote = "Support Gabi Development"
-                            val uri = Uri.parse("upi://pay").buildUpon()
-                                .appendQueryParameter("pa", myUpiId)
-                                .appendQueryParameter("pn", payeeName)
-                                .appendQueryParameter("tn", transactionNote)
-                                .appendQueryParameter("am", "0")
-                                .appendQueryParameter("cu", "INR")
-                                .build()
-                            val intent = Intent(Intent.ACTION_VIEW).apply { data = uri }
-                            val chooser = Intent.createChooser(intent, "Pay with...")
-                            try {
-                                context.startActivity(chooser)
-                            } catch (e: Exception) {
-                                Toast.makeText(context, "No UPI app found", Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Icon(Icons.Default.AttachMoney, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.upi))
-                    }
-                    Button(
-                        onClick = { showKofiDialog = true },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color(0xFFFFB6C1))
-                    ) {
-                        Icon(Icons.Default.LocalCafe, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Coffee")
-                    }
-                }
-            }
-        }
-        
-        Spacer(Modifier.height(8.dp))
-        
-        OutlinedCard(
-            onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Hotaro26/gabi"))) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
-                Column {
-                    Text(stringResource(R.string.star_the_project), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.support_on_github), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun LicenseItem(name: String, license: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-        Text(license, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogsTab(
     history: List<com.duck.app.model.DownloadLog>, 
     onDelete: (com.duck.app.model.DownloadLog) -> Unit,
     onItemClick: (com.duck.app.model.DownloadLog) -> Unit = {},
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-    onYoutubeSearch: () -> Unit = {}
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     var itemToDelete by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
     var selectedLog by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
@@ -3695,249 +3169,4 @@ fun StatusInfo(state: DownloadState, onOpenFolder: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CookiesSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
-    val context = LocalContext.current
-    var showNewCookieSheet by remember { mutableStateOf(false) }
-    
-    // For the extractor dialog
-    var showCookieExtractor by remember { mutableStateOf(false) }
-    var targetEngineForCookies by remember { mutableStateOf<String?>(null) }
-    var extractUrl by remember { mutableStateOf("https://") }
-    
-    val cookieSessions by viewModel.cookieSessions.collectAsState()
 
-    var cookieContentToShow by remember { mutableStateOf<Pair<String, String>?>(null) }
-    
-    if (cookieContentToShow != null) {
-        AlertDialog(
-            onDismissRequest = { cookieContentToShow = null },
-            title = { Text(cookieContentToShow!!.first) },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text(cookieContentToShow!!.second, style = MaterialTheme.typography.bodySmall, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { cookieContentToShow = null }) { Text(stringResource(R.string.close)) }
-            }
-        )
-    }
-
-    if (showCookieExtractor && targetEngineForCookies != null) {
-        CookieExtractorDialog(
-            initialUrl = extractUrl,
-            fileName = "temp", // not used
-            onDismiss = { showCookieExtractor = false },
-            onCookiesExtracted = { extractedUrl, cookies ->
-                val uri = android.net.Uri.parse(extractedUrl)
-                val domain = uri.host ?: "Unknown Site"
-                val session = com.duck.app.model.CookieSession(
-                    id = java.util.UUID.randomUUID().toString(),
-                    domain = domain,
-                    cookieString = cookies,
-                    engine = targetEngineForCookies!!
-                )
-                viewModel.addCookieSession(session)
-                android.widget.Toast.makeText(context, "Cookies added for ${targetEngineForCookies!!}", android.widget.Toast.LENGTH_SHORT).show()
-            }
-        )
-    }
-
-    val listState = rememberLazyListState()
-    val reorderState = rememberReorderableLazyListState(onMove = { from, to ->
-        val fromKey = from.key as? String ?: return@rememberReorderableLazyListState
-        val toKey = to.key as? String ?: return@rememberReorderableLazyListState
-        val fromIndex = cookieSessions.indexOfFirst { it.id == fromKey }
-        val toIndex = cookieSessions.indexOfFirst { it.id == toKey }
-        if (fromIndex != -1 && toIndex != -1) {
-            viewModel.reorderCookieSessions(fromIndex, toIndex)
-        }
-    })
-    
-    // Let's use LazyColumn for the whole screen
-    LazyColumn(
-        state = reorderState.listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .reorderable(reorderState)
-            .padding(horizontal = 24.dp),
-        contentPadding = PaddingValues(top = 16.dp + contentPadding.calculateTopPadding(), bottom = 24.dp + contentPadding.calculateBottomPadding()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                ) { Icon(Icons.Default.ArrowBack, "Back") }
-                Spacer(Modifier.width(16.dp))
-                Text(stringResource(R.string.cookies), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            }
-        }
-        
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.use_cookies), style = MaterialTheme.typography.titleMedium)
-                Switch(
-                    checked = viewModel.useCookies.value,
-                    onCheckedChange = { viewModel.toggleUseCookies(it) }
-                )
-            }
-        }
-        
-        item {
-            OutlinedButton(
-                onClick = { showNewCookieSheet = true },
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.Add, "Add")
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.new_cookie))
-            }
-        }
-        
-        if (cookieSessions.isNotEmpty()) {
-            item {
-                Text(stringResource(R.string.saved_cookies_drag_to_reorder), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-            }
-            
-            items(cookieSessions, key = { it.id }) { session ->
-                ReorderableItem(reorderState, key = session.id) { isDragging ->
-                    val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "")
-                    CookieItem(
-                        session = session,
-                        modifier = Modifier
-                            .detectReorderAfterLongPress(reorderState)
-                            .shadow(elevation, RoundedCornerShape(12.dp)),
-                        onDelete = { viewModel.removeCookieSession(session.id) },
-                        onView = { cookieContentToShow = session.domain to session.cookieString }
-                    )
-                }
-            }
-        }
-        
-        item {
-            Spacer(Modifier.height(16.dp))
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Info, contentDescription = "Info", tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.width(12.dp))
-                    Text(stringResource(R.string.cookies_allow_the_extractors_t),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-    }
-
-    if (showNewCookieSheet) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var tempUrl by remember { mutableStateOf("https://") }
-        var selectedTag by remember { mutableStateOf<String?>(null) }
-        var tagExpanded by remember { mutableStateOf(false) }
-
-        ModalBottomSheet(
-            onDismissRequest = { showNewCookieSheet = false },
-            sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            windowInsets = WindowInsets(0, 0, 0, 0)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = tempUrl,
-                    onValueChange = { tempUrl = it },
-                    label = { Text(stringResource(R.string.url)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                
-                ExposedDropdownMenuBox(
-                    expanded = tagExpanded,
-                    onExpandedChange = { tagExpanded = !tagExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = when (selectedTag) {
-                            "yt_dlp" -> "yt-dlp"
-                            "gallery_dl" -> "gallery-dl"
-                            else -> "Select extractor..."
-                        },
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.target_extractor)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tagExpanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = tagExpanded,
-                        onDismissRequest = { tagExpanded = false }
-                    ) {
-                        DropdownMenuItem(text = { Text(stringResource(R.string.yt_dlp)) }, onClick = { selectedTag = "yt_dlp"; tagExpanded = false })
-                        DropdownMenuItem(text = { Text(stringResource(R.string.gallery_dl)) }, onClick = { selectedTag = "gallery_dl"; tagExpanded = false })
-                    }
-                }
-                
-                Button(
-                    onClick = {
-                        showNewCookieSheet = false
-                        extractUrl = tempUrl
-                        targetEngineForCookies = selectedTag
-                        showCookieExtractor = true
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                    enabled = selectedTag != null && tempUrl.isNotBlank()
-                ) {
-                    Icon(Icons.Default.Cookie, "Cookie")
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.get_cookies))
-                }
-            }
-        }
-    }
-}
-@Composable
-fun CookieItem(session: com.duck.app.model.CookieSession, modifier: Modifier = Modifier, onDelete: () -> Unit, onView: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        modifier = modifier.fillMaxWidth().clickable { onView() }
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.DragIndicator, contentDescription = "Drag", tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.width(16.dp))
-                Column {
-                    Text(session.domain, style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.height(4.dp))
-                    Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    ) {
-                        val tag = if (session.engine == "yt_dlp") "yt-dlp" else "gallery-dl"
-                        Text(tag, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), color = MaterialTheme.colorScheme.onPrimaryContainer)
-                    }
-                }
-            }
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colorScheme.error)
-            }
-        }
-    }
-}

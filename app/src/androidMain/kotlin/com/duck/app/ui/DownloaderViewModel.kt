@@ -27,9 +27,6 @@ import io.ktor.client.statement.*
 import androidx.room.Room
 import com.duck.app.db.AppDatabase
 import com.duck.app.model.DownloadLog
-import com.duck.app.model.CookieSession
-import kotlinx.serialization.encodeToString
-import java.util.UUID
 import com.duck.app.util.NotificationHelper
 
 import androidx.compose.runtime.mutableStateOf
@@ -114,19 +111,12 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     var isNavBarBlurEnabled = mutableStateOf(prefs.getBoolean("nav_bar_blur", true))
     var isNavBarOpaque = mutableStateOf(prefs.getBoolean("nav_bar_opaque", false))
     var isNavBarTrueGlass = mutableStateOf(prefs.getBoolean("nav_bar_true_glass", false))
-    var isOnboardingCompleted = mutableStateOf(prefs.getBoolean("onboarding_completed", false))
-    var useCookies = mutableStateOf(prefs.getBoolean("use_cookies", true))
     var isMaterialShapesEnabled = mutableStateOf(prefs.getBoolean("material_shapes", false))
     fun toggleNavBarBlur(enabled: Boolean) {
         isNavBarBlurEnabled.value = enabled
         prefs.edit().putBoolean("nav_bar_blur", enabled).apply()
     }
     
-    fun setOnboardingCompleted() {
-        isOnboardingCompleted.value = true
-        prefs.edit().putBoolean("onboarding_completed", true).apply()
-    }
-
     fun toggleNavBarOpaque(enabled: Boolean) {
         isNavBarOpaque.value = enabled
         prefs.edit().putBoolean("nav_bar_opaque", enabled).apply()
@@ -137,10 +127,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         prefs.edit().putBoolean("nav_bar_true_glass", enabled).apply()
     }
     
-    fun toggleUseCookies(enabled: Boolean) {
-        useCookies.value = enabled
-        prefs.edit().putBoolean("use_cookies", enabled).apply()
-    }
     
     fun toggleMaterialShapes(enabled: Boolean) {
         isMaterialShapesEnabled.value = enabled
@@ -150,75 +136,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         terminalTheme.value = theme
         prefs.edit().putString("terminal_theme", theme.name).apply()
         logToConsole("Terminal theme changed to: ${theme.displayName}")
-    }
-
-    
-    private val _cookieSessions = MutableStateFlow<List<CookieSession>>(emptyList())
-    val cookieSessions: StateFlow<List<CookieSession>> = _cookieSessions
-
-    private fun loadCookieSessions() {
-        val jsonStr = prefs.getString("cookie_sessions", "[]") ?: "[]"
-        try {
-            val sessions = kotlinx.serialization.json.Json.decodeFromString<List<CookieSession>>(jsonStr)
-            _cookieSessions.value = sessions
-        } catch (e: Exception) {
-            _cookieSessions.value = emptyList()
-        }
-    }
-
-    fun addCookieSession(session: CookieSession) {
-        val newList = _cookieSessions.value + session
-        saveCookieSessions(newList)
-    }
-
-    fun removeCookieSession(id: String) {
-        val newList = _cookieSessions.value.filter { it.id != id }
-        saveCookieSessions(newList)
-    }
-
-    fun reorderCookieSessions(from: Int, to: Int) {
-        val list = _cookieSessions.value.toMutableList()
-        val item = list.removeAt(from)
-        list.add(to, item)
-        saveCookieSessions(list)
-    }
-
-    private fun saveCookieSessions(sessions: List<CookieSession>) {
-        _cookieSessions.value = sessions
-        val jsonStr = kotlinx.serialization.json.Json.encodeToString(sessions)
-        prefs.edit().putString("cookie_sessions", jsonStr).apply()
-        regenerateCookiesTxt("yt_dlp")
-        regenerateCookiesTxt("gallery_dl")
-    }
-    
-    private fun regenerateCookiesTxt(engine: String) {
-        val context = getApplication<Application>()
-        val file = java.io.File(context.filesDir, "${engine}_cookies.txt")
-        val sessions = _cookieSessions.value.filter { it.engine == engine }
-        
-        if (sessions.isEmpty()) {
-            if (file.exists()) file.delete()
-            saveSetting("${engine}_cookies_path", "")
-            return
-        }
-        
-        val out = StringBuilder()
-        out.append("# Netscape HTTP Cookie File\n\n")
-        
-        for (session in sessions) {
-            val cookies = session.cookieString.split(";")
-            for (cookie in cookies) {
-                val parts = cookie.trim().split("=", limit = 2)
-                if (parts.size == 2) {
-                    val name = parts[0]
-                    val value = parts[1]
-                    val domainWithDot = if (session.domain.startsWith(".")) session.domain else ".${session.domain}"
-                    out.append("$domainWithDot\tTRUE\t/\tFALSE\t2147483647\t$name\t$value\n")
-                }
-            }
-        }
-        file.writeText(out.toString())
-        saveSetting("${engine}_cookies_path", file.absolutePath)
     }
 
     fun getDynamicEngine(url: String): String {
@@ -338,8 +255,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val downloader = FileDownloader(application, client)
 
     init {
-        loadCookieSessions()
-
         if (autoCheckUpdates.value) {
             checkForUpdates(manual = false)
         }
@@ -425,35 +340,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     var downloadPath = mutableStateOf("Download/Gabi")
     var selectedFolderUri = mutableStateOf<String?>(null)
     var selectedFolderName = mutableStateOf<String?>(null)
-
-    var newPipeQuery = mutableStateOf("")
-    var newPipeResults = mutableStateOf<List<org.schabi.newpipe.extractor.stream.StreamInfoItem>>(emptyList())
-    var triggerNewPipeSearch = mutableStateOf(false)
-
-    var isNewPipeLoading = mutableStateOf(false)
-    fun performNewPipeSearch(query: String) {
-        if (query.isNotBlank()) {
-            isNewPipeLoading.value = true
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    val searchExtractor = org.schabi.newpipe.extractor.ServiceList.YouTube.getSearchExtractor(query)
-                    searchExtractor.fetchPage()
-                    val items = searchExtractor.initialPage.items.filterIsInstance<org.schabi.newpipe.extractor.stream.StreamInfoItem>()
-                    withContext(Dispatchers.Main) {
-                        newPipeResults.value = items
-                        isNewPipeLoading.value = false
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    withContext(Dispatchers.Main) {
-                        isNewPipeLoading.value = false
-                    }
-                }
-            }
-        }
-    }
-
-    val voiceSearchEvent = kotlinx.coroutines.flow.MutableSharedFlow<String>(extraBufferCapacity = 1)
 
     // Appearance Settings
     var themeMode = mutableIntStateOf(prefs.getInt("theme_mode", 0))
@@ -602,8 +488,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             } else {
                 logToConsole("Executing $engine extractor in Python...")
                 val engineKey = if (engine == "gallery-dl") "gallery_dl" else "yt_dlp"
-                val cookiesPath = if (useCookies.value) prefs.getString("${engineKey}_cookies_path", null) else null
-                val webViewUa = if (useCookies.value) android.webkit.WebSettings.getDefaultUserAgent(getApplication()) else null
+                val cookiesPath = prefs.getString("${engineKey}_cookies_path", null)
+                val webViewUa = android.webkit.WebSettings.getDefaultUserAgent(getApplication())
                 val res = extractor.extract(url, quality, mode, engine, cookiesPath, webViewUa)
                 if (res.status == "success") {
                     if (res.is_gallery == true) {
@@ -870,7 +756,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                             if (trackUrl.contains(".m3u8")) {
                                 logToConsole("Downloading $trackName track with yt-dlp native downloader...")
                                 val engineKey = if (engine == "gallery-dl") "gallery_dl" else "yt_dlp"
-                                val cookiesPath = if (useCookies.value) prefs.getString("${engineKey}_cookies_path", null) else null
+                                val cookiesPath = prefs.getString("${engineKey}_cookies_path", null)
                                 val pythonResult = extractor.downloadVideo(trackUrl, destFile.absolutePath, cookiesPath)
                                 if (pythonResult["status"] == "success") {
                                     _uiState.value = DownloadState.Downloading(progressOffset + progressScale)
