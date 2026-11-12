@@ -105,6 +105,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.graphics.graphicsLayer
 
+
+/** Release notes can be long; the dialog shows a readable prefix. */
+private const val MAX_RELEASE_NOTES_CHARS = 1200
 /** Containers the preview renders as an image gallery rather than a video. */
 private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 
