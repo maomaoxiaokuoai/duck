@@ -59,11 +59,13 @@ jobs:
           entry = '## v' + new_name + ' — 自动发布' + chr(10)*2 + '本次更新为自动构建，详见提交记录。' + chr(10)*2
           open('CHANGELOG.md', 'w', encoding='utf-8').write(entry + text)
 
-          print(new_name)
+          # Write the step output from Python: piping it out of the heredoc loses the
+          # value, which left the release tagged as a bare "v".
+          import os
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write('version=' + new_name + chr(10))
+          print('bumped to ' + new_name)
           PYEOF
-          VERSION=$(grep -oP "versionName = \K[^\"]+" app/build.gradle.kts | tail -1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "升到 $VERSION"
 
       # Commit the bump so the tag points at it. [skip ci] stops this push from
       # starting another build, which would bump again forever.
