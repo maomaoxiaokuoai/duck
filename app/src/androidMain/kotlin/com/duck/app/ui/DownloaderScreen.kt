@@ -1232,7 +1232,7 @@ fun MainDownloaderTab(
                             ) {
                                 Icon(if (isAudio) Icons.Default.MusicNote else Icons.Default.PlayArrow, null)
                                 Spacer(Modifier.width(8.dp))
-                                val qual = if (quality == "best") "Best" else "${quality}p"
+                                val qual = if (quality == "best") "最佳" else quality + "p"
                                 Text(if (isAudio) "Audio" else "Video ($qual)", maxLines = 1)
                             }
                         }
@@ -1360,13 +1360,13 @@ fun MainDownloaderTab(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Icon(Icons.Default.Settings, null, modifier = Modifier.size(14.dp))
-                        Text(if (engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe") downloadMode.replaceFirstChar { it.uppercase() } else "Original", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        Text(if (engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe") modeLabel(downloadMode) else "原画", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                 }
                 DropdownMenu(expanded = modeExpanded, onDismissRequest = { modeExpanded = false }) {
                     listOf("auto", "video", "audio").forEach { mode ->
                         DropdownMenuItem(
-                            text = { Text(mode.replaceFirstChar { it.uppercase() }) },
+                            text = { Text(modeLabel(mode)) },
                             onClick = { onModeChange(mode); modeExpanded = false }
                         )
                     }
@@ -1399,29 +1399,29 @@ fun MainDownloaderTab(
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         val label = if (downloadMode == "audio") {
                             when(quality) {
-                                "max" -> "Best"
-                                "1080" -> "High"
-                                "720" -> "Med"
-                                else -> "Low"
+                                "max" -> "最佳"
+                                "1080" -> "高"
+                                "720" -> "中"
+                                else -> "低"
                             }
                         } else {
-                            if (quality == "max") "Max" else "${quality}p"
+                            if (quality == "max") "最高" else quality + "p"
                         }
                         Text(label, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                 }
                 DropdownMenu(expanded = qualityExpanded, onDismissRequest = { qualityExpanded = false }) {
                     val options = if (downloadMode == "audio") {
-                        listOf("480" to "Low", "720" to "Medium", "1080" to "High", "max" to "Best")
+                        listOf("480" to "低", "720" to "中", "1080" to "高", "max" to "最佳")
                     } else {
                         val avQuals = preview?.available_qualities
                         if (!avQuals.isNullOrEmpty()) {
                             avQuals.map { 
                                 val clean = it.replace("p", "")
                                 clean to it
-                            } + listOf("max" to "Max Quality")
+                            } + listOf("max" to "最高画质")
                         } else {
-                            listOf("480" to "480p", "720" to "720p", "1080" to "1080p", "max" to "Max Quality")
+                            listOf("480" to "480p", "720" to "720p", "1080" to "1080p", "max" to "最高画质")
                         }
                     }
                     options.forEach { (valStr, label) ->
@@ -3166,4 +3166,13 @@ fun StatusInfo(state: DownloadState, onOpenFolder: () -> Unit) {
     }
 }
 
+
+/** Chinese labels for the download mode chips. */
+private fun modeLabel(mode: String): String = when (mode) {
+    "auto" -> "自动"
+    "video" -> "视频"
+    "audio" -> "音频"
+    "image" -> "图片"
+    else -> mode
+}
 
