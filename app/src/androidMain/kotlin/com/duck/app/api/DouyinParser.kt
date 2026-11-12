@@ -21,7 +21,7 @@ import java.net.URL
  *
  * Only direct links are produced here; downloading them is FileDownloader's job.
  */
-class DouyinParser {
+class DouyinParser(private val signer: DouyinSigner? = null) {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
@@ -36,7 +36,7 @@ class DouyinParser {
      * the media items behind it. Failures come back as an error result instead of throwing,
      * so callers never fall back to a removed engine.
      */
-    fun resolve(input: String, cookie: String? = null): ExtractionResult {
+    suspend fun resolve(input: String, cookie: String? = null): ExtractionResult {
         val pageUrl = extractUrl(input)
         if (!isDouyinUrl(pageUrl)) {
             return ExtractionResult(
@@ -48,7 +48,13 @@ class DouyinParser {
         return try {
             val browserCookie = cookie?.takeIf { it.isNotBlank() }
             val finalUrl = followRedirects(pageUrl, browserCookie)
-            val html = httpGet(finalUrl, browserCookie)
+
+            // Douyin only renders the SSR payload for a signed request. The first call
+            // just mints __ac_nonce; the signature derived from it unlocks the second.
+            val nonce = fetchNonce(finalUrl, browserCookie)
+            val signature = nonce?.let { signer?.sign(it) }
+            val html = httpGet(finalUrl, browserCookie, nonce, signature)
+
             parsePage(finalUrl, html, browserCookie)
         } catch (e: Exception) {
             ExtractionResult(status = "error", message = e.message ?: "抖音解析失败")
@@ -103,8 +109,50 @@ class DouyinParser {
         return current
     }
 
-    private fun httpGet(url: String, cookie: String? = null): String {
+    /** Fetches [url], attaching the nonce and signature that unlock the SSR payload. */
+    /**
+     * Performs the throwaway request whose only purpose is the __ac_nonce cookie.
+     *
+     * Douyin mints the nonce on the first hit and expects it echoed, signed, on the
+     * second. This response body is an empty shell, so it is discarded.
+     */
+    private fun fetchNonce(url: String, cookie: String?): String? {
         val connection = open(url, cookie)
+        return try {
+            connection.responseCode
+            connection.headerFields["Set-Cookie"]
+                .orEmpty()
+                .asSequence()
+                .firstOrNull { it.startsWith("__ac_nonce=") }
+                ?.removePrefix("__ac_nonce=")
+                ?.substringBefore(';')
+        } catch (e: Exception) {
+            null
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private fun httpGet(
+        url: String,
+        cookie: String? = null,
+        nonce: String? = null,
+        signature: String? = null,
+    ): String {
+        val connection = open(url, cookie)
+        if (!nonce.isNullOrBlank()) {
+            val jar = buildString {
+                if (!cookie.isNullOrBlank()) {
+                    append(cookie)
+                    append("; ")
+                }
+                append("__ac_nonce=").append(nonce)
+                if (!signature.isNullOrBlank()) {
+                    append("; __ac_signature=").append(signature)
+                }
+            }
+            connection.setRequestProperty("Cookie", jar)
+        }
         return try {
             if (connection.responseCode !in 200..299) {
                 throw IOException("服务器返回 ${connection.responseCode}")
@@ -132,7 +180,98 @@ class DouyinParser {
 
     // ---------------------------------------------------------------- page parsing
 
+    /**
+     * Reads the __pace_f payload the signed page embeds.
+     *
+     * The modern page streams its data as repeated
+     *   self.__pace_f.push([1,"<escaped json>"])
+     * calls. One of those payloads carries the aweme object. Unlike the older
+     * _ROUTER_DATA blob it uses camelCase keys (awemeId, playAddr, urlList), so it is
+     * parsed separately rather than reshaped into the old path.
+     */
+    private fun extractPacePayload(html: String): JsonArray? {
+        val prefix = "__pace_f.push([1,\""
+        var index = html.indexOf(prefix)
+        while (index >= 0) {
+            val start = index + prefix.length
+            var i = start
+            var escaped = false
+            while (i < html.length) {
+                val c = html[i]
+                if (escaped) escaped = false
+                else if (c == '\\') escaped = true
+                else if (c == '"') break
+                i++
+            }
+            val raw = html.substring(start, i)
+            val decoded = runCatching {
+                json.parseToJsonElement("\"" + raw + "\"").jsonPrimitive.content
+            }.getOrNull()
+            if (decoded != null && decoded.contains("awemeId") && decoded.contains("\"detail\"")) {
+                val arrayStart = decoded.indexOf('[')
+                if (arrayStart >= 0) {
+                    val array = runCatching {
+                        json.parseToJsonElement(decoded.substring(arrayStart)).jsonArray
+                    }.getOrNull()
+                    if (array != null) return array
+                }
+            }
+            index = html.indexOf(prefix, i)
+        }
+        return null
+    }
+
+    /** Turns one __pace_f aweme entry into a result. */
+    private fun parsePaceAweme(array: JsonArray): ExtractionResult? {
+        val entry = array.firstOrNull {
+            it is JsonObject && it["aweme"] is JsonObject
+        }?.jsonObject ?: return null
+
+        val aweme = entry["aweme"]?.jsonObject ?: return null
+        val detail = aweme["detail"]?.jsonObject ?: return null
+
+        val items = mutableListOf<Media>()
+
+        detail["images"]?.asArray()?.forEach { image ->
+            val urls = image.jsonObject["urlList"]?.asArray()
+                ?.mapNotNull { it.asString() }
+                .orEmpty()
+            val best = urls.lastOrNull { it.startsWith("http") } ?: urls.firstOrNull()
+            if (best != null) items += Media(best, extensionOf(best, "jpg"))
+        }
+
+        val videoUrls = detail["video"]?.asObject()
+            ?.get("playAddr")?.asArray()
+            ?.mapNotNull { it.jsonObject["src"]?.asString() }
+            .orEmpty()
+        videoUrls.firstOrNull { it.startsWith("http") }?.let {
+            items += Media(playUrl(it), "mp4")
+        }
+
+        if (items.isEmpty()) return null
+
+        val author = detail["authorInfo"]?.asObject()?.get("nickname")?.asString()
+        val cover = detail["video"]?.asObject()
+            ?.get("cover")?.asString()
+
+        return ExtractionResult(
+            status = "success",
+            url = items.first().url,
+            urls = items.map { it.url },
+            title = detail["desc"]?.asString()?.takeIf { it.isNotBlank() } ?: "抖音作品",
+            author = author ?: "抖音",
+            thumbnail = cover ?: items.first().url,
+            ext = items.first().ext,
+            is_gallery = items.size > 1,
+        )
+    }
+
     private fun parsePage(pageUrl: String, html: String, cookie: String?): ExtractionResult {
+        // The signed page streams __pace_f; older captures still carry _ROUTER_DATA.
+        extractPacePayload(html)?.let { array ->
+            parsePaceAweme(array)?.let { return it }
+        }
+
         val routerData = extractRouterData(html)
             ?: return resolveFromSlidesInfo(pageUrl, cookie)
 

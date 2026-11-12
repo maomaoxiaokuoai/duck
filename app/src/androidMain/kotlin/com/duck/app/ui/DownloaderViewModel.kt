@@ -48,7 +48,9 @@ enum class TerminalTheme(
 }
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
-    private val douyinParser = DouyinParser()
+    /** Builds the __ac_signature the Douyin page needs; a hidden WebView runs their JSVM. */
+    private val douyinSigner = com.duck.app.api.DouyinSigner(application)
+    private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3)
         .fallbackToDestructiveMigration()
@@ -731,5 +733,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         const val COOKIE_SETTING_KEY = "douyin_cookies_path"
 
         val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        douyinSigner.dispose()
     }
 }
