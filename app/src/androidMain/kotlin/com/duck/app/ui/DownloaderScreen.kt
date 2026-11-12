@@ -2272,13 +2272,12 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
 @Composable
 fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
     val context = LocalContext.current
+    // The avatar ships inside the APK. Fetching it from githubusercontent meant a
+    // network round trip on a screen the user opens to read a version number, and it
+    // also failed offline. A bundled image renders instantly, always.
     val profileImageRequest = remember(context) {
         coil.request.ImageRequest.Builder(context)
-            .data("https://avatars.githubusercontent.com/maomaoxiaokuoai")
-            .diskCacheKey("duck_author_avatar")
-            .memoryCacheKey("duck_author_avatar")
-            .diskCachePolicy(coil.request.CachePolicy.ENABLED)
-            .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+            .data("file:///android_asset/profile/avatar.png")
             .crossfade(true)
             .build()
     }
