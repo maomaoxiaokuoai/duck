@@ -527,7 +527,6 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             downloadMode = downloadMode,
                             onModeChange = { downloadMode = it },
                             engine = engine,
-                            onEngineChange = { engine = it },
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
@@ -684,12 +683,10 @@ fun MainDownloaderTab(
     downloadMode: String,
     onModeChange: (String) -> Unit,
     engine: String,
-    onEngineChange: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var qualityExpanded by remember { mutableStateOf(false) }
     var modeExpanded by remember { mutableStateOf(false) }
-    var engineExpanded by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
     var showFullscreenLogs by remember { mutableStateOf(false) }
     var showPreviewSheet by remember { mutableStateOf(false) }
@@ -1260,81 +1257,6 @@ fun MainDownloaderTab(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            // Engine Selector
-            Box(modifier = Modifier.weight(1f)) {
-                val engineColors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-                val engineInnerCorner by animateDpAsState(if (engineExpanded) 100.dp else 8.dp)
-                FilledTonalButton(
-                    onClick = { engineExpanded = true },
-                    shape = RoundedCornerShape(topStart = 100.dp, bottomStart = 100.dp, topEnd = engineInnerCorner, bottomEnd = engineInnerCorner),
-                    colors = engineColors,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        val engineIcon = when (engine) {
-                            "newpipe" -> Icons.Default.PlayArrow
-                            "yt-dlp" -> Icons.Default.Movie
-                            "gallery-dl" -> Icons.Default.Image
-                            else -> Icons.Default.CloudDownload
-                        }
-                        val engineLabel = when (engine) {
-                            "newpipe" -> "NewPipe"
-                            "yt-dlp" -> "yt-dlp"
-                            "gallery-dl" -> "gallery-dl"
-                            else -> "Cobalt"
-                        }
-                        Icon(engineIcon, null, modifier = Modifier.size(14.dp))
-                        Text(engineLabel, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                    }
-                }
-                DropdownMenu(expanded = engineExpanded, onDismissRequest = { engineExpanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.newpipe)) },
-                        leadingIcon = { Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(18.dp)) },
-                        onClick = { 
-                            onEngineChange("newpipe")
-                            engineExpanded = false
-                            viewModel.clearPreview()
-                            viewModel.logToConsole("Switched engine to: NewPipe")
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.yt_dlp)) },
-                        leadingIcon = { Icon(Icons.Default.Movie, null, modifier = Modifier.size(18.dp)) },
-                        onClick = { 
-                            onEngineChange("yt-dlp")
-                            engineExpanded = false
-                            viewModel.clearPreview()
-                            viewModel.logToConsole("Switched engine to: yt-dlp")
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.gallery_dl)) },
-                        leadingIcon = { Icon(Icons.Default.Image, null, modifier = Modifier.size(18.dp)) },
-                        onClick = { 
-                            onEngineChange("gallery-dl")
-                            engineExpanded = false
-                            viewModel.clearPreview()
-                            viewModel.logToConsole("Switched engine to: gallery-dl")
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.cobalt)) },
-                        leadingIcon = { Icon(Icons.Default.CloudDownload, null, modifier = Modifier.size(18.dp)) },
-                        onClick = { 
-                            onEngineChange("cobalt")
-                            engineExpanded = false
-                            viewModel.clearPreview()
-                            viewModel.logToConsole("Switched engine to: Cobalt")
-                        }
-                    )
-                }
-            }
-
             // Mode Selector
             Box(modifier = Modifier.weight(1f)) {
                 val isModeDefault = downloadMode == "auto"
@@ -1351,16 +1273,15 @@ fun MainDownloaderTab(
                 }
                 val modeCorner by animateDpAsState(if (modeExpanded) 100.dp else 8.dp)
                 FilledTonalButton(
-                    onClick = { if (engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe") modeExpanded = true },
+                    onClick = { modeExpanded = true },
                     shape = RoundedCornerShape(modeCorner),
                     colors = modeColors,
-                    enabled = engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe",
-                    modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Icon(Icons.Default.Settings, null, modifier = Modifier.size(14.dp))
-                        Text(if (engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe") modeLabel(downloadMode) else "原画", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        Text(modeLabel(downloadMode), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                 }
                 DropdownMenu(expanded = modeExpanded, onDismissRequest = { modeExpanded = false }) {
@@ -1389,11 +1310,10 @@ fun MainDownloaderTab(
                 }
                 val qualityInnerCorner by animateDpAsState(if (qualityExpanded) 100.dp else 8.dp)
                 FilledTonalButton(
-                    onClick = { if (engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe") qualityExpanded = true },
+                    onClick = { qualityExpanded = true },
                     shape = RoundedCornerShape(topStart = qualityInnerCorner, bottomStart = qualityInnerCorner, topEnd = 100.dp, bottomEnd = 100.dp),
                     colors = qualityColors,
-                    enabled = engine == "yt-dlp" || engine == "cobalt" || engine == "newpipe",
-                    modifier = Modifier.fillMaxWidth(),
+                                        modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = 4.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -1682,7 +1602,7 @@ fun MainDownloaderTab(
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Terminal Logs",
+                            text = "终端日志",
                             color = Color(currentTerminalTheme.text),
                             style = MaterialTheme.typography.titleMedium,
                             fontFamily = FontFamily.Monospace
@@ -1746,7 +1666,7 @@ fun MainDownloaderTab(
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "Your media has been downloaded successfully.",
+                            text = "下载完成",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -2038,7 +1958,6 @@ fun SettingsMainList(
             Triple("Material Expressive Shapes", "Use dynamic shapes for settings icons", "Customisation?target=Material Expressive Shapes"),
             Triple("Theme Mode", "System, Light, Dark", "Customisation?target=Theme Mode"),
             Triple("Color Scheme", "App Colors", "Customisation?target=Color Scheme"),
-            Triple("Language", "Change app language", "Customisation?target=Language"),
             Triple("Download Repository", "Files will be saved in your selected folder", "Downloads?target=Download Repository"),
             Triple("Extractors", "Update internal components", "Downloads?target=Extractors"),
             Triple("Check for Updates", "Check latest GitHub release", "Developer?target=Check for Updates")
@@ -2053,7 +1972,7 @@ fun SettingsMainList(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Settings",
+            text = "设置",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -2122,8 +2041,8 @@ fun SettingsMainList(
                 SettingsListItem(
                     icon = Icons.Default.Palette,
                     iconColor = Color(0xFF88637B), // Mauve
-                    title = "Customisation",
-                    subtitle = "Themes, App Appearance, Terminal",
+                    title = "个性化",
+                    subtitle = "主题、外观、终端",
                     useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
@@ -2138,8 +2057,8 @@ fun SettingsMainList(
                 SettingsListItem(
                     icon = Icons.Default.FolderOpen,
                     iconColor = Color(0xFF00758F), // Teal
-                    title = "Downloads",
-                    subtitle = "Storage location, rules",
+                    title = "下载",
+                    subtitle = "存储位置、下载规则",
                     useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
@@ -2154,8 +2073,8 @@ fun SettingsMainList(
                 SettingsListItem(
                     icon = Icons.Default.Code,
                     iconColor = Color(0xFF4C6B8B), // Slate blue
-                    title = "Developer",
-                    subtitle = "App Info, Platforms, Licenses",
+                    title = "开发者",
+                    subtitle = "应用信息、平台、许可",
                     useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
@@ -2243,74 +2162,6 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
         }
         
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Language / اللغة / भाषा", style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["Language"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val languages = listOf(
-                        "en" to "English",
-                        "ar" to "العربية",
-                        "hi" to "हिन्दी",
-                        "ru" to "Русский",
-                        "ja" to "日本語",
-                        "zh" to "中文",
-                        "de" to "Deutsch",
-                        "ne" to "नेपाली",
-                        "bn" to "বাংলা"
-                    )
-                    val currentLocale = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().get(0)?.language ?: "en"
-                    
-                    languages.chunked(3).forEach { rowLangs ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                            rowLangs.forEachIndexed { index, lang ->
-                                val isSelected = currentLocale == lang.first || (currentLocale == "en" && lang.first == "en")
-                                val shape = RoundedCornerShape(
-                                    topStart = if (index == 0) 100.dp else 8.dp,
-                                    bottomStart = if (index == 0) 100.dp else 8.dp,
-                                    topEnd = if (index == rowLangs.lastIndex) 100.dp else 8.dp,
-                                    bottomEnd = if (index == rowLangs.lastIndex) 100.dp else 8.dp
-                                )
-                                val colors = if (isSelected) {
-                                    ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                        contentColor = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else {
-                                    ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                FilledTonalButton(
-                                    onClick = {
-                                        // Persist the pick; MainActivity applies it in
-                                        // attachBaseContext, so no window teardown happens.
-                                        context.getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
-                                            .edit().putString("app_language", lang.first).apply()
-                                        (context as? android.app.Activity)?.recreate()
-                                    },
-                                    shape = shape,
-                                    colors = colors,
-                                    modifier = Modifier.weight(1f),
-                                    contentPadding = PaddingValues(horizontal = 4.dp)
-                                ) {
-                                    Text(lang.second, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                }
-                            }
-                            if (rowLangs.size < 3) {
-                                repeat(3 - rowLangs.size) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         Card(
             modifier = Modifier.fillMaxWidth(),

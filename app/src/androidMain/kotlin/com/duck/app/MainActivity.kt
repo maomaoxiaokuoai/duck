@@ -33,16 +33,14 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     /**
-     * Pin the UI language before the Activity is built.
+     * Force the Chinese resources before the Activity is built.
      *
-     * Doing it here instead of onCreate avoids a configuration change, which used to
-     * tear the window down and show a black frame on first launch.
+     * The app ships Chinese only, so pinning the locale here keeps it consistent on
+     * devices whose system language is something else, and doing it before onCreate
+     * avoids the configuration change that used to flash a black window at launch.
      */
     override fun attachBaseContext(newBase: android.content.Context) {
-        val stored = newBase.getSharedPreferences("duck_prefs", MODE_PRIVATE)
-            .getString("app_language", null)
-        val tag = stored ?: "zh-CN"
-        val locale = java.util.Locale.forLanguageTag(tag)
+        val locale = java.util.Locale.forLanguageTag("zh-CN")
         java.util.Locale.setDefault(locale)
         val config = android.content.res.Configuration(newBase.resources.configuration)
         config.setLocale(locale)
