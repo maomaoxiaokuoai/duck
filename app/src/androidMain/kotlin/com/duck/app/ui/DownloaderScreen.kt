@@ -2330,18 +2330,25 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp)
                     ) {
-                        Icon(androidx.compose.ui.res.painterResource(id = com.duck.app.R.drawable.ic_github), null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.github))
+                        Icon(androidx.compose.ui.res.painterResource(id = com.duck.app.R.drawable.ic_github), null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.github), style = MaterialTheme.typography.labelLarge, maxLines = 1)
                     }
                     OutlinedButton(
-                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MAOMAOXIAOKUOAI"))) },
+                        onClick = {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MAOMAOXIAOKUOAI")),
+                            )
+                        },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(24.dp),
+                        // The two buttons share the row, and 8 characters plus an icon do
+                        // not fit on one line at the default padding, so tighten both.
+                        contentPadding = PaddingValues(horizontal = 8.dp),
                     ) {
-                        Icon(painterResource(R.drawable.ic_telegram), null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Telegram")
+                        Icon(painterResource(R.drawable.ic_telegram), null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Telegram", style = MaterialTheme.typography.labelLarge, maxLines = 1)
                     }
                 }
             }
