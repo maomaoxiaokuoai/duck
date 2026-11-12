@@ -7,8 +7,11 @@ import android.os.Looper
 import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.withContext
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
 /**
@@ -19,51 +22,90 @@ import kotlin.coroutines.resume
  * page. Reimplementing that VM in Kotlin is impractical, so the official bytecode is
  * bundled at assets/douyin/acrawler.js and executed in a hidden WebView.
  *
- * One WebView is created on first use and reused for the process lifetime: booting it
- * costs a few hundred milliseconds once, then each signature takes ~3ms. The instance
- * keeps no browsing state, and no cookie is read or persisted beyond the nonce passed in.
+ * One WebView is created on first use and reused for the process lifetime. Booting it
+ * costs a few hundred milliseconds once, then each signature takes about 3ms. The
+ * instance keeps no browsing state, and no cookie is read or persisted beyond the
+ * nonce handed in.
  */
 class DouyinSigner(private val context: Context) {
 
     private var webView: WebView? = null
-    private var ready = false
     private val main = Handler(Looper.getMainLooper())
+    private val ready = CountDownLatch(1)
+    private var failed = false
 
     /** Returns the signature for [nonce], or null when the JSVM could not run. */
-    suspend fun sign(nonce: String): String? = suspendCancellableCoroutine { cont ->
-        main.post {
-            try {
-                val view = getOrCreateWebView()
-                val js = "(function(){try{" +
-                    "var s=window.byted_acrawler;" +
-                    "if(!s||typeof s.sign!=='function')return 'ERR:NO_API';" +
-                    "return s.sign('', " + quote(nonce) + ");" +
-                    "}catch(e){return 'ERR:'+e.message}})()"
+    suspend fun sign(nonce: String): String? {
+        val loaded = ensureLoaded()
+        Log.d(TAG, "JSVM ready=" + loaded)
+        if (!loaded) return null
 
-                view.evaluateJavascript(js) { raw ->
-                    val value = raw?.trim('"')?.replace("\\\"", "\"")
-                    if (cont.isActive) {
-                        cont.resume(value?.takeIf { it.startsWith("_02B") })
+        return suspendCancellableCoroutine { cont ->
+            main.post {
+                try {
+                    val view = webView
+                    if (view == null) {
+                        if (cont.isActive) cont.resume(null)
+                        return@post
                     }
+                    val js = "(function(){try{" +
+                        "var s=window.byted_acrawler;" +
+                        "if(!s||typeof s.sign!=='function')return 'ERR:NO_API';" +
+                        "return s.sign('', " + quote(nonce) + ");" +
+                        "}catch(e){return 'ERR:'+e.message}})()"
+
+                    view.evaluateJavascript(js) { raw ->
+                        val value = raw?.trim('"')?.replace("\\\"", "\"")
+                        if (value == null || !value.startsWith("_02B")) {
+                            Log.w(TAG, "unexpected signature: " + raw)
+                        } else {
+                            Log.d(TAG, "signed nonce=" + nonce.take(8) + " sig=" + value.take(20))
+                        }
+                        if (cont.isActive) {
+                            cont.resume(value?.takeIf { it.startsWith("_02B") })
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "signature failed: " + e.message)
+                    if (cont.isActive) cont.resume(null)
                 }
-            } catch (e: Exception) {
-                Log.w(TAG, "signature failed: " + e.message)
-                if (cont.isActive) cont.resume(null)
             }
         }
     }
 
-    /** Builds the WebView once and loads the JSVM into it. */
-    private fun getOrCreateWebView(): WebView {
-        webView?.let { if (ready) return it }
+    /**
+     * Makes sure the JSVM has finished loading.
+     *
+     * The WebView loads the bytecode asynchronously, so awaiting [ready] here is what
+     * keeps the first call from evaluating against an empty document.
+     */
+    private suspend fun ensureLoaded(): Boolean = withContext(Dispatchers.IO) {
+        if (failed) return false
+        if (ready.count == 0L) return true
 
-        val script = context.assets.open("douyin/acrawler.js")
-            .bufferedReader()
-            .use { it.readText() }
+        main.post {
+            if (webView == null) {
+                val script = try {
+                    context.assets.open("douyin/acrawler.js")
+                        .bufferedReader()
+                        .use { it.readText() }
+                } catch (e: Exception) {
+                    Log.w(TAG, "acrawler.js missing: " + e.message)
+                    failed = true
+                    ready.countDown()
+                    return@post
+                }
+                webView = createWebView(script)
+            }
+        }
 
-        val view = webView ?: createWebView(script)
-        webView = view
-        return view
+        // Booting a WebView and compiling a 70KB JSVM is slow on a cold process.
+        val ok = ready.await(LOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        if (!ok) {
+            Log.w(TAG, "JSVM load timed out")
+            failed = true
+        }
+        ok && !failed
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -74,13 +116,19 @@ class DouyinSigner(private val context: Context) {
         view.settings.userAgentString = USER_AGENT
         view.webViewClient = object : WebViewClient() {
             override fun onPageFinished(v: WebView?, url: String?) {
-                v?.evaluateJavascript(script) {
+                v ?: return
+                v.evaluateJavascript(script) {
                     v.evaluateJavascript("typeof window.byted_acrawler") { t ->
-                        ready = t?.contains("object") == true
-                        if (ready) {
-                            v.evaluateJavascript("window.byted_acrawler.init({aid:99999999,dfp:0})", null)
+                        if (t != null && t.contains("object")) {
+                            v.evaluateJavascript(
+                                "window.byted_acrawler.init({aid:99999999,dfp:0})",
+                            ) {
+                                ready.countDown()
+                            }
                         } else {
-                            Log.w(TAG, "JSVM did not expose byted_acrawler")
+                            Log.w(TAG, "JSVM did not expose byted_acrawler: " + t)
+                            failed = true
+                            ready.countDown()
                         }
                     }
                 }
@@ -104,7 +152,6 @@ class DouyinSigner(private val context: Context) {
             } catch (_: Exception) {
             }
             webView = null
-            ready = false
         }
     }
 
@@ -113,6 +160,7 @@ class DouyinSigner(private val context: Context) {
 
     private companion object {
         const val TAG = "DouyinSigner"
+        const val LOAD_TIMEOUT_SECONDS = 25L
         const val USER_AGENT =
             "Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
