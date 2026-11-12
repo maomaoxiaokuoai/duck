@@ -55,24 +55,30 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        
+        // All heavyweight setup runs off the main thread: Python bootstraps its
+        // interpreter, NewPipe builds downloader state and Coil allocates caches.
+        // Doing any of it inline added seconds to the first frame.
         CoroutineScope(Dispatchers.IO).launch {
-            if (!Python.isStarted()) {
-                Python.start(AndroidPlatform(this@MainActivity))
-                val py = Python.getInstance()
-                val customPath = java.io.File(filesDir, "python_packages").absolutePath
-                py.getModule("sys").get("path")?.callAttr("insert", 0, customPath)
+            runCatching {
+                if (!Python.isStarted()) {
+                    Python.start(AndroidPlatform(this@MainActivity))
+                    val py = Python.getInstance()
+                    val customPath = java.io.File(filesDir, "python_packages").absolutePath
+                    py.getModule("sys").get("path")?.callAttr("insert", 0, customPath)
+                }
+            }
+
+            runCatching {
+                org.schabi.newpipe.extractor.NewPipe.init(com.duck.app.api.OkHttpDownloader())
+            }
+
+            runCatching {
+                val imageLoader = coil.ImageLoader.Builder(this@MainActivity)
+                    .components { add(coil.decode.VideoFrameDecoder.Factory()) }
+                    .build()
+                coil.Coil.setImageLoader(imageLoader)
             }
         }
-        
-        org.schabi.newpipe.extractor.NewPipe.init(com.duck.app.api.OkHttpDownloader())
-
-        val imageLoader = coil.ImageLoader.Builder(this)
-            .components {
-                add(coil.decode.VideoFrameDecoder.Factory())
-            }
-            .build()
-        coil.Coil.setImageLoader(imageLoader)
 
         enableEdgeToEdge()
         setContent {

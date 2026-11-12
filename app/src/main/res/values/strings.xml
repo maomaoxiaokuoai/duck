@@ -77,7 +77,6 @@
     <string name="login_to_sites_to_get_cookies">登录网站以自动获取Cookie</string>
     <string name="extract_save_cookies">提取并保存 Cookie</string>
     <string name="developer">开发者</string>
-    <string name="hotaro">Hotaro</string>
     <string name="building_crisp_fast_and_secure">构建清晰、快速、安全的软件。</string>
     <string name="github">GitHub</string>
     <string name="discord">Discord</string>
@@ -89,12 +88,9 @@
     <string name="check_latest_github_release">检查最新 GitHub 版本</string>
     <string name="check">检查</string>
     <string name="support_on_ko_fi">在 Ko-fi 上支持</string>
-    <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">支持</string>
     <string name="support_gabi_development">支持 duck 开发</string>
     <string name="help_keep_gabi_alive_and_fast">帮助 duck 保持活跃和快速。</string>
-    <string name="upi">UPI</string>
-    <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">给项目加星</string>
     <string name="support_on_github">在 GitHub 上支持</string>
     <string name="are_you_sure_you_want_to_remov">您确定要从历史记录中删除此项吗？</string>
