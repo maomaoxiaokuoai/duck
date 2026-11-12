@@ -29,28 +29,32 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
 
 class MainActivity : AppCompatActivity() {
+
+    /**
+     * Pin the UI language before the Activity is built.
+     *
+     * Doing it here instead of onCreate avoids a configuration change, which used to
+     * tear the window down and show a black frame on first launch.
+     */
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val stored = newBase.getSharedPreferences("duck_prefs", MODE_PRIVATE)
+            .getString("app_language", null)
+        val tag = stored ?: "zh-CN"
+        val locale = java.util.Locale.forLanguageTag(tag)
+        java.util.Locale.setDefault(locale)
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
-        var keepSplash = true
-        lifecycleScope.launch {
-            delay(1000L) // Wait 1 second for animation to finish
-            keepSplash = false
-        }
-        splashScreen.setKeepOnScreenCondition { keepSplash }
+        // Show the system splash only while the first frame is prepared; it is released
+        // as soon as the content is ready, so startup stays snappy.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // The app ships Chinese copy as its primary language: pin the locale so a
-        // fresh install opens in Chinese regardless of the device setting. Users can
-        // still switch languages later from 个性化 -> Language.
-        if (!hasChosenLanguage()) {
-            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                androidx.core.os.LocaleListCompat.forLanguageTags("zh-CN")
-            )
-        }
         
         CoroutineScope(Dispatchers.IO).launch {
             if (!Python.isStarted()) {
