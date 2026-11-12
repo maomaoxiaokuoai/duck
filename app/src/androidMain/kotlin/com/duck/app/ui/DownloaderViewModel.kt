@@ -540,7 +540,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     ) {
         val title = result.title ?: "抖音图集"
         val extension = result.ext ?: "jpg"
-        val targetPath = galleryTargetPath(mode)
+        val targetPath = mediaTargetPath(mode, isImage = true)
         val sanitizedTitle = sanitizeFileName(title)
         var succeededCount = 0
 
@@ -611,7 +611,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         val isImage = result.ext in IMAGE_EXTENSIONS
         val extension = result.ext ?: if (isImage) "jpg" else "mp4"
         val title = result.title ?: "抖音作品"
-        val targetPath = galleryTargetPath(mode, isImage)
+        val targetPath = mediaTargetPath(mode, isImage)
         val fileName = "${sanitizeFileName(title)}_${System.currentTimeMillis()}.$extension"
 
         logToConsole("正在下载: $fileName")
@@ -660,15 +660,18 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    /** Picks the MediaStore bucket for a download, keeping galleries in Pictures. */
-    private fun galleryTargetPath(mode: String, isImage: Boolean = true): String {
-        val configured = downloadPath.value
-        return when {
-            !isImage -> configured
-            configured.contains("Picture", ignoreCase = true) -> configured
-            mode == "audio" -> "Music/duck"
-            else -> "Pictures/duck"
-        }
+    /**
+     * Picks the MediaStore bucket for a download.
+     *
+     * Images and video go to separate folders on purpose: both live under the standard
+     * Pictures and Movies trees, which is what makes the system gallery index them.
+     * A single folder under Download/ would not be scanned, which is why the split is
+     * enforced rather than left to whatever the user typed in the path setting.
+     */
+    private fun mediaTargetPath(mode: String, isImage: Boolean): String = when {
+        isImage -> "Pictures/duck"
+        mode == "audio" -> "Music/duck"
+        else -> "Movies/duck"
     }
 
     private fun folderUriFor(targetPath: String): Uri {

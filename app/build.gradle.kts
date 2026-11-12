@@ -96,14 +96,11 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 20000037
-        versionName = "2.0.37"
+        versionCode = 20000038
+        versionName = "2.0.38"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
-        ndk {
-            abiFilters += listOf("arm64-v8a", "x86_64")
-        }
     }
 
     signingConfigs {
@@ -116,6 +113,26 @@ android {
                 keyAlias = System.getenv("DUCK_KEY_ALIAS") ?: ""
                 keyPassword = System.getenv("DUCK_KEY_PASSWORD") ?: ""
             }
+        }
+    }
+
+    // One APK per ABI plus a universal one, named the way the release page expects.
+    // Shipping every ABI in a single file doubled the download for no benefit.
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val abi = output.getFilter(com.android.build.api.variant.FilterConfiguration.FilterType.ABI)
+            val suffix = abi?.identifier ?: "universal"
+            output.outputFileName = "duck-" + versionName + "-" + suffix + "-release.apk"
         }
     }
 

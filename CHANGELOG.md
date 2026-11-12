@@ -1,3 +1,10 @@
+## v2.0.38 — 2026-11-12
+
+### 变更
+
+- 构建产物恢复按 ABI 分包，命名为 duck-2.0.38-{abi}-release.apk，另附 universal 包
+- 图片与视频分目录保存：图片进 Pictures/duck，视频进 Movies/duck，两者都会被系统相册索引
+
 ## v2.0.37 — 2026-11-12
 
 首个正式发布版，界面基于 Material 3 Expressive 重写。
