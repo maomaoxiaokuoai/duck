@@ -1,159 +1,123 @@
-@file:Suppress("UnstableApiUsage")
-
-import com.android.build.api.variant.FilterConfiguration
-import java.io.FileInputStream
 import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    id("com.google.devtools.ksp")
-    kotlin("kapt")
-    id("org.jetbrains.kotlin.android")
-    kotlin("plugin.serialization")
-}
-apply(plugin = "dagger.hilt.android.plugin")
-
-sealed class Version(
-    open val versionMajor: Int,
-    val versionMinor: Int,
-    val versionPatch: Int,
-    val versionBuild: Int = 0
-) {
-    abstract fun toVersionName(): String
-    class Alpha(versionMajor: Int, versionMinor: Int, versionPatch: Int, versionBuild: Int) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-alpha.$versionBuild"
-    }
-
-    class Beta(versionMajor: Int, versionMinor: Int, versionPatch: Int, versionBuild: Int) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-beta.$versionBuild"
-    }
-
-    class Stable(versionMajor: Int, versionMinor: Int, versionPatch: Int) :
-        Version(versionMajor, versionMinor, versionPatch) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}"
-    }
-
-    class ReleaseCandidate(
-        versionMajor: Int,
-        versionMinor: Int,
-        versionPatch: Int,
-        versionBuild: Int
-    ) :
-        Version(versionMajor, versionMinor, versionPatch, versionBuild) {
-        override fun toVersionName(): String =
-            "${versionMajor}.${versionMinor}.${versionPatch}-rc.$versionBuild"
-    }
+    id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.chaquo.python")
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
-val currentVersion: Version = Version.Stable(
-    versionMajor = 2,
-    versionMinor = 0,
-    versionPatch = 35,
-)
-
-val keystorePropertiesFile: File = rootProject.file("keystore.properties")
-
-val splitApks = !project.hasProperty("noSplits")
-
-val abiFilterList = (properties["ABI_FILTERS"] as String).split(';')
-
-
-android {
-    // Signing material comes either from keystore.properties (local) or from CI
-    // environment variables, so release builds are reproducible without committing secrets.
-    val envStore = System.getenv("DUCK_KEYSTORE_PATH")
-    val envStorePassword = System.getenv("DUCK_KEYSTORE_PASSWORD")
-    val envKeyAlias = System.getenv("DUCK_KEY_ALIAS")
-    val envKeyPassword = System.getenv("DUCK_KEY_PASSWORD")
-    val hasEnvSigning =
-        !envStore.isNullOrBlank() && !envStorePassword.isNullOrBlank() && !envKeyAlias.isNullOrBlank()
-
-    if (keystorePropertiesFile.exists() || hasEnvSigning) {
-        val keystoreProperties = Properties()
-        if (keystorePropertiesFile.exists()) {
-            keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-        }
-        signingConfigs {
-            getByName("debug") {
-                if (hasEnvSigning) {
-                    keyAlias = envKeyAlias
-                    keyPassword = envKeyPassword
-                    storeFile = file(envStore!!)
-                    storePassword = envStorePassword
-                } else {
-                    keyAlias = keystoreProperties["keyAlias"].toString()
-                    keyPassword = keystoreProperties["keyPassword"].toString()
-                    storeFile = file(keystoreProperties["storeFile"]!!)
-                    storePassword = keystoreProperties["storePassword"].toString()
-                }
+kotlin {
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "17"
             }
         }
     }
+    
+    jvm("desktop")
+    
+    sourceSets {
+        val desktopMain by getting
+        
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+            implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+            implementation("dev.chrisbanes.haze:haze:0.7.2")
+            
+            // Ktor
+            val ktor_version = "2.3.8"
+            implementation("io.ktor:ktor-client-core:$ktor_version")
+            implementation("io.ktor:ktor-client-android:$ktor_version")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+            implementation("io.ktor:ktor-client-logging:$ktor_version")
+            
+            // Kotlinx Serialization & Coroutines
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+            
+            // Koin Dependency Injection
+            implementation("io.insert-koin:koin-core:3.5.3")
+            implementation("io.insert-koin:koin-compose:1.1.2")
+        }
+        
+        androidMain.dependencies {
+            implementation("androidx.core:core-ktx:1.12.0")
+            implementation("androidx.core:core-splashscreen:1.0.1")
+            implementation("androidx.activity:activity-compose:1.8.2")
+            
+            // Koin Android
+            implementation("io.insert-koin:koin-android:3.5.3")
+            implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+            
+            implementation("androidx.graphics:graphics-shapes:1.0.1")
+            
+            // Old Android-only dependencies (will break if moved to commonMain)
+            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+            implementation("androidx.compose.material:material-icons-extended:1.6.0")
+            implementation("com.google.android.material:material:1.11.0")
+            implementation("androidx.compose.material3:material3-window-size-class:1.2.0")
+            
+            val room_version = "2.6.1"
+            implementation("androidx.room:room-runtime:$room_version")
+            implementation("androidx.room:room-ktx:$room_version")
+            
+            implementation("io.coil-kt:coil-compose:2.6.0")
+            implementation("io.coil-kt:coil-video:2.6.0")
+            
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+            implementation("com.github.TeamNewPipe:NewPipeExtractor:v0.26.3")
+            implementation("com.squareup.okhttp3:okhttp:4.12.0")
+            implementation("androidx.media3:media3-exoplayer:1.2.1")
+            implementation("androidx.media3:media3-ui:1.2.1")
+            
+        }
+        
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
+        }
+    }
+}
 
+android {
+    namespace = "com.duck.app"
     compileSdk = 34
-
-
 
     defaultConfig {
         applicationId = "com.duck.app"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 34
-        versionCode = 20000035
-
-        if (splitApks) {
-            splits {
-                abi {
-                    isEnable = true
-                    reset()
-                    include("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-                    isUniversalApk = true
-                }
-            }
-        }
-
-        versionName = currentVersion.toVersionName().run {
-            if (!splitApks) "$this-(F-Droid)"
-            else this
-        }
+        versionCode = 20000036
+        versionName = "2.0.36"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-        ksp {
-            arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
-            arg("room.incremental", "true")
-        }
-        if (!splitApks) {
-            ndk {
-                abiFilters.addAll(abiFilterList)
-            }
+        vectorDrawables { useSupportLibrary = true }
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
         }
     }
-    val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 3, "x86_64" to 4)
 
-    androidComponents {
-        onVariants { variant ->
-
-            variant.outputs.forEach { output ->
-                val name =
-                    if (splitApks) {
-                        output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
-                    } else {
-                        abiFilterList.firstOrNull()
-                    }
-
-                val baseAbiCode = abiCodes[name]
-
-                if (baseAbiCode != null) {
-                    output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0))
-                }
-
+    signingConfigs {
+        create("release") {
+            // CI passes these through env vars; a local build without them stays unsigned.
+            val path = System.getenv("DUCK_KEYSTORE_PATH")
+            if (!path.isNullOrEmpty() && file(path).exists()) {
+                storeFile = file(path)
+                storePassword = System.getenv("DUCK_KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("DUCK_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("DUCK_KEY_PASSWORD") ?: ""
             }
         }
     }
@@ -161,127 +125,61 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            )
-            if (keystorePropertiesFile.exists() || hasEnvSigning) {
-                signingConfig = signingConfigs.getByName("debug")
-            }
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
-            if (keystorePropertiesFile.exists() || hasEnvSigning) {
-                signingConfig = signingConfigs.getByName("debug")
-            }
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-            resValue("string", "app_name", "duck Debug")
         }
     }
-
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
     buildFeatures {
-        compose = true
+        buildConfig = true
     }
-
-    lint {
-        disable.addAll(listOf("MissingTranslation", "ExtraTranslation", "MissingQuantity"))
-    }
-
-    applicationVariants.all {
-        // name looks like "arm64-v8aRelease" or "universalRelease"; strip the build type
-        // so artifacts read duck-2.0.0-arm64-v8a.apk
-        val buildType = buildType.name
-        outputs.all {
-            val abi = name.removeSuffix(buildType).removeSuffix("-")
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "duck-${defaultConfig.versionName}-${abi}-${buildType}.apk"
-        }
-    }
-
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
-    }
+    
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-        jniLibs.useLegacyPackaging = true
     }
-    androidResources {
-        generateLocaleConfig = true
+    
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
-
-    namespace = "com.duck.app"
-}
-
-kotlin {
-    jvmToolchain(11)
+    
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
 }
 
 dependencies {
-
-    implementation(project(":color"))
-
-    //Core libs for the app
-    implementation(libs.bundles.core)
-
-    //Lifecycle support for Jetpack Compose
-    implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.lifecycle.viewModelCompose)
-
-    //Material UI, Accompanist...
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.androidxCompose)
-    implementation(libs.bundles.accompanist)
-
-    //Coil (For Jetpack Compose)
-    implementation(libs.coil.kt.compose)
-
-    //Serialization
-    implementation(libs.kotlinx.serialization.json)
-
-    //DI (Dependency Injection - Hilt)
-    implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.ext.compiler)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-
-    //Database powered by Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-    // Network requests (OkHttp)
-    implementation(libs.okhttp)
-
-    // yt-dlp removed: parsing and downloading are implemented natively.
-
-    //SVG implementation (AndroidSVG by Caverock)
-    implementation(libs.caverock.androidsvg)
-
-    //MMKV (Ultrafast Key-Value storage)
-    implementation(libs.mmkv)
-
-    //Unit testing libraries
-    testImplementation(libs.junit4)
-    androidTestImplementation(libs.androidx.test.ext)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-//  androidTestImplementation(libs.androidx.compose.ui.test)
-
-    //UI debugging library for Jetpack Compose
-    implementation(libs.androidx.compose.ui.tooling)
-
+    add("kspAndroid", "androidx.room:room-compiler:2.6.1")
 }
 
-class RoomSchemaArgProvider(
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val schemaDir: File
-) : CommandLineArgumentProvider {
+chaquopy {
+    defaultConfig {
+        version = "3.11"
+        pip {
+            install("pip")
+            install("yt-dlp")
+            install("gallery-dl")
+        }
+    }
+}
 
-    override fun asArguments(): Iterable<String> {
-        return listOf("room.schemaLocation=${schemaDir.path}")
+compose.desktop {
+    application {
+        mainClass = "com.material.downloader.MainKt"
+        nativeDistributions {
+            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb)
+            packageName = "duck"
+            packageVersion = "3.5.0"
+        }
     }
 }

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- White plate behind the duck; the artwork now fills the canvas so it reads as the icon itself. -->
-    <color name="ic_launcher_background">#FFFFFF</color>
-</resources>

@@ -1,35 +1,21 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
+/.idea/caches/gradle.xml
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-/.idea/deploymentTargetDropDown.xml
-/.idea/shelf
 .DS_Store
 /build
+/app/build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
-/keystore.properties
 
-# Signing material and local machine config -- must never be committed.
+# Keystore files
 *.jks
 *.keystore
-*.p12
-*.pem
-*.key
-keystore.properties
-.env
-.env.*
-
-# Local scratch space: emulator screenshots, downloaded APKs, probe scripts.
-# Lives at ../临时缓存 (outside the repo) -- kept here so a stray copy never
-# gets committed.
-/临时缓存/
-/tmp_*/
-*.apk
+keys/

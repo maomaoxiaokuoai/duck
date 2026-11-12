@@ -1,152 +1,145 @@
-# duck
+<div align="center">
+<img width="300" height="300" alt="gabi11" src="https://github.com/user-attachments/assets/c1435762-4f08-431b-b485-202ffae1800a" />
 
-> 国内短视频与图文聚合解析的 Android 客户端，粘贴分享链接即可解析、预览并下载无水印视频、图集与音频。
+ ## Gabi
 
-duck 是 **GPL-3.0** 开源项目，面向 Android 7.0（API 24）及以上，底层调用 [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-完成实际解析与下载，界面、主题、图标和产品形态由本项目维护。
+  <img alt="Kotlin" src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Kotlin/kotlin1.svg" />
+  
+  <img src="https://ziadoua.github.io/m3-Markdown-Badges/badges/Android/android1.svg" />
+</div>
 
-<p align="center">
-  <img src="artwork/icon-512.png" width="128" alt="duck icon">
-</p>
+</br>
+
+[Gabi](https://hotaro26.github.io/gabi/) is a minimal, fast, and secure media downloader for Android. Built with a modern Material 3 interface, it allows you to download videos, audio, and image galleries from over 1000+ supported sites with ease. Right now, it has 4 engines, **yt-dlp**, **gallery-dl** **newpipe extractor** and **cobalt api**!!
+
+---
+> PLEASE CONSIDER GIVING A ⭐STAR TO THIS PROJECT IF THIS APP HAS BEEN USEFUL TO YOU! (also to support a teenage dev, stars motivates me to keep going for new future updates and features)
+ 
+> [!TIP]
+> Refer to [pre-release](https://github.com/Hotaro26/gabi/releases/tag/v3.4) section for experimental feature.
+
+##  Features
+
+-   **Wide Support**: Powered by `yt-dlp` and `gallery-dl` and `cobalt`Gabi supports YouTube, TikTok, Instagram, Twitter/X, Reddit, Facebook, Twitch, SoundCloud, Pixiv, Pinterest, and many more.
+-   **Media Flexibility**: 
+    -   **Video**: Download in various qualities up to 1080p/Max.
+    -   **Audio**: Extract high-quality MP3s from any video source.
+    -   **Galleries**: Download full image sets from supported platforms.
+-   **Smart Preview**: See metadata like title, author, thumbnail, and estimated file size before you hit download.
+-   **Instant Action**: 
+    -   **One-Tap Download**: Use the "Instant" button to automatically fetch and download links from your clipboard.
+    -   **Share to Gabi**: Share links directly from other apps (like YouTube or Twitter) to Gabi for immediate processing.
+-   **Customization**:
+    -   **Themes**: Choose from Lavender, Forest, Midnight, Rose, Monochrome, or Dynamic (Material You) themes.
+    -   **Dark/Light Mode**: Full support for system-wide dark and light modes, including a themed splash screen.
+-   **File Management**: 
+    -   Select your preferred download folder using the Android Storage Access Framework.
+    -   View and manage your download history in the "Logs" tab.
+-   **Modern UI**: Built entirely with Jetpack Compose for a smooth, responsive experience.
+
+---
+## Screenshots
+
+| | | | |
+|:---:|:---:|:---:|:---:|
+| <img width="180" alt="Screenshot 1" src="https://github.com/user-attachments/assets/61de43f7-8d98-4f78-bd7c-499fdbe9caf6" /> | <img width="180" alt="Screenshot 2" src="https://github.com/user-attachments/assets/088cfadf-cb43-44a0-8387-aa33e428419a" /> | <img width="180" alt="Screenshot 4" src="https://github.com/user-attachments/assets/ac151180-b4be-4018-8a30-dc2ff46167a8" /> | <img width="180" alt="Screenshot 5" src="https://github.com/user-attachments/assets/adeaf938-cbfd-4a4c-bf34-988e51b2087b" /> |
+| <img width="180" alt="Screenshot 6" src="https://github.com/user-attachments/assets/f71b11c0-90be-4912-a1f4-d06fd02611d9" /> | <img width="180" alt="Screenshot 7" src="https://github.com/user-attachments/assets/c4513fe2-b71a-4fe0-8b9a-370779714cc7" /> | <img width="180" alt="Screenshot 8" src="https://github.com/user-attachments/assets/67db7c74-f38a-4abd-a1b7-45afafbd6863" /> | <img width="180" alt="Screenshot 9" src="https://github.com/user-attachments/assets/245a40ce-37b3-49de-a7f6-4e80333e3fde" /> |
+
+<table>
+  <tr>
+    <td><img width="430" alt="Screenshot_20260630-101533" src="https://github.com/user-attachments/assets/2a75481c-b350-41c5-811c-7d89e4818ca1" /></td>
+    <td><img width="430" alt="Screenshot_20260630-101700" src="https://github.com/user-attachments/assets/f135ce83-a2c5-44f0-9b49-b04c49fd49fd" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img width="430" alt="Screenshot_20260630-103157" src="https://github.com/user-attachments/assets/9fac9ea2-6060-4465-8be5-2501844d0379" /></td>
+  </tr>
+</table>
+
+
+
+<details>
+  <summary>📸 Old Screenshots</summary>
+  <br>
+
+  <table>
+    <tr>
+      <td><img width="270" src="https://github.com/user-attachments/assets/8dc91593-854e-4c7f-b41f-3b2bf470f3b0"/></td>
+      <td><img width="270" src="https://github.com/user-attachments/assets/fd34b92a-5d9c-4273-ad41-4d890f76bf0d"/></td>
+    </tr>
+    <tr>
+      <td><img width="270" src="https://github.com/user-attachments/assets/15d170e5-e465-49fa-bbdd-ed6335527fe5"/></td>
+      <td><img width="270" src="https://github.com/user-attachments/assets/65daa539-6e07-466a-b88d-5a740de0abbf"/></td>
+    </tr>
+  </table>
+</details>
+
+##  Tech Stack
+
+-   **Language**: Kotlin
+-   **UI Framework**: Jetpack Compose (Material 3)
+-   **Backend Logic**: Python (integrated via [Chaquopy](https://chaquo.com/))
+-   **Download Engines**: `yt-dlp`, `gallery-dl` `cobalt`
+-   **Networking**: Ktor Client
+-   **Database**: Room (for download history)
+-   **Image Loading**: Coil
 
 ---
 
-## 功能
+##  How to Use
 
-- **一键下载**：粘贴链接即可解析，支持视频、纯音频、封面、字幕等多形态输出
-- **格式选择**：视频容器/编码/分辨率、音频编码/码率、字幕语言与嵌入方式全部可选
-- **下载队列**：多任务排队、暂停、重试、查看实时日志
-- **自定义命令**：把常用 yt-dlp 参数保存成模板，像终端一样直接执行
-- **Cookie 管理**：内置 WebView 抓取 Cookie，支持多站点配置，登录态内容可解析
-- **播放列表**：解析整张播放列表后按条目勾选
-- **Material You**：跟随系统取色的动态主题，支持深色模式与自定义配色
-- **多语言**：内置 60+ 语言的界面翻译资源
+1.  **Paste & Fetch**: Paste a link in the home screen and wait for the metadata preview.
+2.  **Configure**: Choose between "Media" (Video/Audio) or "Gallery" mode, then select your desired quality.
+3.  **Download**: Hit "Download Now" and track the progress via the notification bar or the in-app progress indicator.
+4.  **Instant**: Click the Bolt icon to instantly download whatever is currently in your clipboard.
+5.  **Settings**: Customize your theme and set your preferred download directory in the Settings tab.
 
-## 下载安装
+---
 
-所有 APK 均由 GitHub Actions 在云端构建并发布到 [Releases](../../releases)，**不提供本地构建产物**。
+##  Building from Source
 
-每个版本会同时产出 5 个 APK：
+To build Gabi yourself:
 
-| 文件 | 适用设备 | 体积 |
-| --- | --- | --- |
-| `duck-<版本>-arm64-v8a-release.apk` | 绝大多数手机（2017 年后） | 约 41 MB |
-| `duck-<版本>-armeabi-v7a-release.apk` | 老设备（32 位 ARM） | 约 40 MB |
-| `duck-<版本>-x86_64-release.apk` | 模拟器 / x86 平板 | 约 42 MB |
-| `duck-<版本>-x86-release.apk` | 老模拟器 | 约 41 MB |
-| `duck-<版本>-universal-release.apk` | 不确定架构时用 | 约 110 MB |
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/Hotaro26/gabi.git
+    ```
+2.  Open the project in **Android Studio Jellyfish** (or newer).
+3.  Ensure you have the **Android SDK 34** installed.
+4.  Build the project. Chaquopy will automatically handle the Python dependencies (`yt-dlp`, `gallery-dl`) during the first build.
 
-> 拿不准就下 `universal`，一个包装所有架构，只是体积大。
+---
 
-### 版本说明
+## 🤝 Support
 
-每个 Release 的正文会自动从 [CHANGELOG.md](CHANGELOG.md) 里提取对应版本号的
-「新增 / 变更 / 修复」小节，所以每个版本的改动都有记录可查。
+Gabi is built with ❤️ by **hotaro**. If you find the app useful, consider supporting the development (Totally Optional).
+or Just ⭐ star the project!
 
-## 构建
+-   **GitHub**: [Hotaro26](https://github.com/Hotaro26)
+-   **Discord**: `flawed_mango`
 
-### 推荐：云端构建
+---
+## Donate
+You can support Gabi development through [buy me a coffee](www.buymeacoffee.com/oi.hotaro)
 
-本仓库的主构建路径是 GitHub Actions —— 推送即编译，本地不需要 Android SDK：
+<a href="buymeacoffee.com/oi.hotaro)
+">
+  <img src="https://github.com/user-attachments/assets/f62638ee-9ad9-42c6-b275-a620b4cabe25" width="128px">
+</a>
 
-- **push 到 `main` / PR / 手动触发**：构建全部 ABI 的 release APK，作为 Actions artifact 保留
-- **推送 `v*` 标签**：额外发布到 Releases 页面
-- 产物：`duck-<version>-<abi>-release.apk`（5 个）
-- 流水线会校验签名，未签名的 APK 直接判定失败
+##  License
 
-### 本地构建（可选，仅用于调试）
+Gabi uses several open-source libraries. Please check the "Licenses" section in the app settings for full details. 
+- `yt-dlp`: Unlicense
+- `gallery-dl`: GPLv2
+- `Chaquopy`: BSD 3-Clause
+- `cobalt` : open source
+- `newpipe extractor`: open source
+## Star History
 
-仅在你需要本地调试时使用，需自备环境：
-
-| 组件 | 版本 |
-| --- | --- |
-| JDK | 21 |
-| Android SDK | compileSdk 35 / minSdk 24 |
-| Gradle | 8.10.2（随 wrapper 提供） |
-
-```bash
-git clone <this-repo> duck
-cd duck
-
-echo "sdk.dir=/path/to/Android/Sdk" > local.properties
-./gradlew :app:assembleRelease
-```
-
-如需签名，在根目录放 `keystore.properties`：
-
-```properties
-storeFile=/absolute/path/to/release.jks
-storePassword=******
-keyAlias=duck
-keyPassword=******
-```
-
-### 变体
-
-| Flavor | applicationId | 说明 |
-| --- | --- | --- |
-| `generic` | `com.duck.app` | 默认渠道 |
-| `githubPreview` | `com.duck.app.preview` | 可与正式版共存 |
-| `fdroid` | `com.duck.app` | 关闭应用内更新入口 |
-
-## 项目结构
-
-```
-duck/
-├── .github/workflows/       # 云端构建流水线
-├── app/                     # 主应用模块
-│   ├── src/main/java/com/duck/app/
-│   │   ├── ui/              # Compose 界面：下载页、设置、主题、组件
-│   │   ├── download/        # 下载执行器
-│   │   ├── database/        # Room 数据库与备份
-│   │   └── util/            # 偏好设置、文件、通知、yt-dlp 封装
-│   ├── src/main/res/        # 图标、字符串（60+ 语言）、主题
-│   └── schemas/             # Room 导出的数据库 schema
-├── color/                   # Material You 取色库（Monet / HCT）
-├── buildSrc/                # 版本号生成
-└── artwork/                 # 图标等设计源文件
-```
-
-## 技术栈
-
-Kotlin · Jetpack Compose · Material 3 · Room · Koin · OkHttp · MMKV · Coil ·
-kotlinx.serialization · youtubedl-android
-
-## 开源说明
-
-- 本项目以 **GNU General Public License v3.0** 发布，完整条款见 [LICENSE](LICENSE)。
-- 你可以自由使用、修改、分发本项目，但分发衍生作品时**必须同样以 GPL-3.0 开源**，
-  并提供对应的完整源代码。
-- 第三方组件的版权与许可证归各自作者所有，完整清单见 [NOTICE.md](NOTICE.md)
-  以及应用内「设置 → 关于 → Credits」。
-- `duck` 是本项目的名称与图标，代表本项目的构建与发布。
-
-## 致谢
-
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) — 实际的下载/解析引擎，Unlicense
-- [youtubedl-android](https://github.com/yausername/youtubedl-android) — yt-dlp 的 Android 封装，GPL-3.0
-- [FFmpeg](https://ffmpeg.org/) / [aria2](https://github.com/aria2/aria2) — 转码与外链下载
-- [AndroidX](https://github.com/androidx/androidx)、[Kotlin](https://kotlinlang.org/) — 基础框架
-- [Material color utilities](https://github.com/material-foundation/material-color-utilities)、[Monet](https://github.com/Kyant0/Monet) — 动态取色
-- [Termux](https://github.com/termux/termux-app) — 打包脚本参考
-
-## 许可证
-
-GPL-3.0 © duck contributors
-
-## 本地开发约定
-
-所有构建产物、模拟器截图、下载的 APK、临时脚本一律放在仓库外的 临时缓存 目录，
-不要写到 C 盘根目录：
-
-    聚合解析/
-    |- duck/            源码仓库（只放代码）
-    |- 工具/             抖音解析参考实现
-    |- duck-签名密钥/    签名文件（已在 .gitignore 排除）
-    |- 临时缓存/         所有测试产物
-         |- cookies/    抖音 / YouTube cookie
-         |- _scripts/   一次性脚本
-         |- tmp_*/      各版本验证截图与 APK
-
-.gitignore 已显式排除 /临时缓存/、/tmp_*/、*.apk，
-即使误放进来也不会被提交。
+<a href="https://www.star-history.com/?repos=Hotaro26%2Fgabi&type=timeline&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Hotaro26/gabi&type=timeline&theme=dark&legend=top-left&sealed_token=2O9JIfnAG5PVvrVo5HDThBD5x2Tld5b5uoFGJWNo3Rhnk6BkD8yhQKvjDlFjZ_NzusXcMEdoL2VLDnlCstjzWOFs1hylFipMpKWTjsNp6QHAytaJEhhCLOPTQ6M7os6rB-cK0nRaCNLivagwgPDYbPzJVIDMzTG99D5H-3QyMwc1CuFQ891j-bD1y8C_" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Hotaro26/gabi&type=timeline&legend=top-left&sealed_token=2O9JIfnAG5PVvrVo5HDThBD5x2Tld5b5uoFGJWNo3Rhnk6BkD8yhQKvjDlFjZ_NzusXcMEdoL2VLDnlCstjzWOFs1hylFipMpKWTjsNp6QHAytaJEhhCLOPTQ6M7os6rB-cK0nRaCNLivagwgPDYbPzJVIDMzTG99D5H-3QyMwc1CuFQ891j-bD1y8C_" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Hotaro26/gabi&type=timeline&legend=top-left&sealed_token=2O9JIfnAG5PVvrVo5HDThBD5x2Tld5b5uoFGJWNo3Rhnk6BkD8yhQKvjDlFjZ_NzusXcMEdoL2VLDnlCstjzWOFs1hylFipMpKWTjsNp6QHAytaJEhhCLOPTQ6M7os6rB-cK0nRaCNLivagwgPDYbPzJVIDMzTG99D5H-3QyMwc1CuFQ891j-bD1y8C_" />
+ </picture>
+</a>
