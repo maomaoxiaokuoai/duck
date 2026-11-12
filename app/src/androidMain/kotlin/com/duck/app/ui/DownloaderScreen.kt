@@ -533,6 +533,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             onQualityChange = { },
                             downloadMode = downloadMode,
                             onModeChange = { },
+                            onStartDownload = { viewModel.downloadMedia(it, quality, downloadMode) },
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
@@ -626,6 +627,34 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Opens the original Douyin post in the browser.
+ *
+ * The link the user pasted may be a short v.douyin.com redirect, which Douyin's own app
+ * does not always resolve from an external intent, so the canonical page is used.
+ */
+private fun openDouyin(url: String, context: android.content.Context) {
+    val target = url.ifBlank { "https://www.douyin.com/" }
+    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(target))
+    runCatching { context.startActivity(intent) }
+}
+
+/**
+ * Hands the post link to whichever app the user picks.
+ *
+ * Sharing the link rather than the downloaded file is deliberate: the receiver usually
+ * wants the post itself, and the files are already in the gallery for local sharing.
+ */
+private fun shareLink(url: String, context: android.content.Context) {
+    if (url.isBlank()) return
+    val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(android.content.Intent.EXTRA_TEXT, url)
+    }
+    val chooser = android.content.Intent.createChooser(send, "分享作品链接")
+    runCatching { context.startActivity(chooser) }
+}
+
 @Composable
 fun MainDownloaderTab(
     viewModel: DownloaderViewModel, 
@@ -637,6 +666,7 @@ fun MainDownloaderTab(
     onQualityChange: (String) -> Unit,
     downloadMode: String,
     onModeChange: (String) -> Unit,
+    onStartDownload: (String) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var qualityExpanded by remember { mutableStateOf(false) }
@@ -1039,6 +1069,40 @@ fun MainDownloaderTab(
                 }
             }
         }
+        // Download action, shown only once a post has resolved.
+        //
+        // The bolt moves here from the floating bar: the button now sits with the post it
+        // downloads, so there is no guessing which link it will act on.
+        AnimatedVisibility(visible = preview != null && preview?.status == "success") {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Button(
+                    onClick = {
+                        val text = url.trim()
+                        if (text.isNotEmpty()) {
+                            onStartDownload(text)
+                        }
+                    },
+                    modifier = Modifier.weight(1f).height(52.dp),
+                    shape = RoundedCornerShape(100),
+                ) {
+                    Icon(Icons.Default.Bolt, null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("下载", maxLines = 1)
+                }
+
+                OutlinedButton(
+                    onClick = { openDouyin(url, context) },
+                    modifier = Modifier.height(52.dp),
+                    shape = RoundedCornerShape(100),
+                ) {
+                    Icon(Icons.Default.OpenInNew, null, modifier = Modifier.size(18.dp))
+                }
+            }
+        }
+
 
         if (showPreviewSheet && preview != null) {
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -1185,216 +1249,60 @@ fun MainDownloaderTab(
                 }
             }
         }
-
-        // Terminal CLI Component
-        AnimatedVisibility(
-            visible = showTerminalCard,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Column {
-                Spacer(Modifier.height(16.dp))
-                val currentTerminalTheme = viewModel.terminalTheme.value
-                Card(
-                    modifier = Modifier.fillMaxWidth().height(180.dp)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onDoubleTap = { showFullscreenLogs = true }
-                            )
-                        },
-                    colors = CardDefaults.cardColors(containerColor = Color(currentTerminalTheme.background)),
-                    border = BorderStroke(1.dp, Color(currentTerminalTheme.header)),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        // Header (macOS style window control dots)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(currentTerminalTheme.header))
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Box(Modifier.size(8.dp).background(Color(0xFFFF5F56), CircleShape))
-                                Box(Modifier.size(8.dp).background(Color(0xFFFFBD2E), CircleShape))
-                                Box(Modifier.size(8.dp).background(Color(0xFF27C93F), CircleShape))
-                            }
-                            Text(
-                                text = "duck@terminal: ~",
-                                color = Color(currentTerminalTheme.text).copy(alpha = 0.6f),
-                                style = MaterialTheme.typography.labelSmall,
-                                fontFamily = FontFamily.Monospace
-                            )
-                            IconButton(
-                                onClick = { viewModel.clearConsole() },
-                                modifier = Modifier.size(16.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Clear Console",
-                                    tint = Color(currentTerminalTheme.text).copy(alpha = 0.6f),
-                                    modifier = Modifier.size(12.dp)
-                                )
-                            }
-                        }
-                        
-                        Divider(color = Color(currentTerminalTheme.header), thickness = 1.dp)
-                        
-                        // Logs Box
-                        val lazyListState = rememberLazyListState()
-                        LaunchedEffect(consoleLogs.size) {
-                            if (consoleLogs.isNotEmpty()) {
-                                lazyListState.animateScrollToItem(consoleLogs.size - 1)
-                            }
-                        }
-                        
-                        LazyColumn(
-                            state = lazyListState,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            items(consoleLogs) { log ->
-                                Text(
-                                    text = log,
-                                    color = Color(currentTerminalTheme.text),
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 11.sp,
-                                    lineHeight = 14.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (showFullscreenLogs) {
-        Dialog(
-            properties = DialogProperties(usePlatformDefaultWidth = false),
-            onDismissRequest = { showFullscreenLogs = false }
-        ) {
-            val currentTerminalTheme = viewModel.terminalTheme.value
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Color(currentTerminalTheme.background)
-            ) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(currentTerminalTheme.header))
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { showFullscreenLogs = false }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color(currentTerminalTheme.text)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = "终端日志",
-                            color = Color(currentTerminalTheme.text),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                    
-                    val lazyListState = rememberLazyListState()
-                    LaunchedEffect(consoleLogs.size) {
-                        if (consoleLogs.isNotEmpty()) {
-                            lazyListState.animateScrollToItem(consoleLogs.size - 1)
-                        }
-                    }
-                    
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        items(consoleLogs) { log ->
-                            Text(
-                                text = log,
-                                color = Color(currentTerminalTheme.text),
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 
     if (showSuccessDialog) {
         AlertDialog(
-            onDismissRequest = { 
+            onDismissRequest = {
                 showSuccessDialog = false
                 viewModel.resetDownloadState()
             },
+            title = {
+                Text("下载完成", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            },
             text = {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.download_success_girl),
-                        contentDescription = "Download Success Illustration",
-                        modifier = Modifier
-                            .size(100.dp, 100.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Finished!",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "下载完成",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                Text(
+                    "文件已保存，可以在相册或文件管理器中查看。",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             },
             confirmButton = {
                 Button(
                     onClick = {
                         showSuccessDialog = false
-                        onUrlChange("") // Reset the URL placeholder
-                        viewModel.clearPreview() // Clear preview
-                        viewModel.resetDownloadState() // Revert to Idle
+                        viewModel.resetDownloadState()
+                        openDouyin(url, context)
                     },
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
                 ) {
-                    Text(stringResource(R.string.download_again))
+                    Text("打开抖音")
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        showSuccessDialog = false
-                        viewModel.resetDownloadState()
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(
+                        onClick = {
+                            showSuccessDialog = false
+                            viewModel.resetDownloadState()
+                            shareLink(url, context)
+                        },
+                    ) {
+                        Text("分享")
                     }
-                ) {
-                    Text(stringResource(R.string.close))
+                    TextButton(
+                        onClick = {
+                            showSuccessDialog = false
+                            onUrlChange("")
+                            viewModel.clearPreview()
+                            viewModel.resetDownloadState()
+                        },
+                    ) {
+                        Text("关闭")
+                    }
                 }
             },
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
