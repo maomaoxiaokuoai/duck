@@ -42,6 +42,15 @@ class MainActivity : AppCompatActivity() {
         }
         splashScreen.setKeepOnScreenCondition { keepSplash }
         super.onCreate(savedInstanceState)
+
+        // The app ships Chinese copy as its primary language: pin the locale so a
+        // fresh install opens in Chinese regardless of the device setting. Users can
+        // still switch languages later from 个性化 -> Language.
+        if (!hasChosenLanguage()) {
+            androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                androidx.core.os.LocaleListCompat.forLanguageTags("zh-CN")
+            )
+        }
         
         CoroutineScope(Dispatchers.IO).launch {
             if (!Python.isStarted()) {
@@ -111,4 +120,9 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
     }
+
+    /** True once the user has picked a language; before that we default to Chinese. */
+    private fun hasChosenLanguage(): Boolean =
+        getSharedPreferences("duck_prefs", MODE_PRIVATE)
+            .getBoolean("language_chosen", false)
 }

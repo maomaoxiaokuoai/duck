@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gabi</string>
+    <string name="app_name">duck</string>
     <string name="playing">播放中</string>
     <string name="youtube_search">YouTube 搜索</string>
     <string name="search_youtube">在 YouTube 上搜索...</string>
@@ -42,7 +42,7 @@
     <string name="a_new_version_of_gabi_is_avail">GitHub上有新版本的Gabi。您想下载并安装吗？</string>
     <string name="update_now">立即更新</string>
     <string name="later">稍后</string>
-    <string name="gabi">Gabi</string>
+    <string name="gabi">duck</string>
     <string name="search_or_paste_link">搜索或粘贴链接</string>
     <string name="yt_dlp">yt-dlp</string>
     <string name="gallery_dl">gallery-dl</string>

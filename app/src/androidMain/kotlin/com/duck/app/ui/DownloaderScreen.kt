@@ -2519,6 +2519,11 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
                                 }
                                 FilledTonalButton(
                                     onClick = {
+                                        // Remember the pick so the forced Chinese default
+                                        // in MainActivity does not override it next launch.
+                                        val prefs = androidx.compose.ui.platform.LocalContext.current
+                                            .getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
+                                        prefs.edit().putBoolean("language_chosen", true).apply()
                                         androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
                                             androidx.core.os.LocaleListCompat.forLanguageTags(lang.first)
                                         )

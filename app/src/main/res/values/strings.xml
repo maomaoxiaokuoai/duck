@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gabi</string>
+    <string name="app_name">duck</string>
     <string name="playing">Playing</string>
     <string name="youtube_search">YouTube Search</string>
     <string name="search_youtube">Search YouTube...</string>
@@ -44,7 +44,7 @@ To use this feature, please install the official Google app or another speech-to
     <string name="a_new_version_of_gabi_is_avail">A new version of Gabi is available on GitHub. Would you like to download and install it?</string>
     <string name="update_now">Update Now</string>
     <string name="later">Later</string>
-    <string name="gabi">Gabi</string>
+    <string name="gabi">duck</string>
     <string name="search_or_paste_link">Search or paste link</string>
     <string name="yt_dlp">yt-dlp</string>
     <string name="gallery_dl">gallery-dl</string>

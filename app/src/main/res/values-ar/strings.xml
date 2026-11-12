@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gabi</string>
+    <string name="app_name">duck</string>
     <string name="playing">قيد التشغيل</string>
     <string name="youtube_search">بحث يوتيوب</string>
     <string name="search_youtube">ابحث في يوتيوب...</string>
@@ -44,7 +44,7 @@
     <string name="a_new_version_of_gabi_is_avail">إصدار جديد من Gabi متاح على GitHub. هل ترغب في تنزيله وتثبيته؟</string>
     <string name="update_now">تحديث الآن</string>
     <string name="later">لاحقاً</string>
-    <string name="gabi">غابي</string>
+    <string name="gabi">duck</string>
     <string name="search_or_paste_link">ابحث أو الصق الرابط</string>
     <string name="yt_dlp">yt-dlp</string>
     <string name="gallery_dl">gallery-dl</string>
