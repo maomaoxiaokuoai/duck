@@ -1,5 +1,6 @@
 package com.duck.app.api
 
+import android.util.Log
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -270,6 +271,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
     }
 
     private fun parsePage(pageUrl: String, html: String, cookie: String?): ExtractionResult {
+        Log.d(TAG, "page len=" + html.length + " pace=" + html.split("__pace_f").size + " router=" + html.split("_ROUTER_DATA").size + " aweme=" + html.split("awemeId").size)
         // The signed page streams __pace_f; older captures still carry _ROUTER_DATA.
         extractPacePayload(html)?.let { array ->
             parsePaceAweme(array)?.let { return it }
@@ -472,6 +474,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         if (isString) content else content.takeIf { it.isNotEmpty() }
 
     private companion object {
+        const val TAG = "DouyinParser"
         const val CONNECT_TIMEOUT_MS = 15_000
         const val READ_TIMEOUT_MS = 20_000
         const val MAX_REDIRECTS = 5
