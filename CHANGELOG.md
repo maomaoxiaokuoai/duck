@@ -1,3 +1,33 @@
+## v2.0.37 — 2026-11-12
+
+首个正式发布版，界面基于 Material 3 Expressive 重写。
+
+### 新增
+
+- **抖音解析**：支持视频与图集，签名请求取无水印直链
+- **自动更新**：每次启动并发优选 CDN 节点，不直连 github.com
+- **更新日志**：弹窗显示该版本在 GitHub 上的更新内容
+- **纯中文界面**，移除其他语言
+- **图集批量下载**，保存至 `Pictures/duck`
+
+### 变更
+
+- 视频默认保存至 `Movies/duck`，相册可直接索引
+- 开发者页头像随 APK 打包，无需联网
+- 应用名、图标、包名统一为 duck / com.duck.app
+
+### 移除
+
+- yt-dlp、gallery-dl、cobalt、NewPipeExtractor 四个下载引擎
+- Chaquopy 与打包的 Python 运行时（APK 48 MB → 5.2 MB）
+- 首次启动引导页、播放器 tab、语音搜索
+- Cookies 设置页与 Support 页
+- 引擎选择器、Material 表现形状、Home Search Style
+
+### 修复
+
+- 即时下载按钮同时触发预览和下载导致的状态竞争（闪退）
+- 主线程阻塞在引擎初始化，冷启动从 3.9s 降至约 1s
 ## v2.0.36 — 2026-11-12
 
 首个基于 Material 3 Expressive 重写的版本。
