@@ -89,7 +89,7 @@ class GithubMirror {
      * Takes the path from "/releases/download/" onward so the result points at the
      * same asset; a link without that marker is returned untouched.
      */
-    fun accelerateDownloadUrl(url: String): String {
+    fun accelerateDownloadUrl(url: String, downloadPrefix: String): String {
         val marker = "/releases/download/"
         val at = url.indexOf(marker)
         if (at < 0) return url

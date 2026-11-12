@@ -269,7 +269,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 val latestVersion = match.groupValues[1]
                 val rawUrl = urlRegex.find(body)?.groupValues?.getOrNull(1)
                 val apkUrl = rawUrl?.let {
-                    release.downloadPrefix + it.substring(it.indexOf("/releases/download/") + 1)
+                    githubMirror.accelerateDownloadUrl(it, release.downloadPrefix)
                 } ?: return@launch
 
                 val current = com.duck.app.BuildConfig.VERSION_NAME
@@ -293,6 +293,46 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 isCheckingUpdates.value = false
             }
         }
+    }
+
+    /**
+     * Pulls the human-written notes out of the GitHub release JSON.
+     *
+     * The value arrives JSON-escaped, so newlines and quotes are unescaped here;
+     * otherwise the dialog would show literal backslash-n sequences.
+     */
+    private fun extractReleaseNotes(body: String): String {
+        val keyIndex = body.indexOf("body")
+        if (keyIndex < 0) return ""
+
+        val colonIndex = body.indexOf(':', keyIndex)
+        if (colonIndex < 0) return ""
+
+        var i = body.indexOf('"', colonIndex)
+        if (i < 0) return ""
+        i++
+
+        val out = StringBuilder()
+        var escaped = false
+        while (i < body.length) {
+            val c = body[i]
+            if (escaped) {
+                when (c) {
+                    'n' -> out.append('\n')
+                    't' -> out.append("  ")
+                    else -> out.append(c)
+                }
+                escaped = false
+            } else if (c == '\') {
+                escaped = true
+            } else if (c == '"') {
+                break
+            } else {
+                out.append(c)
+            }
+            i++
+        }
+        return out.toString().trim()
     }
 
     /** True when [remote] is a higher semantic version than [local]. */
