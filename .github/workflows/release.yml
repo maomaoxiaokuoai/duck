@@ -20,9 +20,6 @@ jobs:
   build:
     name: Build all ABIs
     runs-on: ubuntu-latest
-    # Needs write access to commit the bumped version and create the tag.
-    permissions:
-      contents: write
 
     # Signing secrets are only exposed to trusted refs. A pull_request from a fork can
     # modify build scripts, so it must never receive the keystore: PR runs build unsigned
@@ -37,48 +34,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
-      # Bump before building, so the APK carries the version it is published as.
-      - name: Bump version
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        id: bump
-        run: |
-          python3 - <<'PYEOF'
-          import re
-          src = open('app/build.gradle.kts', encoding='utf-8').read()
-          name = re.search(r'versionName\s*=\s*"([^"]+)"', src).group(1)
-          code = int(re.search(r'versionCode\s*=\s*(\d+)', src).group(1))
-          parts = name.split('.')
-          parts[-1] = str(int(parts[-1]) + 1)
-          new_name = '.'.join(parts)
-
-          src = re.sub(r'versionName\s*=\s*"[^"]+"', 'versionName = "' + new_name + '"', src)
-          src = re.sub(r'versionCode\s*=\s*\d+', 'versionCode = ' + str(code + 1), src)
-          open('app/build.gradle.kts', 'w', encoding='utf-8').write(src)
-
-          text = open('CHANGELOG.md', encoding='utf-8').read()
-          entry = '## v' + new_name + ' — 自动发布' + chr(10)*2 + '本次更新为自动构建，详见提交记录。' + chr(10)*2
-          open('CHANGELOG.md', 'w', encoding='utf-8').write(entry + text)
-
-          # Write the step output from Python: piping it out of the heredoc loses the
-          # value, which left the release tagged as a bare "v".
-          import os
-          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
-              fh.write('version=' + new_name + chr(10))
-          print('bumped to ' + new_name)
-          PYEOF
-
-      # Commit the bump so the tag points at it. [skip ci] stops this push from
-      # starting another build, which would bump again forever.
-      - name: Commit the version bump
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/build.gradle.kts CHANGELOG.md
-          git commit -m "chore: release v${{ steps.bump.outputs.version }} [skip ci]"
-          git tag -a "v${{ steps.bump.outputs.version }}" -m "duck ${{ steps.bump.outputs.version }}"
-          git push origin HEAD:main
-          # The tag is created below by the release action, not pushed here.
       - name: Set up JDK 21
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
@@ -143,19 +98,55 @@ jobs:
           path: artifacts/*.apk
           if-no-files-found: error
 
-      # Publish from this same run. Pushing a tag would start a second workflow that
-      # has to rebuild from scratch; everything needed is already here.
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Download APKs
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: duck-apk
+          path: artifacts
+
+      # Turn the matching CHANGELOG section into the release body.
+      - name: Extract changelog for this tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          VER="${TAG#v}"
+          python3 - "$VER" <<'PYEOF' > notes.md
+          import re, sys
+          ver = sys.argv[1]
+          text = open('CHANGELOG.md', encoding='utf-8').read()
+          # Accept both the "## [2.0.39]" and "## v2.0.39" heading styles.
+          pat = re.compile(r'^## (?:\[|v?)' + re.escape(ver) + r'\]?.*?$(.*?)(?=^## (?:\[|v?\d)|\Z)', re.S | re.M)
+          m = pat.search(text)
+          if m:
+              body = m.group(1).strip()
+              print(body if body else '_该版本无详细说明_')
+          else:
+              print('_未在 CHANGELOG.md 中找到 %s 的说明_' % ver)
+          PYEOF
+          {
+            echo "## 变更内容"
+            echo
+            cat notes.md
+            echo
+          } > body.md
+          cat body.md
+
       - name: Publish GitHub Release
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
-          tag_name: v${{ steps.bump.outputs.version }}
-          name: v${{ steps.bump.outputs.version }}
-          body: |
-            本次更新为自动构建。
-
-            提交记录见 ${{ github.server_url }}/${{ github.repository }}/commits/main
           files: artifacts/*.apk
+          body_path: body.md
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
