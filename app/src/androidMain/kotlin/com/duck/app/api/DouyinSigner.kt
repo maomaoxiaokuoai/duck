@@ -80,9 +80,17 @@ class DouyinSigner(private val context: Context) {
      * keeps the first call from evaluating against an empty document.
      */
     private suspend fun ensureLoaded(): Boolean = withContext(Dispatchers.IO) {
-        if (failed) return false
-        if (ready.count == 0L) return true
+        if (failed) {
+            false
+        } else if (ready.count == 0L) {
+            true
+        } else {
+            loadAndWait()
+        }
+    }
 
+    /** Boots the WebView if needed, then blocks until the JSVM reports ready. */
+    private suspend fun loadAndWait(): Boolean = withContext(Dispatchers.IO) {
         main.post {
             if (webView == null) {
                 val script = try {
