@@ -114,6 +114,7 @@ private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val activity = LocalContext.current as? androidx.activity.ComponentActivity
     val windowSize = calculateWindowSizeClass(activity!!)
     val isExpanded = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
@@ -122,8 +123,10 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
 
     
     var url by remember { mutableStateOf("") }
-    var quality by remember { mutableStateOf("720") }
-    var downloadMode by remember { mutableStateOf("auto") }
+    // Always grab the best available rendition; the picker is gone.
+    val quality = "max"
+    // auto lets the parser decide between video and gallery from the response itself.
+    val downloadMode = "auto"
     var showClearLogsDialog by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
     val preview by viewModel.previewMetadata.collectAsState()
@@ -405,13 +408,29 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                 ) {
                                     FloatingActionButton(
                                         onClick = {
-                                            // Only start the download here. Previewing at the
-                                            // same time launched two coroutines that both
-                                            // wrote _uiState, which is what crashed.
-                                            clipboardManager.getText()?.let {
-                                                val text = it.text
-                                                url = text
-                                                viewModel.downloadMedia(text, quality, downloadMode)
+                                            // The clipboard is the whole input here, so an
+                                            // empty one has to say so instead of doing
+                                            // nothing and looking broken.
+                                            val text = clipboardManager.getText()?.text?.trim()
+                                            when {
+                                                text.isNullOrEmpty() -> {
+                                                    android.widget.Toast.makeText(
+                                                        context,
+                                                        "剪贴板是空的，请先复制抖音链接",
+                                                        android.widget.Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                }
+                                                !viewModel.isDouyinUrl(text) -> {
+                                                    android.widget.Toast.makeText(
+                                                        context,
+                                                        "剪贴板内容不是抖音链接",
+                                                        android.widget.Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                }
+                                                else -> {
+                                                    url = text
+                                                    viewModel.downloadMedia(text, quality, downloadMode)
+                                                }
                                             }
                                         },
                                         modifier = Modifier
@@ -1165,242 +1184,6 @@ fun MainDownloaderTab(
                     Spacer(Modifier.height(16.dp))
                 }
             }
-        }
-
-        // Expressive Connected Button Group (Engine/Mode/Quality)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            // Mode Selector
-            Box(modifier = Modifier.weight(1f)) {
-                val isModeDefault = downloadMode == "auto"
-                val modeColors = if (isModeDefault) {
-                    ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                } else {
-                    ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                }
-                val modeCorner by animateDpAsState(if (modeExpanded) 100.dp else 8.dp)
-                FilledTonalButton(
-                    onClick = { modeExpanded = true },
-                    shape = RoundedCornerShape(100.dp),
-                    colors = modeColors,
-                                        modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Icon(Icons.Default.Settings, null, modifier = Modifier.size(14.dp))
-                        Text(modeLabel(downloadMode), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                    }
-                }
-                DropdownMenu(expanded = modeExpanded, onDismissRequest = { modeExpanded = false }) {
-                    listOf("auto", "video", "audio").forEach { mode ->
-                        DropdownMenuItem(
-                            text = { Text(modeLabel(mode)) },
-                            onClick = { onModeChange(mode); modeExpanded = false }
-                        )
-                    }
-                }
-            }
-
-            // Quality Selector
-            Box(modifier = Modifier.weight(1f)) {
-                val isQualityDefault = quality == "720"
-                val qualityColors = if (isQualityDefault) {
-                    ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                } else {
-                    ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                }
-                val qualityInnerCorner by animateDpAsState(if (qualityExpanded) 100.dp else 8.dp)
-                FilledTonalButton(
-                    onClick = { qualityExpanded = true },
-                    shape = RoundedCornerShape(100.dp),
-                    colors = qualityColors,
-                                        modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        val label = if (downloadMode == "audio") {
-                            when(quality) {
-                                "max" -> "最佳"
-                                "1080" -> "高"
-                                "720" -> "中"
-                                else -> "低"
-                            }
-                        } else {
-                            if (quality == "max") "最高" else quality + "p"
-                        }
-                        Text(label, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                    }
-                }
-                DropdownMenu(expanded = qualityExpanded, onDismissRequest = { qualityExpanded = false }) {
-                    val options = if (downloadMode == "audio") {
-                        listOf("480" to "低", "720" to "中", "1080" to "高", "max" to "最佳")
-                    } else {
-                        val avQuals = preview?.available_qualities
-                        if (!avQuals.isNullOrEmpty()) {
-                            avQuals.map { 
-                                val clean = it.replace("p", "")
-                                clean to it
-                            } + listOf("max" to "最高画质")
-                        } else {
-                            listOf("480" to "480p", "720" to "720p", "1080" to "1080p", "max" to "最高画质")
-                        }
-                    }
-                    options.forEach { (valStr, label) ->
-                        DropdownMenuItem(
-                            text = { Text(label) },
-                            onClick = { onQualityChange(valStr); qualityExpanded = false }
-                        )
-                    }
-                }
-            }
-        }
-
-        // Connected Button Group (Terminal / Download)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            // Terminal Pill Button (Left)
-            Box(modifier = Modifier.weight(1f)) {
-                val terminalInteractionSource = remember { MutableInteractionSource() }
-                val isTerminalPressed by terminalInteractionSource.collectIsPressedAsState()
-                val terminalInnerCorner by animateDpAsState(if (isTerminalPressed || showTerminalCard) 100.dp else 8.dp)
-                
-                val terminalContainerColor by animateColorAsState(
-                    targetValue = if (showTerminalCard) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant,
-                    animationSpec = tween(150),
-                    label = "terminal_container_color"
-                )
-                val terminalContentColor by animateColorAsState(
-                    targetValue = if (showTerminalCard) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    animationSpec = tween(150),
-                    label = "terminal_content_color"
-                )
-
-                FilledTonalButton(
-                    onClick = { showTerminalCard = !showTerminalCard },
-                    modifier = Modifier.fillMaxWidth(),
-                    interactionSource = terminalInteractionSource,
-                    shape = RoundedCornerShape(topStart = 100.dp, bottomStart = 100.dp, topEnd = terminalInnerCorner, bottomEnd = terminalInnerCorner),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = terminalContainerColor,
-                        contentColor = terminalContentColor
-                    ),
-                    contentPadding = PaddingValues(14.dp)
-                ) {
-                    Icon(Icons.Default.Terminal, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.terminal), maxLines = 1)
-                }
-            }
-
-            // Download Pill Button (Right)
-            Box(modifier = Modifier.weight(1f)) {
-                val downloadInteractionSource = remember { MutableInteractionSource() }
-                val isDownloadPressed by downloadInteractionSource.collectIsPressedAsState()
-                val isDownloading = uiState is DownloadState.Downloading
-                val downloadInnerCorner by animateDpAsState(if (isDownloadPressed || isDownloading) 100.dp else 8.dp)
-                val downloadContainerColor by animateColorAsState(
-                    targetValue = if (isDownloading) MaterialTheme.colorScheme.primaryContainer else if (isDownloadPressed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondaryContainer,
-                    animationSpec = tween(150),
-                    label = "download_container_color"
-                )
-                val downloadContentColor by animateColorAsState(
-                    targetValue = if (isDownloading) MaterialTheme.colorScheme.onPrimaryContainer else if (isDownloadPressed) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSecondaryContainer,
-                    animationSpec = tween(150),
-                    label = "download_content_color"
-                )
-
-                FilledTonalButton(
-                    onClick = { 
-                        if (isDownloading) {
-                            showDownloadingDetailsSheet = true
-                        } else if (url.isNotBlank()) {
-                            coroutineScope.launch {
-                                if (viewModel.hasDownloadedUrl(url)) {
-                                    duplicateWarningUrl = url
-                                } else {
-                                    viewModel.downloadMedia(url, quality, downloadMode)
-                                }
-                            }
-                        } 
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = {
-                                if (isDownloading) {
-                                    showDownloadingDetailsSheet = true
-                                } else if (url.isNotBlank()) {
-                                    coroutineScope.launch {
-                                        if (viewModel.hasDownloadedUrl(url)) {
-                                            duplicateWarningUrl = url
-                                        } else {
-                                            viewModel.downloadMedia(url, quality, downloadMode)
-                                        }
-                                    }
-                                }
-                            },
-                            onLongClick = {
-                                if (isDownloading) {
-                                    showDownloadingDetailsSheet = true
-                                }
-                            }
-                        ),
-                    interactionSource = downloadInteractionSource,
-                    shape = RoundedCornerShape(topStart = downloadInnerCorner, bottomStart = downloadInnerCorner, topEnd = 100.dp, bottomEnd = 100.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = downloadContainerColor,
-                        contentColor = downloadContentColor
-                    ),
-                    contentPadding = if (isDownloading) PaddingValues(horizontal = 10.dp, vertical = 14.dp) else PaddingValues(14.dp)
-                ) {
-                    if (isDownloading) {
-                        val progress = (uiState as DownloadState.Downloading).progress
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            WavyProgressIndicator(
-                                progress = progress,
-                                modifier = Modifier.weight(1f).height(12.dp),
-                                strokeWidth = 3.dp,
-                                waveAmplitude = 2.dp,
-                                color = downloadContentColor,
-                                trackColor = downloadContentColor.copy(alpha = 0.25f)
-                            )
-                            Text(
-                                "${(progress * 100).toInt()}%",
-                                style = MaterialTheme.typography.labelSmall,
-                                maxLines = 1
-                            )
-                        }
-                    } else {
-                        Icon(Icons.Default.Download, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.download), maxLines = 1)
-                    }
-                }
-            }
-        }
-
-        AnimatedVisibility(visible = uiState is DownloadState.Success || uiState is DownloadState.Error) {
-            StatusInfo(uiState, viewModel::openSavedFolder)
         }
 
         // Terminal CLI Component

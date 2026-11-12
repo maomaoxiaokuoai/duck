@@ -446,12 +446,22 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     logToConsole("[INFO] 直链: ${result.url?.take(80)}...")
                 }
                 _previewMetadata.value = result
+
+                // Parsing success is also the download trigger: the user pasted a link to
+                // get the file, not to read metadata. The parser already distinguishes
+                // video from gallery, so nothing here has to care which it is.
+                if (result.status == "success") {
+                    downloadMedia(url, quality, mode)
+                }
             } catch (e: Exception) {
                 logToConsole("预览异常: ${e.message}")
                 _previewMetadata.value = ExtractionResult(status = "error", message = e.message ?: "解析失败")
             }
         }
     }
+
+    /** True when [url] looks like something the parser can handle. */
+    fun isDouyinUrl(url: String): Boolean = douyinParser.isDouyinUrl(url)
 
     fun clearPreview() {
         _previewMetadata.value = null
