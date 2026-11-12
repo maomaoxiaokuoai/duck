@@ -126,7 +126,8 @@ jobs:
           ver = sys.argv[1]
           text = open('CHANGELOG.md', encoding='utf-8').read()
           # grab "## [1.2.3] ... " up to the next "## ["
-          pat = re.compile(r'^## \[' + re.escape(ver) + r'\].*?$(.*?)(?=^## \[|\Z)', re.S | re.M)
+          # Accept both "## [2.0.39]" and "## v2.0.39" headings.
+          pat = re.compile(r'^## (?:\[|v?)' + re.escape(ver) + r'\]?.*?$(.*?)(?=^## (?:\[|v?\d)|\Z)', re.S | re.M)
           m = pat.search(text)
           if m:
               body = m.group(1).strip()
