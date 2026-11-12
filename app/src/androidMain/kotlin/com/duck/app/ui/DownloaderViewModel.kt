@@ -51,7 +51,7 @@ enum class TerminalTheme(
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
     private val extractor = PythonExtractor()
     private val cobaltRepository = CobaltRepository()
-    private val db = Room.databaseBuilder(application, AppDatabase::class.java, "gabi_db")
+    private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3)
         .fallbackToDestructiveMigration()
         .build()
@@ -102,7 +102,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         return@withContext thumbnailUrl ?: mediaPath
     }
     
-    private val prefs = application.getSharedPreferences("gabi_prefs", android.content.Context.MODE_PRIVATE)
+    private val prefs = application.getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
     
     var terminalTheme = mutableStateOf(
         TerminalTheme.valueOf(prefs.getString("terminal_theme", TerminalTheme.MOCHA.name) ?: TerminalTheme.MOCHA.name)
@@ -160,17 +160,17 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.value = DownloadState.Idle
     }
     
-    private val _consoleLogs = MutableStateFlow<List<String>>(listOf("gabi@terminal:~ $ app initialized"))
+    private val _consoleLogs = MutableStateFlow<List<String>>(listOf("duck@terminal:~ $ app initialized"))
     val consoleLogs: StateFlow<List<String>> = _consoleLogs
 
     fun logToConsole(message: String) {
         val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
         _consoleLogs.value = _consoleLogs.value + "[$timestamp] $message"
-        android.util.Log.d("GabiApp", message)
+        android.util.Log.d("DuckApp", message)
     }
 
     fun clearConsole() {
-        _consoleLogs.value = listOf("gabi@terminal:~ $ console cleared")
+        _consoleLogs.value = listOf("duck@terminal:~ $ console cleared")
     }
 
     fun saveSetting(key: String, value: String) {
@@ -265,7 +265,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             isCheckingUpdates.value = true
             updateCheckMessage.value = if (manual) "Checking for updates..." else null
             try {
-                val response: HttpResponse = client.get("https://api.github.com/repos/Hotaro26/gabi/releases/latest")
+                val response: HttpResponse = client.get("https://api.github.com/repos/maomaoxiaokuoai/duck/releases/latest")
                 if (response.status.value in 200..299) {
                     val responseBody = response.bodyAsText()
                     val tagRegex = "\"tag_name\"\\s*:\\s*\"([^\"]+)\"".toRegex()
@@ -274,7 +274,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     val urlMatch = urlRegex.find(responseBody)
                     if (match != null) {
                         val latestVersion = match.groupValues[1]
-                        val apkUrl = urlMatch?.groupValues?.getOrNull(1) ?: "https://github.com/Hotaro26/gabi/releases/latest"
+                        val apkUrl = urlMatch?.groupValues?.getOrNull(1) ?: "https://github.com/maomaoxiaokuoai/duck/releases/latest"
                         val currentVersion = "v" + com.duck.app.BuildConfig.VERSION_NAME
                         
                         val cleanLatest = latestVersion.substringBefore("-").removePrefix("v").trim()
@@ -337,7 +337,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val _previewMetadata = MutableStateFlow<ExtractionResult?>(null)
     val previewMetadata: StateFlow<ExtractionResult?> = _previewMetadata
 
-    var downloadPath = mutableStateOf("Download/Gabi")
+    var downloadPath = mutableStateOf("Download/duck")
     var selectedFolderUri = mutableStateOf<String?>(null)
     var selectedFolderName = mutableStateOf<String?>(null)
 
@@ -694,10 +694,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                             val sanitizedTitle = title.replace(Regex("[^a-zA-Z0-9]"), "_")
                             val fileName = "${sanitizedTitle}_${index + 1}_${System.currentTimeMillis()}.$extension"
                             
-                            // Automatically save galleries to Pictures/Gabi and audio to Music/Gabi
+                            // Automatically save galleries to Pictures/duck and audio to Music/duck
                             val targetPath = when {
-                                isGallery && downloadPath.value == "Downloads/Gabi" -> "Pictures/Gabi"
-                                mode == "audio" && downloadPath.value == "Downloads/Gabi" -> "Music/Gabi"
+                                isGallery && downloadPath.value == "Downloads/duck" -> "Pictures/duck"
+                                mode == "audio" && downloadPath.value == "Downloads/duck" -> "Music/duck"
                                 else -> downloadPath.value
                             }
                             logToConsole("Downloading file [${index + 1}/$totalFiles]: $fileName")
@@ -745,8 +745,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         val fileName = "${sanitizedTitle}_${System.currentTimeMillis()}.$extension"
                         
                         val targetPath = when {
-                            isGallery && downloadPath.value == "Download/Gabi" -> "Pictures/Gabi"
-                            mode == "audio" && downloadPath.value == "Download/Gabi" -> "Music/Gabi"
+                            isGallery && downloadPath.value == "Download/duck" -> "Pictures/duck"
+                            mode == "audio" && downloadPath.value == "Download/duck" -> "Music/duck"
                             else -> downloadPath.value
                         }
 

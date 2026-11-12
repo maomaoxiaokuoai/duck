@@ -68,7 +68,7 @@ Um diese Funktion zu nutzen, installieren Sie bitte die offizielle Google-App od
     <string name="downloads">Downloads</string>
     <string name="download_repository">Download-Verzeichnis</string>
     <string name="files_will_be_saved_in_your_se">Dateien werden im ausgewählten Ordner gespeichert</string>
-    <string name="default_movies_gabi">Standard: Movies/Gabi</string>
+    <string name="default_movies_gabi">Standard: Movies/duck</string>
     <string name="extractors">Extraktoren</string>
     <string name="update_internal_components">Interne Komponenten aktualisieren</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlp und gallery-dl aktualisieren</string>

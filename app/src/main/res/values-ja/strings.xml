@@ -66,7 +66,7 @@
     <string name="downloads">ダウンロード</string>
     <string name="download_repository">ダウンロードリポジトリ</string>
     <string name="files_will_be_saved_in_your_se">選択したフォルダにファイルが保存されます</string>
-    <string name="default_movies_gabi">デフォルト: Movies/Gabi</string>
+    <string name="default_movies_gabi">デフォルト: Movies/duck</string>
     <string name="extractors">エクストラクター</string>
     <string name="update_internal_components">内部コンポーネントを更新</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlpとgallery-dlを更新</string>

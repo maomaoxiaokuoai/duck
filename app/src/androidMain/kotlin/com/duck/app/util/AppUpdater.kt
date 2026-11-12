@@ -18,7 +18,7 @@ class AppUpdater(private val context: Context) {
         
         val request = DownloadManager.Request(Uri.parse(url)).apply {
             setTitle("App Update")
-            setDescription("Downloading latest version of Gabi")
+            setDescription("Downloading latest version of duck")
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
         }

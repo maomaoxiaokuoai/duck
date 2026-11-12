@@ -65,7 +65,7 @@
     <string name="downloads">İndirilenler</string>
     <string name="download_repository">İndirme Dizini</string>
     <string name="files_will_be_saved_in_your_se">Dosyalar seçtiğiniz klasöre kaydedilecek</string>
-    <string name="default_movies_gabi">Varsayılan: Movies/Gabi</string>
+    <string name="default_movies_gabi">Varsayılan: Movies/duck</string>
     <string name="extractors">Ayıklayıcılar</string>
     <string name="update_internal_components">Dahili bileşenleri güncelle</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlp &amp; gallery-dl güncelle</string>

@@ -68,7 +68,7 @@
     <string name="downloads">Загрузки</string>
     <string name="download_repository">Репозиторий загрузок</string>
     <string name="files_will_be_saved_in_your_se">Файлы будут сохранены в выбранной папке</string>
-    <string name="default_movies_gabi">По умолчанию: Movies/Gabi</string>
+    <string name="default_movies_gabi">По умолчанию: Movies/duck</string>
     <string name="extractors">Экстракторы</string>
     <string name="update_internal_components">Обновить внутренние компоненты</string>
     <string name="update_yt_dlp_gallery_dl">Обновить yt-dlp и gallery-dl</string>

@@ -68,7 +68,7 @@
     <string name="downloads">التنزيلات</string>
     <string name="download_repository">مستودع التنزيل</string>
     <string name="files_will_be_saved_in_your_se">سيتم حفظ الملفات في المجلد المحدد الخاص بك</string>
-    <string name="default_movies_gabi">الافتراضي: Movies/Gabi</string>
+    <string name="default_movies_gabi">الافتراضي: Movies/duck</string>
     <string name="extractors">المستخرجات</string>
     <string name="update_internal_components">تحديث المكونات الداخلية</string>
     <string name="update_yt_dlp_gallery_dl">تحديث yt-dlp و gallery-dl</string>

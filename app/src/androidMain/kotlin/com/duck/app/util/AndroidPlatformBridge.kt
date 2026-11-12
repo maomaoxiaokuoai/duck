@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 class AndroidPlatformBridge(private val context: Context) : PlatformBridge {
     
-    private val prefs = context.getSharedPreferences("gabi_prefs", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("duck_prefs", Context.MODE_PRIVATE)
 
     override fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

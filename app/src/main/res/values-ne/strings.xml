@@ -66,7 +66,7 @@
     <string name="downloads">डाउनलोडहरू</string>
     <string name="download_repository">डाउनलोड भण्डार</string>
     <string name="files_will_be_saved_in_your_se">फाइलहरू चयन गरिएको फोल्डरमा सुरक्षित गरिनेछ</string>
-    <string name="default_movies_gabi">पूर्वनिर्धारित: Movies/Gabi</string>
+    <string name="default_movies_gabi">पूर्वनिर्धारित: Movies/duck</string>
     <string name="extractors">एक्सट्र्याक्टरहरू</string>
     <string name="update_internal_components">आन्तरिक घटकहरू अपडेट गर्नुहोस्</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlp र gallery-dl अपडेट गर्नुहोस्</string>

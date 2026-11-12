@@ -66,7 +66,7 @@
     <string name="downloads">ডাউনলোড</string>
     <string name="download_repository">ডাউনলোড রিপোজিটরি</string>
     <string name="files_will_be_saved_in_your_se">ফাইলগুলি আপনার নির্বাচিত ফোল্ডারে সংরক্ষিত হবে</string>
-    <string name="default_movies_gabi">ডিফল্ট: Movies/Gabi</string>
+    <string name="default_movies_gabi">ডিফল্ট: Movies/duck</string>
     <string name="extractors">এক্সট্র্যাক্টর</string>
     <string name="update_internal_components">অভ্যন্তরীণ উপাদান আপডেট করুন</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlp এবং gallery-dl আপডেট করুন</string>

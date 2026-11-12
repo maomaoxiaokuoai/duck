@@ -65,7 +65,7 @@
     <string name="downloads">Endirmələr</string>
     <string name="download_repository">Endirmə qovluğu</string>
     <string name="files_will_be_saved_in_your_se">Fayllar seçdiyiniz qovluqda saxlanılacaq</string>
-    <string name="default_movies_gabi">Standart: Movies/Gabi</string>
+    <string name="default_movies_gabi">Standart: Movies/duck</string>
     <string name="extractors">Çıxarıcılar</string>
     <string name="update_internal_components">Daxili komponentləri yenilə</string>
     <string name="update_yt_dlp_gallery_dl">yt-dlp və gallery-dl proqramlarını yenilə</string>

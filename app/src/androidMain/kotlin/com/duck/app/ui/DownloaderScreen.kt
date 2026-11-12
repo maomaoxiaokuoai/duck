@@ -1604,7 +1604,7 @@ fun MainDownloaderTab(
                                 Box(Modifier.size(8.dp).background(Color(0xFF27C93F), CircleShape))
                             }
                             Text(
-                                text = "gabi@terminal: ~",
+                                text = "duck@terminal: ~",
                                 color = Color(currentTerminalTheme.text).copy(alpha = 0.6f),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontFamily = FontFamily.Monospace
@@ -2768,7 +2768,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
     val context = LocalContext.current
     val profileImageRequest = remember(context) {
         coil.request.ImageRequest.Builder(context)
-            .data("https://github.com/Hotaro26.png")
+            .data("https://avatars.githubusercontent.com/maomaoxiaokuoai")
             .diskCacheKey("hotaro_avatar")
             .memoryCacheKey("hotaro_avatar")
             .diskCachePolicy(coil.request.CachePolicy.ENABLED)
@@ -2821,7 +2821,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Hotaro26"))) },
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/maomaoxiaokuoai"))) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp)
                     ) {
@@ -2853,7 +2853,7 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary)
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Gabi v${com.duck.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                        Text("duck v${com.duck.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.powered_by_yt_dlp_gallery_dl_c), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

@@ -41,7 +41,7 @@ To use this feature, please install the official Google app or another speech-to
     <string name="no">No</string>
     <string name="downloading">Downloading...</string>
     <string name="cancel_download_1">Cancel Download</string>
-    <string name="a_new_version_of_gabi_is_avail">A new version of Gabi is available on GitHub. Would you like to download and install it?</string>
+    <string name="a_new_version_of_gabi_is_avail">A new version of duck is available on GitHub. Would you like to download and install it?</string>
     <string name="update_now">Update Now</string>
     <string name="later">Later</string>
     <string name="gabi">duck</string>
@@ -68,7 +68,7 @@ To use this feature, please install the official Google app or another speech-to
     <string name="downloads">Downloads</string>
     <string name="download_repository">Download Repository</string>
     <string name="files_will_be_saved_in_your_se">Files will be saved in your selected folder</string>
-    <string name="default_movies_gabi">Default: Movies/Gabi</string>
+    <string name="default_movies_gabi">Default: Movies/duck</string>
     <string name="extractors">Extractors</string>
     <string name="update_internal_components">Update internal components</string>
     <string name="update_yt_dlp_gallery_dl">Update yt-dlp &amp; gallery-dl</string>
@@ -93,8 +93,8 @@ To use this feature, please install the official Google app or another speech-to
     <string name="support_on_ko_fi">Support on Ko-fi</string>
     <string name="ko_fi_com_oi_hotaro">ko-fi.com/oi.hotaro</string>
     <string name="support">Support</string>
-    <string name="support_gabi_development">Support Gabi Development</string>
-    <string name="help_keep_gabi_alive_and_fast">Help keep Gabi alive and fast. Your support via UPI helps maintain the project.</string>
+    <string name="support_gabi_development">Support duck Development</string>
+    <string name="help_keep_gabi_alive_and_fast">Help keep duck alive and fast. Your support via UPI helps maintain the project.</string>
     <string name="upi">UPI</string>
     <string name="ko_fi">Ko-fi</string>
     <string name="star_the_project">Star the Project</string>
