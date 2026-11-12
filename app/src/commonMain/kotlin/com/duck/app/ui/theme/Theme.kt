@@ -34,16 +34,16 @@ val M3ExpressiveShapes = Shapes(
 )
 
 enum class AppTheme(val label: String) {
-    Default("Lavender"),
-    Forest("Forest"),
-    Midnight("Midnight"),
-    Rose("Rose"),
-    Ocean("Ocean"),
-    Sunset("Sunset"),
-    Amethyst("Amethyst"),
-    Cyberpunk("Cyberpunk"),
-    Monochrome("Monochrome"),
-    Dynamic("Dynamic (M3)")
+    Default("薰衣草"),
+    Forest("森林"),
+    Midnight("午夜"),
+    Rose("玫瑰"),
+    Ocean("海洋"),
+    Sunset("日落"),
+    Amethyst("紫水晶"),
+    Cyberpunk("赛博朋克"),
+    Monochrome("单色"),
+    Dynamic("动态取色")
 }
 
 @Composable

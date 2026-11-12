@@ -50,8 +50,6 @@
     <string name="make_navigation_bar_fully_tran">使导航栏完全透明如玻璃</string>
     <string name="opaque_navigation_bar">不透明导航栏</string>
     <string name="make_floating_navigation_solid">使浮动导航栏变为纯色</string>
-    <string name="material_expressive_shapes">Material 表现形状</string>
-    <string name="use_dynamic_shapes_for_setting">为设置图标使用动态形状</string>
     <string name="theme_mode">主题模式</string>
     <string name="color_scheme">配色方案</string>
     <string name="terminal_theme">终端主题</string>
@@ -59,16 +57,9 @@
     <string name="download_repository">下载存储库</string>
     <string name="files_will_be_saved_in_your_se">文件将保存在您选择的文件夹中</string>
     <string name="default_movies_gabi">默认：Movies/duck</string>
-    <string name="extraction_credentials">提取凭据</string>
-    <string name="import_cookies_txt_for_private">导入 cookies.txt 用于私人内容</string>
-    <string name="import_cookies_txt">导入 cookies.txt</string>
-    <string name="extract_from_web_login">从网页登录中提取</string>
-    <string name="login_to_sites_to_get_cookies">登录网站以自动获取Cookie</string>
-    <string name="extract_save_cookies">提取并保存 Cookie</string>
     <string name="developer">开发者</string>
     <string name="building_crisp_fast_and_secure">构建清晰、快速、安全的软件。</string>
     <string name="github">GitHub</string>
-    <string name="discord">Discord</string>
     <string name="app_info_updates">应用信息与更新</string>
     <string name="auto_check_updates">自动检查更新</string>
     <string name="notify_on_launch_when_new_rele">启动时如果有新版本则通知</string>
@@ -87,12 +78,5 @@
     <string name="no_history_yet">暂无历史记录</string>
     <string name="copy_original_url">复制原始网址</string>
     <string name="check_your_selected_folder">检查您选择的文件夹</string>
-    <string name="cookies">Cookies</string>
-    <string name="use_cookies">使用 Cookies</string>
-    <string name="new_cookie">新 Cookie</string>
-    <string name="saved_cookies_drag_to_reorder">已保存的 Cookies (拖动以重新排序)</string>
-    <string name="cookies_allow_the_extractors_t">Cookie允许访问需要登录的受限内容。</string>
     <string name="url">网址</string>
-    <string name="target_extractor">目标提取器</string>
-    <string name="get_cookies">获取 Cookies</string>
 </resources>

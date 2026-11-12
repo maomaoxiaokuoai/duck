@@ -41,14 +41,16 @@ enum class TerminalTheme(
     val text: Long,
     val header: Long
 ) {
-    CLASSIC("Classic Green", 0xFF0C0C0C, 0xFF00FF66, 0xFF1E1E1E),
-    MOCHA("Mocha", 0xFF1E1E2E, 0xFFF5E0DC, 0xFF181825),
-    PINK("Pink Sakura", 0xFF1F121F, 0xFFFF85A2, 0xFF2E1A2E),
-    DRACULA("Dracula", 0xFF282A36, 0xFFF8F8F2, 0xFF21222C)
+    CLASSIC("经典绿", 0xFF0C0C0C, 0xFF00FF66, 0xFF1E1E1E),
+    MOCHA("摩卡", 0xFF1E1E2E, 0xFFF5E0DC, 0xFF181825),
+    PINK("樱花粉", 0xFF1F121F, 0xFFFF85A2, 0xFF2E1A2E),
+    DRACULA("德古拉", 0xFF282A36, 0xFFF8F8F2, 0xFF21222C)
 }
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
     /** Builds the __ac_signature the Douyin page needs; a hidden WebView runs their JSVM. */
+    /** Races GitHub mirrors so updates never connect to github.com directly. */
+    private val githubMirror = com.duck.app.util.GithubMirror()
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
@@ -111,7 +113,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     var isNavBarBlurEnabled = mutableStateOf(prefs.getBoolean("nav_bar_blur", true))
     var isNavBarOpaque = mutableStateOf(prefs.getBoolean("nav_bar_opaque", false))
     var isNavBarTrueGlass = mutableStateOf(prefs.getBoolean("nav_bar_true_glass", false))
-    var isMaterialShapesEnabled = mutableStateOf(prefs.getBoolean("material_shapes", false))
     fun toggleNavBarBlur(enabled: Boolean) {
         isNavBarBlurEnabled.value = enabled
         prefs.edit().putBoolean("nav_bar_blur", enabled).apply()
@@ -127,11 +128,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         prefs.edit().putBoolean("nav_bar_true_glass", enabled).apply()
     }
     
-    
-    fun toggleMaterialShapes(enabled: Boolean) {
-        isMaterialShapesEnabled.value = enabled
-        prefs.edit().putBoolean("material_shapes", enabled).apply()
-    }    
     fun updateTerminalTheme(theme: TerminalTheme) {
         terminalTheme.value = theme
         prefs.edit().putString("terminal_theme", theme.name).apply()
@@ -170,7 +166,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     var autoCheckUpdates = mutableStateOf(prefs.getBoolean("auto_check_updates", true))
-    var updateAvailable = mutableStateOf<Pair<String, String>?>(null)
+    /** A pending update: version tag, accelerated APK link, and the release notes. */
+    var updateAvailable = mutableStateOf<UpdateInfo?>(null)
     var updateDownloadProgress = mutableStateOf(-1f)
     var isCheckingUpdates = mutableStateOf(false)
     var updateCheckMessage = mutableStateOf<String?>(null)
@@ -242,69 +239,75 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    /**
+     * Looks for a newer release, going through whichever mirror is fastest.
+     *
+     * github.com is slow or unreachable on a lot of networks, so the metadata comes
+     * from a raced mirror (see GithubMirror) and the download link is rewritten to
+     * that same mirror. Nothing ever talks to github.com directly.
+     */
     fun checkForUpdates(manual: Boolean = false) {
         viewModelScope.launch {
             isCheckingUpdates.value = true
-            updateCheckMessage.value = if (manual) "Checking for updates..." else null
+            if (manual) updateCheckMessage.value = "正在检查更新..."
             try {
-                val response: HttpResponse = client.get("https://api.github.com/repos/maomaoxiaokuoai/duck/releases/latest")
-                if (response.status.value in 200..299) {
-                    val responseBody = response.bodyAsText()
-                    val tagRegex = "\"tag_name\"\\s*:\\s*\"([^\"]+)\"".toRegex()
-                    val urlRegex = "\"browser_download_url\"\\s*:\\s*\"([^\"]+\\.apk)\"".toRegex()
-                    val match = tagRegex.find(responseBody)
-                    val urlMatch = urlRegex.find(responseBody)
-                    if (match != null) {
-                        val latestVersion = match.groupValues[1]
-                        val apkUrl = urlMatch?.groupValues?.getOrNull(1) ?: "https://github.com/maomaoxiaokuoai/duck/releases/latest"
-                        val currentVersion = "v" + com.duck.app.BuildConfig.VERSION_NAME
-                        
-                        val cleanLatest = latestVersion.substringBefore("-").removePrefix("v").trim()
-                        val cleanCurrent = com.duck.app.BuildConfig.VERSION_NAME.substringBefore("-").removePrefix("v").trim()
-                        
-                        var isNewer = false
-                        try {
-                            val lParts = cleanLatest.split('.').map { it.toIntOrNull() ?: 0 }
-                            val cParts = cleanCurrent.split('.').map { it.toIntOrNull() ?: 0 }
-                            val maxLen = maxOf(lParts.size, cParts.size)
-                            for (i in 0 until maxLen) {
-                                val l = lParts.getOrNull(i) ?: 0
-                                val c = cParts.getOrNull(i) ?: 0
-                                if (l > c) {
-                                    isNewer = true
-                                    break
-                                } else if (l < c) {
-                                    break
-                                }
-                            }
-                        } catch (e: Exception) {
-                            // Fallback if parsing fails
-                            isNewer = latestVersion != currentVersion && !latestVersion.contains("beta", ignoreCase = true)
-                        }
+                val release = githubMirror.fetchLatestRelease()
+                if (release == null) {
+                    if (manual) updateCheckMessage.value = "检查失败，所有加速节点均不可用"
+                    return@launch
+                }
 
-                        if (isNewer && !latestVersion.contains("beta", ignoreCase = true)) {
-                            updateAvailable.value = Pair(latestVersion, apkUrl)
-                            updateCheckMessage.value = "New version $latestVersion available!"
-                        } else {
-                            if (manual) {
-                                updateCheckMessage.value = "Up to date ($currentVersion)"
-                            }
-                        }
-                    } else if (manual) {
-                        updateCheckMessage.value = "No releases found."
-                    }
+                val body = release.body
+                val tagRegex = "\"tag_name\"\\s*:\\s*\"([^\"]+)\"".toRegex()
+                val urlRegex = "\"browser_download_url\"\\s*:\\s*\"([^\"]+\\.apk)\"".toRegex()
+                val match = tagRegex.find(body)
+                if (match == null) {
+                    if (manual) updateCheckMessage.value = "没有找到发布版本"
+                    return@launch
+                }
+
+                val latestVersion = match.groupValues[1]
+                val rawUrl = urlRegex.find(body)?.groupValues?.getOrNull(1)
+                val apkUrl = rawUrl?.let {
+                    release.downloadPrefix + it.substring(it.indexOf("/releases/download/") + 1)
+                } ?: return@launch
+
+                val current = com.duck.app.BuildConfig.VERSION_NAME
+                val isNewer = isVersionNewer(latestVersion, current)
+
+                if (isNewer && !latestVersion.contains("beta", ignoreCase = true)) {
+                    updateAvailable.value = UpdateInfo(
+                        version = latestVersion,
+                        apkUrl = apkUrl,
+                        notes = extractReleaseNotes(body),
+                    )
+                    updateCheckMessage.value = "发现新版本 " + latestVersion
+                    logToConsole("更新可用: " + latestVersion + " via " + release.mirrorLabel)
                 } else if (manual) {
-                    updateCheckMessage.value = "Check failed (HTTP ${response.status.value})"
+                    updateCheckMessage.value = "已是最新版本 v" + current
                 }
             } catch (e: Exception) {
-                logToConsole("Update check failed: ${e.message}")
-                if (manual) {
-                    updateCheckMessage.value = "Check failed: ${e.message}"
-                }
+                logToConsole("检查更新失败: " + e.message)
+                if (manual) updateCheckMessage.value = "检查失败: " + e.message
             } finally {
                 isCheckingUpdates.value = false
             }
         }
+    }
+
+    /** True when [remote] is a higher semantic version than [local]. */
+    private fun isVersionNewer(remote: String, local: String): Boolean {
+        val cleanRemote = remote.substringBefore("-").removePrefix("v").trim()
+        val cleanLocal = local.substringBefore("-").removePrefix("v").trim()
+        val remoteParts = cleanRemote.split('.').map { it.toIntOrNull() ?: 0 }
+        val localParts = cleanLocal.split('.').map { it.toIntOrNull() ?: 0 }
+        for (i in 0 until maxOf(remoteParts.size, localParts.size)) {
+            val r = remoteParts.getOrNull(i) ?: 0
+            val l = localParts.getOrNull(i) ?: 0
+            if (r > l) return true
+            if (r < l) return false
+        }
+        return false
     }
 
     private var currentDownloadJob: Job? = null
@@ -322,7 +325,13 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val _previewMetadata = MutableStateFlow<ExtractionResult?>(null)
     val previewMetadata: StateFlow<ExtractionResult?> = _previewMetadata
 
-    var downloadPath = mutableStateOf("Download/duck")
+    /**
+     * Where finished media lands.
+     *
+     * Movies/duck and Pictures/duck are both indexed by MediaStore, so the gallery and
+     * video apps pick files up immediately. A Download/ folder stays invisible to them.
+     */
+    var downloadPath = mutableStateOf("Movies/duck")
     var selectedFolderUri = mutableStateOf<String?>(null)
     var selectedFolderName = mutableStateOf<String?>(null)
 
@@ -365,7 +374,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
             logToConsole("解析抖音链接: ${douyinParser.extractUrl(url)}")
 
-            val result = douyinParser.resolve(url, readCookieHeader())
+            val result = douyinParser.resolve(url)
             if (result.status == "success") {
                 if (result.is_gallery == true) {
                     logToConsole("解析成功：图集，共 ${result.urls?.size ?: 0} 个直链")
@@ -640,19 +649,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             .build()
     }
 
-    /**
-     * Reads the cookie jar imported from Downloads settings, if the user provided one.
-     * Douyin serves some posts only to logged-in visitors; without a jar the request simply
-     * goes out anonymous and the parser reports whatever it could resolve.
-     */
-    private fun readCookieHeader(): String? {
-        val path = prefs.getString(COOKIE_SETTING_KEY, null)
-        if (path.isNullOrBlank()) return null
-        return runCatching {
-            java.io.File(path).takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.isNotEmpty() }
-        }.getOrNull()
-    }
-
     private fun sanitizeFileName(title: String): String =
         title.replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_").take(60)
 
@@ -729,9 +725,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private companion object {
-        /** Must match the key used by the Downloads settings screen. */
-        const val COOKIE_SETTING_KEY = "douyin_cookies_path"
-
         val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
     }
 
@@ -740,3 +733,15 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         douyinSigner.dispose()
     }
 }
+
+/**
+ * A pending update, as offered to the user.
+ *
+ * [notes] is the release body from GitHub, so the dialog can say what actually
+ * changed instead of only naming a version.
+ */
+data class UpdateInfo(
+    val version: String,
+    val apkUrl: String,
+    val notes: String = "",
+)

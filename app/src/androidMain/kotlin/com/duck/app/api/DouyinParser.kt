@@ -40,7 +40,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * the media items behind it. Failures come back as an error result instead of throwing,
      * so callers never fall back to a removed engine.
      */
-    suspend fun resolve(input: String, cookie: String? = null): ExtractionResult {
+    suspend fun resolve(input: String): ExtractionResult {
         val pageUrl = extractUrl(input)
         if (!isDouyinUrl(pageUrl)) {
             return ExtractionResult(
@@ -50,16 +50,15 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         }
 
         return try {
-            val browserCookie = cookie?.takeIf { it.isNotBlank() }
-            val finalUrl = followRedirects(pageUrl, browserCookie)
+            val finalUrl = followRedirects(pageUrl)
 
             // Douyin only renders the SSR payload for a signed request. The first call
             // just mints __ac_nonce; the signature derived from it unlocks the second.
-            val nonce = fetchNonce(finalUrl, browserCookie)
+            val nonce = fetchNonce(finalUrl)
             val signature = nonce?.let { signer?.sign(it) }
-            val html = httpGet(finalUrl, browserCookie, nonce, signature)
+            val html = httpGet(finalUrl, nonce, signature)
 
-            parsePage(finalUrl, html, browserCookie)
+            parsePage(finalUrl, html)
         } catch (e: Exception) {
             ExtractionResult(status = "error", message = e.message ?: "抖音解析失败")
         }
@@ -93,10 +92,10 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
     // ---------------------------------------------------------------- HTTP
 
-    private fun followRedirects(url: String, cookie: String?): String {
+    private fun followRedirects(url: String): String {
         var current = url
         repeat(MAX_REDIRECTS) {
-            val connection = open(current, cookie)
+            val connection = open(current)
             connection.instanceFollowRedirects = false
             try {
                 if (connection.responseCode !in 300..399) return current
@@ -120,8 +119,8 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * Douyin mints the nonce on the first hit and expects it echoed, signed, on the
      * second. This response body is an empty shell, so it is discarded.
      */
-    private fun fetchNonce(url: String, cookie: String?): String? {
-        val connection = open(url, cookie)
+    private fun fetchNonce(url: String): String? {
+        val connection = open(url)
         return try {
             connection.responseCode
             connection.headerFields["Set-Cookie"]
@@ -139,17 +138,12 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
     private fun httpGet(
         url: String,
-        cookie: String? = null,
         nonce: String? = null,
         signature: String? = null,
     ): String {
-        val connection = open(url, cookie)
+        val connection = open(url)
         if (!nonce.isNullOrBlank()) {
             val jar = buildString {
-                if (!cookie.isNullOrBlank()) {
-                    append(cookie)
-                    append("; ")
-                }
                 append("__ac_nonce=").append(nonce)
                 if (!signature.isNullOrBlank()) {
                     append("; __ac_signature=").append(signature)
@@ -167,7 +161,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         }
     }
 
-    private fun open(url: String, cookie: String? = null): HttpURLConnection {
+    private fun open(url: String): HttpURLConnection {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = CONNECT_TIMEOUT_MS
         connection.readTimeout = READ_TIMEOUT_MS
@@ -176,9 +170,6 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         connection.setRequestProperty("Referer", "https://www.douyin.com/")
         connection.setRequestProperty("Accept", "text/html,application/json,*/*")
         connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9")
-        if (!cookie.isNullOrBlank()) {
-            connection.setRequestProperty("Cookie", cookie)
-        }
         return connection
     }
 
@@ -270,7 +261,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         )
     }
 
-    private fun parsePage(pageUrl: String, html: String, cookie: String?): ExtractionResult {
+    private fun parsePage(pageUrl: String, html: String): ExtractionResult {
         Log.d(TAG, "page len=" + html.length + " pace=" + html.split("__pace_f").size + " router=" + html.split("_ROUTER_DATA").size + " aweme=" + html.split("awemeId").size)
         // The signed page streams __pace_f; older captures still carry _ROUTER_DATA.
         extractPacePayload(html)?.let { array ->
@@ -278,15 +269,15 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         }
 
         val routerData = extractRouterData(html)
-            ?: return resolveFromSlidesInfo(pageUrl, cookie)
+            ?: return resolveFromSlidesInfo(pageUrl)
 
         val loaderData = routerData["loaderData"]?.asObject()
-            ?: return resolveFromSlidesInfo(pageUrl, cookie)
+            ?: return resolveFromSlidesInfo(pageUrl)
         val videoKey = loaderData.keys.firstOrNull {
             it.startsWith("video_(id)") || it.startsWith("note_(id)")
         }
         val page = videoKey?.let { loaderData[it]?.asObject() }
-            ?: return resolveFromSlidesInfo(pageUrl, cookie)
+            ?: return resolveFromSlidesInfo(pageUrl)
 
         var title: String? = null
         var author: String? = null
@@ -309,7 +300,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             items = extractMediaFromPage(page)
         }
 
-        if (items.isEmpty()) return resolveFromSlidesInfo(pageUrl, cookie)
+        if (items.isEmpty()) return resolveFromSlidesInfo(pageUrl)
 
         return ExtractionResult(
             status = "success",
@@ -383,14 +374,14 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * Reads the slideshow metadata endpoint. It answers with a JSON object holding the same
      * url_list shapes, so the extraction logic above is reused for the video-only case.
      */
-    private fun resolveFromSlidesInfo(pageUrl: String, cookie: String?): ExtractionResult {
+    private fun resolveFromSlidesInfo(pageUrl: String): ExtractionResult {
         val awemeId = Regex("/(?:video|note|share/video|share/note)/(\\d+)")
             .find(pageUrl)?.groupValues?.get(1)
             ?: Regex("\\d{15,}").find(pageUrl)?.value
             ?: return ExtractionResult(status = "error", message = "无法从链接中识别作品 ID")
 
         val body = runCatching {
-            httpGet(SLIDES_INFO_ENDPOINT + "?aweme_id=" + awemeId, cookie)
+            httpGet(SLIDES_INFO_ENDPOINT + "?aweme_id=" + awemeId)
         }.getOrElse {
             return ExtractionResult(status = "error", message = "抖音作品信息获取失败：" + it.message)
         }

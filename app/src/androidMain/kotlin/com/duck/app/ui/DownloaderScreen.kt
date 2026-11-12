@@ -108,9 +108,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 /** Containers the preview renders as an image gallery rather than a video. */
 private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 
-/** SharedPreferences key holding the imported Douyin cookie jar path. */
-private const val COOKIES_SETTING_KEY = "douyin_cookies_path"
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
@@ -763,24 +760,51 @@ fun MainDownloaderTab(
     viewModel.updateAvailable.value?.let { updateInfo ->
         val progress = viewModel.updateDownloadProgress.value
         val isDownloading = progress >= 0f
-        
+
         AlertDialog(
             onDismissRequest = { if (!isDownloading) viewModel.updateAvailable.value = null },
-            title = { Text(if (isDownloading) "Downloading Update..." else "Update Available: ${updateInfo.first}") },
-            text = { 
-                Column {
-                    Text(if (isDownloading) "Please wait while the update downloads." else stringResource(R.string.a_new_version_of_gabi_is_avail))
+            title = {
+                Text(
+                    if (isDownloading) "正在下载更新"
+                    else "发现新版本 " + updateInfo.version,
+                )
+            },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     if (isDownloading) {
+                        Text("下载完成后会自动打开安装程序。")
                         Spacer(Modifier.height(16.dp))
                         LinearProgressIndicator(
                             progress = { progress.coerceIn(0f, 1f) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                         Text(
-                            text = "${(progress * 100).toInt()}%",
+                            text = (progress * 100).toInt().toString() + "%",
                             modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
                         )
+                    } else {
+                        if (updateInfo.notes.isNotBlank()) {
+                            Text(
+                                text = "更新内容",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(
+                                    text = updateInfo.notes.take(MAX_RELEASE_NOTES_CHARS),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(12.dp),
+                                )
+                            }
+                        } else {
+                            Text("GitHub 上有新版本可用。")
+                        }
                     }
                 }
             },
@@ -788,18 +812,18 @@ fun MainDownloaderTab(
                 TextButton(
                     onClick = {
                         if (!isDownloading) {
-                            viewModel.downloadUpdate(context, updateInfo.second)
+                            viewModel.downloadUpdate(context, updateInfo.apkUrl)
                         }
                     },
-                    enabled = !isDownloading
+                    enabled = !isDownloading,
                 ) {
-                    Text(if (isDownloading) "Downloading..." else stringResource(R.string.update_now))
+                    Text(if (isDownloading) "下载中…" else "立即更新")
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.updateAvailable.value = null },
-                    enabled = !isDownloading
+                    enabled = !isDownloading,
                 ) {
                     Text(stringResource(R.string.later))
                 }
@@ -823,7 +847,6 @@ fun MainDownloaderTab(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        val homeSearchStyle = viewModel.getSetting("home_search_style", "unified")
         val onKeyboardGo = {
             if (url.isNotBlank()) {
                 viewModel.fetchPreview(url, quality, downloadMode)
@@ -837,9 +860,13 @@ fun MainDownloaderTab(
             }
         }
 
-        if (homeSearchStyle == "split") {
+        Surface(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -864,64 +891,19 @@ fun MainDownloaderTab(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
                     keyboardActions = androidx.compose.foundation.text.KeyboardActions(onGo = { onKeyboardGo() }),
                     singleLine = true,
-                    shape = MaterialTheme.shapes.large
+                    colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
+                        unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
+                        focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
+                        unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
+                    )
                 )
-                
-                Spacer(Modifier.width(8.dp))
-                
+
                 IconButton(
                     onClick = performAction,
-                    modifier = Modifier.size(56.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape)
+                    modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape)
                 ) {
                     Icon(Icons.Default.ContentPaste, contentDescription = "Action")
-                }
-            }
-        } else {
-            Surface(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = url,
-                        onValueChange = { 
-                            onUrlChange(it)
-                            if (it.isEmpty()) viewModel.clearPreview() 
-                        },
-                        placeholder = { Text(stringResource(R.string.search_or_paste_link)) },
-                        modifier = Modifier.weight(1f),
-                        leadingIcon = { Icon(YoutubeOutline, null, modifier = Modifier.size(20.dp)) },
-                        trailingIcon = {
-                            if (url.isNotEmpty()) {
-                                IconButton(onClick = { 
-                                    onUrlChange("")
-                                    viewModel.clearPreview()
-                                }) {
-                                    Icon(Icons.Default.Clear, "Clear URL", modifier = Modifier.size(20.dp))
-                                }
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
-                        keyboardActions = androidx.compose.foundation.text.KeyboardActions(onGo = { onKeyboardGo() }),
-                        singleLine = true,
-                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            focusedContainerColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedContainerColor = androidx.compose.ui.graphics.Color.Transparent
-                        )
-                    )
-
-                    IconButton(
-                        onClick = performAction,
-                        modifier = Modifier.size(48.dp).background(MaterialTheme.colorScheme.primaryContainer, androidx.compose.foundation.shape.CircleShape)
-                    ) {
-                        Icon(Icons.Default.ContentPaste, contentDescription = "Action")
-                    }
                 }
             }
         }
@@ -1775,7 +1757,6 @@ fun SettingsListItem(
     iconColor: androidx.compose.ui.graphics.Color,
     title: String,
     subtitle: String,
-    useMaterialShapes: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
     Row(
@@ -1785,23 +1766,10 @@ fun SettingsListItem(
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val shapesList = remember {
-            listOf(
-                androidx.graphics.shapes.RoundedPolygon(numVertices = 8, rounding = androidx.graphics.shapes.CornerRounding(1f)), // Circle / Octagon
-                androidx.graphics.shapes.RoundedPolygon(numVertices = 6, rounding = androidx.graphics.shapes.CornerRounding(0.2f)), // Hexagon
-                androidx.graphics.shapes.RoundedPolygon(numVertices = 4, rounding = androidx.graphics.shapes.CornerRounding(0.3f)), // Rounded Square
-                androidx.graphics.shapes.RoundedPolygon(numVertices = 5, rounding = androidx.graphics.shapes.CornerRounding(0.3f)), // Rounded Pentagon
-                androidx.graphics.shapes.RoundedPolygon(numVertices = 3, rounding = androidx.graphics.shapes.CornerRounding(0.2f)) // Trigance
-            )
-        }
-        val randomPolygon = remember { shapesList.random() }
-        val expressiveShape = remember(randomPolygon) { PolygonShape(randomPolygon) }
-        val finalShape = if (useMaterialShapes) expressiveShape else CircleShape
-
         Box(
             modifier = Modifier
                 .size(48.dp)
-                .background(iconColor, shape = finalShape),
+                .background(iconColor, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(icon, contentDescription = null, tint = Color.White)
@@ -1885,7 +1853,6 @@ fun SettingsMainList(
             Triple("Navigation Bar Blur", "Enable haze effect on floating navigation bar", "Customisation?target=Navigation Bar Blur"),
             Triple("True Glass Navigation", "Make navigation bar fully transparent glass", "Customisation?target=True Glass Navigation"),
             Triple("Opaque Navigation Bar", "Make floating navigation solid color", "Customisation?target=Opaque Navigation Bar"),
-            Triple("Material Expressive Shapes", "Use dynamic shapes for settings icons", "Customisation?target=Material Expressive Shapes"),
             Triple("Theme Mode", "System, Light, Dark", "Customisation?target=Theme Mode"),
             Triple("Color Scheme", "App Colors", "Customisation?target=Color Scheme"),
             Triple("Download Repository", "Files will be saved in your selected folder", "Downloads?target=Download Repository"),
@@ -1973,7 +1940,6 @@ fun SettingsMainList(
                     iconColor = Color(0xFF88637B), // Mauve
                     title = "个性化",
                     subtitle = "主题、外观、终端",
-                    useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
 
@@ -1989,7 +1955,6 @@ fun SettingsMainList(
                     iconColor = Color(0xFF00758F), // Teal
                     title = "下载",
                     subtitle = "存储位置、下载规则",
-                    useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
 
@@ -2005,7 +1970,6 @@ fun SettingsMainList(
                     iconColor = Color(0xFF4C6B8B), // Slate blue
                     title = "开发者",
                     subtitle = "应用信息、平台、许可",
-                    useMaterialShapes = viewModel.isMaterialShapesEnabled.value
                 )
             }
         }
@@ -2099,22 +2063,9 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.material_expressive_shapes), style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["Material Expressive Shapes"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
-                        Text(stringResource(R.string.use_dynamic_shapes_for_setting), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(
-                        checked = viewModel.isMaterialShapesEnabled.value,
-                        onCheckedChange = { viewModel.toggleMaterialShapes(it) }
-                    )
-                }
-                
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), modifier = Modifier.padding(vertical = 12.dp))
-
                 Text(stringResource(R.string.theme_mode), style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["Theme Mode"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                    val options = listOf("System", "Light", "Dark")
+                    val options = listOf("跟随系统", "浅色", "深色")
                     options.forEachIndexed { index, label ->
                         val isSelected = viewModel.themeMode.intValue == index
                         val shape = RoundedCornerShape(
@@ -2200,52 +2151,6 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
             }
         }
 
-        Card(
-            modifier = Modifier.fillMaxWidth().onGloballyPositioned { positions["Home Search Style"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f },
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Home Search Style", style = MaterialTheme.typography.titleMedium)
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    var currentSearchStyle by remember { mutableStateOf(viewModel.getSetting("home_search_style", "unified")) }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        listOf("unified" to "Unified Pill", "split" to "Split (Older)").forEachIndexed { index, (value, label) ->
-                            val isSelected = currentSearchStyle == value
-                            val shape = RoundedCornerShape(
-                                topStart = if (index == 0) 100.dp else 8.dp,
-                                bottomStart = if (index == 0) 100.dp else 8.dp,
-                                topEnd = if (index == 1) 100.dp else 8.dp,
-                                bottomEnd = if (index == 1) 100.dp else 8.dp
-                            )
-                            val colors = if (isSelected) {
-                                ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondary,
-                                    contentColor = MaterialTheme.colorScheme.onSecondary
-                                )
-                            } else {
-                                ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            FilledTonalButton(
-                                onClick = { 
-                                    currentSearchStyle = value
-                                    viewModel.saveSetting("home_search_style", value)
-                                },
-                                shape = shape,
-                                colors = colors,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(label, style = MaterialTheme.typography.bodySmall, maxLines = 1)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
         Spacer(Modifier.height(16.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -2315,28 +2220,6 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         }
     }
 
-    var hasCookies by remember {
-        mutableStateOf(viewModel.getSetting(COOKIES_SETTING_KEY, "").isNotEmpty())
-    }
-
-    val cookiesPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            try {
-                val cookiesFile = java.io.File(context.filesDir, "douyin_cookies.txt")
-                context.contentResolver.openInputStream(it)?.use { input ->
-                    cookiesFile.outputStream().use { output -> input.copyTo(output) }
-                }
-                viewModel.saveSetting(COOKIES_SETTING_KEY, cookiesFile.absolutePath)
-                hasCookies = true
-                android.widget.Toast.makeText(context, "已导入抖音 Cookie", android.widget.Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "导入 Cookie 失败", android.widget.Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -2376,44 +2259,6 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
                     )
                     if (viewModel.selectedFolderUri.value == null) {
                         Text(stringResource(R.string.default_movies_gabi), style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Text(stringResource(R.string.extraction_credentials), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.import_cookies_txt_for_private), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-        OutlinedCard(
-            onClick = { cookiesPickerLauncher.launch(arrayOf("text/plain")) },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Icon(Icons.Default.VpnKey, null, tint = MaterialTheme.colorScheme.primary)
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.import_cookies_txt), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                    if (hasCookies) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(8.dp).background(Color.Green, CircleShape))
-                            Spacer(Modifier.width(4.dp))
-                            Text("抖音 Cookie 已导入", style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-                }
-                if (hasCookies) {
-                    IconButton(onClick = {
-                        val file = java.io.File(context.filesDir, "douyin_cookies.txt")
-                        if (file.exists()) file.delete()
-                        viewModel.saveSetting(COOKIES_SETTING_KEY, "")
-                        hasCookies = false
-                    }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Remove cookies", tint = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -2488,13 +2333,13 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                         Text(stringResource(R.string.github))
                     }
                     OutlinedButton(
-                        onClick = { Toast.makeText(context, "GitHub: maomaoxiaokuoai", Toast.LENGTH_LONG).show() },
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/MAOMAOXIAOKUOAI"))) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(24.dp)
                     ) {
-                        Icon(androidx.compose.ui.res.painterResource(id = com.duck.app.R.drawable.ic_discord), null, modifier = Modifier.size(18.dp))
+                        Icon(painterResource(R.drawable.ic_telegram), null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.discord))
+                        Text("Telegram")
                     }
                 }
             }
