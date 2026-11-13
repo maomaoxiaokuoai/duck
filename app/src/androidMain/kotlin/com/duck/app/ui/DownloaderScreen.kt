@@ -1986,8 +1986,6 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         )
 
         Spacer(Modifier.height(8.dp))
-
-        Text(
     }
 }
 
