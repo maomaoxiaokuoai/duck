@@ -464,14 +464,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     logToConsole("[INFO] 作者: ${result.author}")
                     logToConsole("[INFO] 直链: ${result.url?.take(80)}...")
                 }
+                // Preview only. Downloading is a separate, explicit step: pasting a link
+                // is a request to find out what it is, and the bolt is the shortcut for
+                // callers that want the file straight away.
                 _previewMetadata.value = result
-
-                // Parsing success is also the download trigger: the user pasted a link to
-                // get the file, not to read metadata. The parser already distinguishes
-                // video from gallery, so nothing here has to care which it is.
-                if (result.status == "success") {
-                    downloadMedia(url, quality, mode)
-                }
             } catch (e: Exception) {
                 logToConsole("预览异常: ${e.message}")
                 _previewMetadata.value = ExtractionResult(status = "error", message = e.message ?: "解析失败")
