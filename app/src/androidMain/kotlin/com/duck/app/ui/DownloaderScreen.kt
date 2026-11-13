@@ -108,6 +108,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Image
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -2070,28 +2071,79 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
             Text(stringResource(R.string.downloads), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         }
 
-        Text(stringResource(R.string.download_repository), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.files_will_be_saved_in_your_se), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "下载位置",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            "图片和视频分开保存，两个目录都会被系统相册索引。",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        // Two rows rather than one: images and video genuinely land in different
+        // folders, and showing a single path made it look like both went there.
+        StorageRow(
+            icon = Icons.Default.Image,
+            title = "图片",
+            path = "Pictures/duck",
+        )
+
+        StorageRow(
+            icon = Icons.Default.PlayArrow,
+            title = "视频",
+            path = "Movies/duck",
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            "自定义文件夹",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            "选择后所有文件都会存到该目录，不再区分图片与视频。",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
 
         OutlinedCard(
             onClick = { folderPickerLauncher.launch(null) },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
         ) {
             Row(
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(Icons.Default.FolderOpen, null, tint = MaterialTheme.colorScheme.primary)
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        viewModel.selectedFolderName.value ?: "Select Folder",
+                        viewModel.selectedFolderName.value ?: "选择文件夹",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     )
-                    if (viewModel.selectedFolderUri.value == null) {
-                        Text(stringResource(R.string.default_movies_path), style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        if (viewModel.selectedFolderUri.value == null) {
+                            "未选择，使用上面两个默认目录"
+                        } else {
+                            "已启用，文件统一存到此处"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (viewModel.selectedFolderUri.value != null) {
+                    TextButton(
+                        onClick = {
+                            viewModel.selectedFolderUri.value = null
+                            viewModel.selectedFolderName.value = null
+                        },
+                    ) {
+                        Text("恢复默认")
                     }
                 }
             }
@@ -2099,6 +2151,35 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
     }
 }
 
+/** One storage destination: an icon, a label and the folder it writes to. */
+@Composable
+private fun StorageRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    path: String,
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+            Column {
+                Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                Text(
+                    path,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
 @Composable
 fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
     val context = LocalContext.current
