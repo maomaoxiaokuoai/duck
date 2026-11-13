@@ -132,14 +132,6 @@ internal fun kindLabel(kind: String): String = when (kind) {
     else -> "视频"
 }
 
-/** Byte size as MB or KB, one decimal. */
-internal fun formatBytes(bytes: Long): String = when {
-    bytes >= 1024L * 1024L ->
-        String.format(java.util.Locale.CHINA, "%.1f MB", bytes / 1024.0 / 1024.0)
-    bytes >= 1024L -> String.format(java.util.Locale.CHINA, "%.0f KB", bytes / 1024.0)
-    else -> bytes.toString() + " B"
-}
-
 /** Publish date and time, to the minute. */
 internal fun formatPostDateTime(epochSeconds: Long): String {
     if (epochSeconds !in 1_000_000_000L..9_999_999_999L) return ""
@@ -1524,7 +1516,7 @@ private fun StatColumn(label: String, value: String) {
 }
 
 /** Renders a byte count the way a download manager would. */
-private fun formatBytes(bytes: Long): String {
+internal fun formatBytes(bytes: Long): String {
     if (bytes <= 0L) return "--"
     val kb = bytes / 1024.0
     val mb = kb / 1024.0
