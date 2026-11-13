@@ -509,6 +509,24 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 val isGallery = result.is_gallery == true
+
+                // Audio saves the post's own mp3, not the video container. Falling back to
+                // the video URL would put a renamed mp4 in Music/duck, which is what used to
+                // happen and played as silence in most audio apps.
+                if (mode == "audio") {
+                    val audioUrl = result.audio_url
+                        ?: throw Exception("这个作品没有独立音频")
+                    downloadSingle(
+                        downloadUrl = audioUrl,
+                        result = result,
+                        sourceUrl = url,
+                        mode = mode,
+                        notificationId = notificationId,
+                        forceExt = "mp3",
+                    )
+                    return@launch
+                }
+
                 val urlsToDownload = result.urls?.takeIf { it.isNotEmpty() }
                     ?: result.url?.let { listOf(it) }
                     ?: throw Exception("未能解析出可下载的直链")
@@ -638,10 +656,12 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         result: ExtractionResult,
         sourceUrl: String,
         mode: String,
-        notificationId: Int
+        notificationId: Int,
+        /** Overrides the container extension, e.g. when saving the mp3 track. */
+        forceExt: String? = null,
     ) {
         val isImage = result.ext in IMAGE_EXTENSIONS
-        val extension = result.ext ?: if (isImage) "jpg" else "mp4"
+        val extension = forceExt ?: result.ext ?: if (isImage) "jpg" else "mp4"
         val title = result.title ?: "抖音作品"
         val targetPath = mediaTargetPath(mode, isImage)
         val fileName = "${sanitizeFileName(title)}_${System.currentTimeMillis()}.$extension"

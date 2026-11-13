@@ -118,14 +118,10 @@ private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 
 /** Compact count: 12345 renders as 1.2万, the way the source app shows it. */
 internal fun formatCount(value: Long): String = when {
-    value >= 100_000_000 -> {
-        val v = value / 100_000_000.0
-        (if (v >= 10) v.toInt().toString() else String.format("%.1f", v)) + "亿"
-    }
-    value >= 10_000 -> {
-        val v = value / 10_000.0
-        (if (v >= 10) v.toInt().toString() else String.format("%.1f", v)) + "万"
-    }
+    value >= 100_000_000 ->
+        String.format(java.util.Locale.CHINA, "%.1f", value / 100_000_000.0) + "亿"
+    value >= 10_000 ->
+        String.format(java.util.Locale.CHINA, "%.1f", value / 10_000.0) + "万"
     else -> value.toString()
 }
 
@@ -1107,12 +1103,12 @@ fun MainDownloaderTab(
                         }
 
                         Column(modifier = Modifier.padding(16.dp)) {
+                            // Full title: this card summarises one post, and cutting it
+                            // short hid the part that identifies the clip.
                             Text(
                                 meta.title ?: "无标题",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 2,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             )
 
                             if (!meta.author.isNullOrBlank()) {
@@ -1252,38 +1248,37 @@ fun MainDownloaderTab(
                     Text(meta.title ?: "Unknown Title", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     Text(meta.author ?: "Unknown Author", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        val isAudio = downloadMode == "audio" || meta.ext == "mp3" || meta.ext == "m4a"
-                        val isImageOrGallery = downloadMode == "image" || meta.ext in IMAGE_EXTENSIONS
-                        
-                        if (!isImageOrGallery) {
-                            Button(
-                                onClick = { }, // Just informational in this context
-                                modifier = Modifier.weight(1f).height(48.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
-                            ) {
-                                Icon(if (isAudio) Icons.Default.MusicNote else Icons.Default.PlayArrow, null)
-                                Spacer(Modifier.width(8.dp))
-                                val qual = if (quality == "best") "最佳" else quality + "p"
-                                Text(if (isAudio) "Audio" else "Video ($qual)", maxLines = 1)
-                            }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        // Two downloads, one per rendition. Both are plain filled
+                        // buttons so the pair reads as equal choices, and each starts
+                        // downloading immediately rather than describing the stream.
+                        Button(
+                            onClick = {
+                                showPreviewSheet = false
+                                viewModel.downloadMedia(url = url, quality = quality, mode = "video")
+                            },
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            shape = RoundedCornerShape(24.dp),
+                        ) {
+                            Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("视频", maxLines = 1)
                         }
 
                         Button(
-                            onClick = { 
+                            onClick = {
                                 showPreviewSheet = false
-                                viewModel.downloadMedia(url = url, quality = quality, mode = downloadMode)
+                                viewModel.downloadMedia(url = url, quality = quality, mode = "audio")
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
-                            shape = RoundedCornerShape(24.dp)
+                            shape = RoundedCornerShape(24.dp),
                         ) {
-                            Icon(Icons.Default.Download, null)
+                            Icon(Icons.Default.MusicNote, null, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.download))
+                            Text("音频", maxLines = 1)
                         }
                     }
                     Spacer(Modifier.height(16.dp))
