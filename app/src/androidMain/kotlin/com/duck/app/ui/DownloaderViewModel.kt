@@ -94,24 +94,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
     
     private val prefs = application.getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
-    
-    var isNavBarBlurEnabled = mutableStateOf(prefs.getBoolean("nav_bar_blur", true))
-    var isNavBarOpaque = mutableStateOf(prefs.getBoolean("nav_bar_opaque", false))
-    var isNavBarTrueGlass = mutableStateOf(prefs.getBoolean("nav_bar_true_glass", false))
-    fun toggleNavBarBlur(enabled: Boolean) {
-        isNavBarBlurEnabled.value = enabled
-        prefs.edit().putBoolean("nav_bar_blur", enabled).apply()
-    }
-    
-    fun toggleNavBarOpaque(enabled: Boolean) {
-        isNavBarOpaque.value = enabled
-        prefs.edit().putBoolean("nav_bar_opaque", enabled).apply()
-    }
-    
-    fun toggleNavBarTrueGlass(enabled: Boolean) {
-        isNavBarTrueGlass.value = enabled
-        prefs.edit().putBoolean("nav_bar_true_glass", enabled).apply()
-    }
 
     fun resetDownloadState() {
         _uiState.value = DownloadState.Idle
@@ -413,8 +395,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * video apps pick files up immediately. A Download/ folder stays invisible to them.
      */
     var downloadPath = mutableStateOf("Movies/duck")
-    var selectedFolderUri = mutableStateOf<String?>(null)
-    var selectedFolderName = mutableStateOf<String?>(null)
 
     // Appearance Settings
     var themeMode = mutableIntStateOf(prefs.getInt("theme_mode", 0))
@@ -604,7 +584,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 url = downloadUrl,
                 fileName = fileName,
                 relativePath = targetPath,
-                customFolderUri = selectedFolderUri.value,
+                customFolderUri = null,
                 httpHeaders = result.http_headers
             ).collect { state ->
                 if (state is DownloadState.Downloading) {
@@ -672,7 +652,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             url = downloadUrl,
             fileName = fileName,
             relativePath = targetPath,
-            customFolderUri = selectedFolderUri.value,
+            customFolderUri = null,
             httpHeaders = result.http_headers
         ).collect { state ->
             _uiState.value = state
@@ -726,8 +706,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun folderUriFor(targetPath: String): Uri {
-        selectedFolderUri.value?.let { return Uri.parse(it) }
-
         val mediaDir = when {
             targetPath.startsWith("Pictures") ->
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)

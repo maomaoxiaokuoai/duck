@@ -93,7 +93,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.duck.app.util.DownloadState
 import com.duck.app.ui.theme.AppTheme
 import coil.compose.AsyncImage
-import androidx.documentfile.provider.DocumentFile
 
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -306,17 +305,14 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             modifier = Modifier
                                 .shadow(8.dp, CircleShape)
                                 .clip(CircleShape)
-                                .let { m ->
-                                    if (viewModel.isNavBarOpaque.value) {
-                                        m.background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                                    } else if (viewModel.isNavBarTrueGlass.value) {
-                                        m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = Color.White.copy(alpha = 0.05f), blurRadius = 32.dp))
-                                    } else if (viewModel.isNavBarBlurEnabled.value) {
-                                        m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f), blurRadius = 24.dp))
-                                    } else {
-                                        m.background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f), CircleShape)
-                                    }
-                                }
+                                .hazeChild(
+                                    state = hazeState,
+                                    shape = CircleShape,
+                                    style = HazeStyle(
+                                        tint = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                                        blurRadius = 24.dp,
+                                    ),
+                                )
                                 .animateContentSize(animationSpec = androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy, stiffness = androidx.compose.animation.core.Spring.StiffnessLow))
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -332,7 +328,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (selectedTab == 0 && viewModel.isNavBarTrueGlass.value) {
+                                        if (false) {
                                             m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
                                         } else {
                                             m.background(bg0)
@@ -357,7 +353,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (selectedTab == 1 && viewModel.isNavBarTrueGlass.value) {
+                                        if (false) {
                                             m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
                                         } else {
                                             m.background(bg1)
@@ -383,7 +379,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (selectedTab == 2 && viewModel.isNavBarTrueGlass.value) {
+                                        if (false) {
                                             m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
                                         } else {
                                             m.background(bg2)
@@ -1846,51 +1842,6 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
             Text(stringResource(R.string.customisation), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         }
         
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.navigation_bar_blur), style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["Navigation Bar Blur"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
-                        Text(stringResource(R.string.enable_haze_effect_on_floating), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(
-                        checked = viewModel.isNavBarBlurEnabled.value,
-                        onCheckedChange = { viewModel.toggleNavBarBlur(it) }
-                    )
-                }
-                
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), modifier = Modifier.padding(vertical = 12.dp))
-                
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.true_glass_navigation), style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["True Glass Navigation"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
-                        Text(stringResource(R.string.make_navigation_bar_fully_tran), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(
-                        checked = viewModel.isNavBarTrueGlass.value,
-                        onCheckedChange = { viewModel.toggleNavBarTrueGlass(it) }
-                    )
-                }
-                
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), modifier = Modifier.padding(vertical = 12.dp))
-                
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.opaque_navigation_bar), style = MaterialTheme.typography.titleMedium, modifier = Modifier.onGloballyPositioned { positions["Opaque Navigation Bar"] = it.parentLayoutCoordinates?.parentLayoutCoordinates?.positionInParent()?.y ?: 0f })
-                        Text(stringResource(R.string.make_floating_navigation_solid), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(
-                        checked = viewModel.isNavBarOpaque.value,
-                        onCheckedChange = { viewModel.toggleNavBarOpaque(it) }
-                    )
-                }
-            }
-        }
-        
 
 
         Card(
@@ -1992,18 +1943,6 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
 @Composable
 fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentPadding: PaddingValues, target: String? = null) {
     val context = LocalContext.current
-    val folderPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocumentTree()
-    ) { uri ->
-        uri?.let {
-            context.contentResolver.takePersistableUriPermission(
-                it, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
-            viewModel.selectedFolderUri.value = it.toString()
-            viewModel.selectedFolderName.value = DocumentFile.fromTreeUri(context, it)?.name ?: "Selected Folder"
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -2049,55 +1988,6 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         Spacer(Modifier.height(8.dp))
 
         Text(
-            "自定义文件夹",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            "选择后所有文件都会存到该目录，不再区分图片与视频。",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        OutlinedCard(
-            onClick = { folderPickerLauncher.launch(null) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Icon(Icons.Default.FolderOpen, null, tint = MaterialTheme.colorScheme.primary)
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        viewModel.selectedFolderName.value ?: "选择文件夹",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                    )
-                    Text(
-                        if (viewModel.selectedFolderUri.value == null) {
-                            "未选择，使用上面两个默认目录"
-                        } else {
-                            "已启用，文件统一存到此处"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (viewModel.selectedFolderUri.value != null) {
-                    TextButton(
-                        onClick = {
-                            viewModel.selectedFolderUri.value = null
-                            viewModel.selectedFolderName.value = null
-                        },
-                    ) {
-                        Text("恢复默认")
-                    }
-                }
-            }
-        }
     }
 }
 
