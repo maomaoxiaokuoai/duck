@@ -116,6 +116,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.foundation.border
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -1105,26 +1106,23 @@ fun MainDownloaderTab(
 
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Whether the content is tall enough to scroll is what decides whether a drag
-        // should do anything. On a short screen (one card, no grid) the column fits, and
-        // letting it scroll anyway meant a stray swipe could shift the whole page.
-        var contentHeight by remember { mutableIntStateOf(0) }
-        var viewportHeight by remember { mutableIntStateOf(0) }
-        val canScroll = contentHeight > viewportHeight
         val scrollState = rememberScrollState()
+        // ScrollState knows the real content extent once layout settles. Measuring
+        // the column ourselves counted its own padding as content, so the check was
+        // always true and a short page could still be dragged around.
+        val canScroll = scrollState.maxValue > 0
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .onSizeChanged { viewportHeight = it.height }
                 .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState, enabled = canScroll)
-                .onSizeChanged { contentHeight = it.height }
                 .padding(
                     top = 108.dp + contentPadding.calculateTopPadding(),
-                    // The floating bar sits over the bottom of this column. 168dp clears
-                    // it with room for the last row of a gallery grid.
-                    bottom = 96.dp + contentPadding.calculateBottomPadding(),
+                    // The Scaffold bottom bar IS the floating navigation bar, so
+                    // calculateBottomPadding already equals its full height. Adding
+                    // more on top of it left ~200dp of empty space below a gallery.
+                    bottom = contentPadding.calculateBottomPadding(),
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1223,9 +1221,15 @@ fun MainDownloaderTab(
                 // A gallery card has its own tappable grid, and a card-level click
                 // wins over the tiles inside it. Only non-gallery cards open the
                 // preview sheet from the card body.
+                val cardModifier = if (isImageOrGallery) {
+                    // A gallery has its own tappable grid; a card-level click would
+                    // read as a button while doing nothing.
+                    Modifier.fillMaxWidth()
+                } else {
+                    Modifier.fillMaxWidth().clickable { showPreviewSheet = true }
+                }
                 Card(
-                    onClick = { if (!isImageOrGallery) showPreviewSheet = true },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = cardModifier,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(24.dp),
                 ) {
@@ -1276,12 +1280,30 @@ fun MainDownloaderTab(
                                     ) {
                                         rowUrls.forEach { imageUrl ->
                                             val isPicked = selected.contains(imageUrl)
+                                            // The border is what separates the two
+                                            // states on a dark photo; the overlay alone
+                                            // was hard to see.
                                             Box(
                                                 modifier = Modifier
                                                     .weight(1f)
                                                     .height(110.dp)
                                                     .clip(RoundedCornerShape(12.dp))
                                                     .background(MaterialTheme.colorScheme.surface)
+                                                    .then(
+                                                        if (isPicked) {
+                                                            Modifier.border(
+                                                                2.dp,
+                                                                MaterialTheme.colorScheme.primary,
+                                                                RoundedCornerShape(12.dp),
+                                                            )
+                                                        } else {
+                                                            Modifier.border(
+                                                                1.dp,
+                                                                MaterialTheme.colorScheme.outlineVariant,
+                                                                RoundedCornerShape(12.dp),
+                                                            )
+                                                        }
+                                                    )
                                                     .clickable {
                                                         if (isPicked) selected.remove(imageUrl)
                                                         else selected.add(imageUrl)
@@ -1425,10 +1447,14 @@ fun MainDownloaderTab(
                         Column(modifier = Modifier.padding(16.dp)) {
                             // Full title: this card summarises one post, and cutting it
                             // short hid the part that identifies the clip.
+                            // Douyin captions run to hundreds of characters; without
+                            // a cap the card grows taller than the screen.
                             Text(
                                 meta.title ?: "无标题",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
+                                maxLines = 3,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             )
 
                             if (!meta.author.isNullOrBlank()) {
