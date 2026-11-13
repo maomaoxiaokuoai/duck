@@ -89,11 +89,18 @@ class GithubMirror {
      * Takes the path from "/releases/download/" onward so the result points at the
      * same asset; a link without that marker is returned untouched.
      */
+    /**
+     * Rewrites a github.com download link to travel through the chosen mirror.
+     *
+     * Everything after "github.com/" is carried over, because that tail still holds the
+     * owner and repository. Slicing from "/releases/download/" instead dropped both, and
+     * the mirror answered 403 for a path that does not exist.
+     */
     fun accelerateDownloadUrl(url: String, downloadPrefix: String): String {
-        val marker = "/releases/download/"
-        val at = url.indexOf(marker)
+        val host = "github.com/"
+        val at = url.indexOf(host)
         if (at < 0) return url
-        return downloadPrefix + url.substring(at + 1)
+        return downloadPrefix + url.substring(at + host.length)
     }
 
     private fun getText(url: String): String? {
