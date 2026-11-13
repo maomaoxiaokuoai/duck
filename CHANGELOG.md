@@ -1,3 +1,21 @@
+## v2.1.1 — 2026-11-13
+
+清理版：删掉所有不再被引用的代码与资源，安装包和功能都不变。
+
+### 移除
+
+- **desktop 目标**：`mainClass` 仍指向旧的 `com.material.downloader`，本来就无法构建
+- **Koin 依赖注入**：`initKoin` 从未被调用，整个体系是死代码
+- **PlatformBridge / Repository 接口**：只被 Koin 使用
+- **未使用依赖**：koin-core / koin-compose / koin-android / koin-androidx-compose、reorderable、graphics-shapes
+- **未使用资源**：下载完成插图、ko-fi 二维码
+- **过期内容**：fastlane 描述（仍写着四个下载引擎）、旧界面截图
+- **13 条字符串**：语音搜索、YouTube 搜索、ko-fi 等已删功能的残留
+
+### 变更
+
+- 字符串 key 里的 gabi 前缀改为语义化命名
+
 ## v2.1.0 — 2026-11-12
 
 界面按「粘贴即下载」的思路重新组织，并补上了独立的下载进度页。
