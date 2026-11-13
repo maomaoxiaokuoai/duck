@@ -1157,8 +1157,7 @@ fun MainDownloaderTab(
                         onUrlChange(cleaned)
                         if (cleaned.isEmpty()) viewModel.clearPreview()
                     },
-                    // No placeholder: the paste icon already says what the field is for,
-                    // and the hint text crowded the rounded bar.
+                    placeholder = { Text(stringResource(R.string.search_or_paste_link)) },
                     modifier = Modifier.weight(1f),
                     leadingIcon = { Icon(YoutubeOutline, null, modifier = Modifier.size(20.dp)) },
                     trailingIcon = {
