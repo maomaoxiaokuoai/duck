@@ -66,9 +66,20 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
             // Douyin renders the SSR payload only for a signed request: the first call
             // just mints __ac_nonce, the signature unlocks the second.
-            val nonce = fetchNonce(finalUrl)
+            // Note posts only embed their image list when the page is requested
+            // through /note/. The same id under /video/ returns a page without it,
+            // which is why galleries used to come back empty.
+            val isGalleryId = awemeId != null && runCatching {
+                resolveFromSlidesInfo(awemeId)?.status != "success"
+            }.getOrDefault(false)
+            val ssrUrl = if (isGalleryId && awemeId != null) {
+                "https://www.douyin.com/note/" + awemeId
+            } else {
+                finalUrl
+            }
+            val nonce = fetchNonce(ssrUrl)
             val signature = nonce?.let { signer?.sign(it) }
-            val html = httpGet(finalUrl, nonce, signature)
+            val html = httpGet(ssrUrl, nonce, signature)
 
             parsePage(finalUrl, html)
         } catch (e: Exception) {
