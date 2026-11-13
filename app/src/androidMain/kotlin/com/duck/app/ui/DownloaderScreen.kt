@@ -743,6 +743,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             downloadMode = downloadMode,
                             onModeChange = { },
                             onStartDownload = { viewModel.downloadMedia(it, quality, downloadMode) },
+                            onDownloadFinished = { selectedTab = 1 },
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
@@ -950,11 +951,12 @@ fun MainDownloaderTab(
     downloadMode: String,
     onModeChange: (String) -> Unit,
     onStartDownload: (String) -> Unit,
+    /** Called once a download lands, so the shell can move to the history list. */
+    onDownloadFinished: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var qualityExpanded by remember { mutableStateOf(false) }
     var modeExpanded by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
     var showFullscreenLogs by remember { mutableStateOf(false) }
     var showPreviewSheet by remember { mutableStateOf(false) }
     var showTerminalCard by remember { mutableStateOf(viewModel.getSetting("show_terminal_card", "true").toBoolean()) }
@@ -971,7 +973,11 @@ fun MainDownloaderTab(
 
     LaunchedEffect(uiState) {
         if (uiState is DownloadState.Success) {
-            showSuccessDialog = true
+            // A dialog announcing what the user just asked for is noise, and it also
+            // covered the preview they may want to keep looking at. Move to the history
+            // list instead, which is where the result now lives.
+            onDownloadFinished()
+            viewModel.resetDownloadState()
         }
     }
 
@@ -1514,62 +1520,6 @@ fun MainDownloaderTab(
                 onCancel = { viewModel.cancelDownload() },
             )
         }
-    }
-
-
-    if (showSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showSuccessDialog = false
-                viewModel.resetDownloadState()
-            },
-            title = {
-                Text("下载完成", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            },
-            text = {
-                Text(
-                    "文件已保存，可以在相册或文件管理器中查看。",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showSuccessDialog = false
-                        viewModel.resetDownloadState()
-                        openDouyin(url, context)
-                    },
-                    shape = RoundedCornerShape(24.dp),
-                ) {
-                    Text("打开抖音")
-                }
-            },
-            dismissButton = {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    TextButton(
-                        onClick = {
-                            showSuccessDialog = false
-                            viewModel.resetDownloadState()
-                            shareLink(url, context)
-                        },
-                    ) {
-                        Text("分享")
-                    }
-                    TextButton(
-                        onClick = {
-                            showSuccessDialog = false
-                            onUrlChange("")
-                            viewModel.clearPreview()
-                            viewModel.resetDownloadState()
-                        },
-                    ) {
-                        Text("关闭")
-                    }
-                }
-            },
-            shape = RoundedCornerShape(28.dp),
-        )
     }
 }
 
@@ -2731,10 +2681,16 @@ fun LogsTab(
                     }
                 }
                 
+                // Tonal rather than filled: closing a sheet is not the primary action
+                // of the screen, and a solid bar there read as a call to action.
                 Button(
                     onClick = { selectedLog = null },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
                 ) {
                     Text(stringResource(R.string.close))
                 }
