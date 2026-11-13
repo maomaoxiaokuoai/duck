@@ -43,7 +43,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
-        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3)
+        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4)
         .fallbackToDestructiveMigration()
         .build()
     private val logDao = db.downloadLogDao()
@@ -622,7 +622,13 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 url = sourceUrl,
                 status = "Success",
                 thumbnailPath = cachedThumb,
-                author = result.author
+                author = result.author,
+                createTime = result.create_time,
+                platform = result.platform ?: "抖音",
+                likeCount = result.like_count,
+                commentCount = result.comment_count,
+                shareCount = result.share_count,
+                collectCount = result.collect_count,
             )
         )
         notificationHelper.showProgressNotification(notificationId, title, 100)
@@ -672,7 +678,13 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         status = "Success",
                         path = state.path,
                         thumbnailPath = cachedThumb,
-                        author = result.author
+                        author = result.author,
+                        createTime = result.create_time,
+                        platform = result.platform ?: "抖音",
+                        likeCount = result.like_count,
+                        commentCount = result.comment_count,
+                        shareCount = result.share_count,
+                        collectCount = result.collect_count,
                     )
                 )
                 logToConsole("文件已保存: $targetPath/$fileName")

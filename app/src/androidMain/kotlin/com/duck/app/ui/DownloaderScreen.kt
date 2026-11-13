@@ -116,6 +116,37 @@ private const val MAX_RELEASE_NOTES_CHARS = 1200
 /** Containers the preview renders as an image gallery rather than a video. */
 private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 
+/** Compact count: 12345 renders as 1.2万, the way the source app shows it. */
+internal fun formatCount(value: Long): String = when {
+    value >= 100_000_000 -> {
+        val v = value / 100_000_000.0
+        (if (v >= 10) v.toInt().toString() else String.format("%.1f", v)) + "亿"
+    }
+    value >= 10_000 -> {
+        val v = value / 10_000.0
+        (if (v >= 10) v.toInt().toString() else String.format("%.1f", v)) + "万"
+    }
+    else -> value.toString()
+}
+
+/** Publish date as yyyy-MM-dd from the platform epoch seconds. */
+internal fun formatPostDate(epochSeconds: Long): String {
+    if (epochSeconds !in 1_000_000_000L..9_999_999_999L) return ""
+    val fmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.CHINA)
+    return fmt.format(java.util.Date(epochSeconds * 1000))
+}
+
+/**
+ * The bare link inside a stored entry.
+ *
+ * Earlier versions stored whatever the user pasted, which for Douyin is a whole
+ * share-sentence. Copying that back out is noise, so the first http(s) token wins.
+ */
+internal fun extractBareUrl(raw: String): String {
+    val m = Regex("https?://[^\\s\u3000]+").find(raw)
+    return (m?.value ?: raw).trim()
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
@@ -2349,10 +2380,59 @@ fun LogsTab(
                     }
                 }
                 
-                Text(log.title, style = MaterialTheme.typography.titleMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                
+                Text(
+                    log.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+
+                // Author, publish date and source, then the engagement counts. The sheet
+                // is where the full metadata lives; the list stays one line per item.
                 if (log.author != null) {
-                    Text(log.author, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        log.author,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                val metaLine = listOfNotNull(
+                    log.platform ?: "抖音",
+                    log.createTime?.let { formatPostDate(it) },
+                ).joinToString(" · ")
+                Text(
+                    metaLine,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                val stats = listOfNotNull(
+                    log.likeCount?.takeIf { it > 0 }?.let { "点赞 " + formatCount(it) },
+                    log.commentCount?.takeIf { it > 0 }?.let { "评论 " + formatCount(it) },
+                    log.shareCount?.takeIf { it > 0 }?.let { "分享 " + formatCount(it) },
+                    log.collectCount?.takeIf { it > 0 }?.let { "收藏 " + formatCount(it) },
+                )
+                if (stats.isNotEmpty()) {
+                    Surface(
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            stats.forEach { entry ->
+                                Text(
+                                    entry,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
                 }
 
                 val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
@@ -2360,17 +2440,32 @@ fun LogsTab(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                     modifier = Modifier.clickable {
-                        clipboardManager.setText(androidx.compose.ui.text.buildAnnotatedString { append(log.url) })
-                        android.widget.Toast.makeText(context, "URL Copied", android.widget.Toast.LENGTH_SHORT).show()
-                    }
+                        // Only the bare link: sharing a whole share-sentence is noise for
+                        // whoever receives it.
+                        clipboardManager.setText(
+                            androidx.compose.ui.text.buildAnnotatedString {
+                                append(extractBareUrl(log.url))
+                            },
+                        )
+                        android.widget.Toast.makeText(context, "已复制链接", android.widget.Toast.LENGTH_SHORT).show()
+                    },
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Icon(Icons.Default.Link, contentDescription = "Link", modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(stringResource(R.string.copy_original_url), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(
+                            Icons.Default.Link,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            "复制链接",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
                 

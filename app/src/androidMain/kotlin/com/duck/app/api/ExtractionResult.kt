@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 /**
  * The resolved media behind a user-supplied link.
  *
- * The downloader UI and the preview sheet read this directly, and it describes exactly what
- * a resolution result needs to carry: direct URL(s), title/author/thumbnail and the
- * container extension.
+ * Alongside the direct URLs it carries what the post says about itself: who published it,
+ * when, and how it was received. The history screen and its detail sheet render those, so
+ * they travel with the resolution rather than being looked up again.
  */
 @Serializable
 data class ExtractionResult(
@@ -24,5 +24,13 @@ data class ExtractionResult(
     val audio_url: String? = null,
     val max_resolution: String? = null,
     val available_qualities: List<String>? = null,
-    val http_headers: Map<String, String>? = null
+    val http_headers: Map<String, String>? = null,
+    /** Unix seconds as reported by the platform. */
+    val create_time: Long? = null,
+    /** Human label of the source, e.g. 抖音. */
+    val platform: String? = "抖音",
+    val like_count: Long? = null,
+    val comment_count: Long? = null,
+    val share_count: Long? = null,
+    val collect_count: Long? = null,
 )

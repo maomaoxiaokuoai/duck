@@ -36,7 +36,24 @@ interface DownloadLogDao {
     suspend fun hasUrl(url: String): Int
 }
 
-@Database(entities = [DownloadLog::class], version = 3)
+/**
+ * Adds the post metadata the history sheet shows.
+ *
+ * Every column is nullable: entries written before this migration have no publish date
+ * or counts, and NULL renders as "not reported" rather than a misleading zero.
+ */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN createTime INTEGER")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN platform TEXT")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN likeCount INTEGER")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN commentCount INTEGER")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN shareCount INTEGER")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN collectCount INTEGER")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }
