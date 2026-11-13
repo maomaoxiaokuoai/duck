@@ -1,5 +1,6 @@
 package com.duck.app.ui
 
+
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
@@ -235,10 +236,9 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         // Douyin hands out several links for the same clip and the first is often a 302
         // to a signed CDN URL. Without this plugin the client treated that 302 as a
         // failure, which is why one post downloaded and the next reported an error.
-        install(io.ktor.client.plugins.HttpRedirect) {
-            maxJumps = 5
-            checkHttpMethod = false
-        }
+        // Follow redirects: Douyin's first url_list entry answers 302 to a signed CDN
+        // URL. maxJumps is the only setting needed, and it is stable across Ktor 2.x.
+        install(io.ktor.client.plugins.HttpRedirect)
     }
 
     private val downloader = FileDownloader(application, client)
@@ -462,18 +462,18 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             result
         }
 
-    fun fetchPreview(rawUrl: String, quality: String, mode: String = "auto") {
-        val url = douyinParser.extractUrl(rawUrl)
+    fun fetchPreview(url: String, quality: String, mode: String = "auto") {
+        val link = douyinParser.extractUrl(url)
         currentPreviewJob?.cancel()
         currentPreviewJob = viewModelScope.launch {
             clearConsole()
             logToConsole("----------------------------------------")
             logToConsole("[SYSTEM] 正在获取抖音作品信息...")
-            logToConsole("[INFO] URL: $url")
+            logToConsole("[INFO] URL: $link")
             logToConsole("[INFO] 模式: $mode")
             logToConsole("----------------------------------------")
             try {
-                val result = performExtraction(url)
+                val result = performExtraction(link)
 
                 if (result.status == "success") {
                     logToConsole("[SUCCESS] 解析成功")
@@ -519,21 +519,21 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * There is exactly one path now: parse, then plain HTTP download. A failed parse is
      * reported to the user; nothing falls back to a removed engine.
      */
-    fun downloadMedia(rawUrl: String, quality: String, mode: String = "auto") {
+    fun downloadMedia(url: String, quality: String, mode: String = "auto") {
         // Everything downstream keys off the link, and callers may hand over a whole
         // share-sentence. Normalising once here means the parser, the log rows and the
         // duplicate check all see the same clean URL.
-        val url = douyinParser.extractUrl(rawUrl)
+        val link = douyinParser.extractUrl(url)
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
             _uiState.value = DownloadState.Downloading(0f)
             val notificationId = System.currentTimeMillis().toInt()
             lastNotificationId = notificationId
-            logToConsole("开始处理: $url")
+            logToConsole("开始处理: $link")
 
             try {
                 logToConsole("正在解析抖音直链...")
-                val result = performExtraction(url)
+                val result = performExtraction(link)
                 if (result.status != "success") {
                     throw Exception(result.message ?: "抖音解析失败")
                 }
@@ -549,7 +549,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     downloadSingle(
                         downloadUrl = audioUrl,
                         result = result,
-                        sourceUrl = url,
+                        sourceUrl = link,
                         mode = mode,
                         notificationId = notificationId,
                         forceExt = "mp3",
@@ -566,7 +566,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     downloadGallery(
                         urls = urlsToDownload,
                         result = result,
-                        sourceUrl = url,
+                        sourceUrl = link,
                         mode = mode,
                         notificationId = notificationId
                     )
@@ -574,7 +574,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     downloadSingle(
                         downloadUrl = urlsToDownload.first(),
                         result = result,
-                        sourceUrl = url,
+                        sourceUrl = link,
                         mode = mode,
                         notificationId = notificationId
                     )
