@@ -109,6 +109,8 @@ import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.material.icons.filled.Pause
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -148,6 +150,131 @@ internal fun formatClock(epochMillis: Long): String =
         .format(java.util.Date(epochMillis))
 
 /** Clip length as m:ss, from the milliseconds the platform reports. */
+/**
+ * Transport for an audio-only entry.
+ *
+ * The video player would show a black rectangle here, so this card replaces the surface
+ * with the cover art and a play control that matches the rest of the sheet.
+ */
+@OptIn(androidx.media3.common.util.UnstableApi::class)
+@Composable
+private fun AudioPlayerCard(
+    player: androidx.media3.exoplayer.ExoPlayer,
+    coverUrl: String?,
+    title: String,
+    author: String?,
+) {
+    var isPlaying by remember { mutableStateOf(true) }
+    var position by remember { mutableLongStateOf(0L) }
+    var duration by remember { mutableLongStateOf(0L) }
+
+    // Poll the player rather than wiring a listener: the card only needs a rough
+    // position for its slider, and this keeps the listener lifecycle trivial.
+    LaunchedEffect(player) {
+        while (true) {
+            position = player.currentPosition
+            duration = player.duration.takeIf { it > 0 } ?: 0L
+            isPlaying = player.isPlaying
+            kotlinx.coroutines.delay(500)
+        }
+    }
+
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(MaterialTheme.colorScheme.surface),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (!coverUrl.isNullOrBlank()) {
+                    coil.compose.AsyncImage(
+                        model = coverUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.MusicNote,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+
+            if (!author.isNullOrBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    author,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Slider(
+                value = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f,
+                onValueChange = { fraction ->
+                    if (duration > 0) player.seekTo((fraction * duration).toLong())
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    formatDuration(position),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    formatDuration(duration),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            FloatingActionButton(
+                onClick = {
+                    if (player.isPlaying) player.pause() else player.play()
+                    isPlaying = player.isPlaying
+                },
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ) {
+                Icon(
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = null,
+                )
+            }
+        }
+    }
+}
 internal fun formatDuration(ms: Long): String {
     val totalSeconds = ms / 1000
     val minutes = totalSeconds / 60
@@ -2377,9 +2504,17 @@ fun LogsTab(
                                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                         )
                                         Spacer(Modifier.height(2.dp))
+                                        // What was actually saved, rather than the word
+                                        // Success. Failed entries still show their reason.
+                                        val kindText = when {
+                                            log.status != "Success" -> log.status
+                                            log.mediaKind == "audio" -> "音频"
+                                            log.mediaKind == "gallery" -> "图文"
+                                            else -> "视频"
+                                        }
                                         Text(
-                                            log.status, 
-                                            style = MaterialTheme.typography.labelSmall, 
+                                            kindText,
+                                            style = MaterialTheme.typography.labelSmall,
                                             color = if (log.status == "Success") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                                         )
                                     }
@@ -2422,31 +2557,47 @@ fun LogsTab(
                     if (streamUrlToPlay.isNotBlank()) {
                         val exoPlayer = remember { androidx.media3.exoplayer.ExoPlayer.Builder(context).build() }
                         DisposableEffect(streamUrlToPlay) {
-                            val videoUri = android.net.Uri.parse(streamUrlToPlay)
-                            val mediaItem = androidx.media3.common.MediaItem.fromUri(videoUri)
+                            val mediaUri = android.net.Uri.parse(streamUrlToPlay)
+                            val mediaItem = androidx.media3.common.MediaItem.fromUri(mediaUri)
                             exoPlayer.setMediaItem(mediaItem)
                             exoPlayer.prepare()
                             exoPlayer.playWhenReady = true
                             onDispose { exoPlayer.release() }
                         }
-                        
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp)
-                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                                .background(androidx.compose.ui.graphics.Color.Black)
-                        ) {
-                            androidx.compose.ui.viewinterop.AndroidView(
-                                factory = { ctx ->
-                                    val view = android.view.LayoutInflater.from(ctx).inflate(com.duck.app.R.layout.player_view_layout, null) as androidx.media3.ui.PlayerView
-                                    view.apply {
-                                        player = exoPlayer
-                                        useController = true
-                                    }
-                                },
-                                modifier = Modifier.fillMaxSize()
+
+                        // An mp3 has no picture, so the video surface renders as a black
+                        // rectangle with controls on it. Audio gets its own card instead:
+                        // cover art, title, and a transport row.
+                        val isAudioOnly = log.mediaKind == "audio" ||
+                            log.path?.endsWith(".mp3", ignoreCase = true) == true ||
+                            log.path?.endsWith(".m4a", ignoreCase = true) == true
+
+                        if (isAudioOnly) {
+                            AudioPlayerCard(
+                                player = exoPlayer,
+                                coverUrl = log.thumbnailPath,
+                                title = log.title,
+                                author = log.author,
                             )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp)
+                                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                    .background(androidx.compose.ui.graphics.Color.Black)
+                            ) {
+                                androidx.compose.ui.viewinterop.AndroidView(
+                                    factory = { ctx ->
+                                        val view = android.view.LayoutInflater.from(ctx).inflate(com.duck.app.R.layout.player_view_layout, null) as androidx.media3.ui.PlayerView
+                                        view.apply {
+                                            player = exoPlayer
+                                            useController = true
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
                         }
                     }
                 }

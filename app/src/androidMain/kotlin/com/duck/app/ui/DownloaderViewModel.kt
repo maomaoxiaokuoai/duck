@@ -43,7 +43,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
-        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4, com.duck.app.db.MIGRATION_4_5)
+        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4, com.duck.app.db.MIGRATION_4_5, com.duck.app.db.MIGRATION_5_6)
         .fallbackToDestructiveMigration()
         .build()
     private val logDao = db.downloadLogDao()
@@ -644,6 +644,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 shareCount = result.share_count,
                 collectCount = result.collect_count,
                 duration = result.duration,
+                mediaKind = result.media_kind ?: if (result.is_gallery == true) "gallery" else "video",
             )
         )
         notificationHelper.showProgressNotification(notificationId, title, 100)
@@ -703,6 +704,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         shareCount = result.share_count,
                         collectCount = result.collect_count,
                         duration = result.duration,
+                        mediaKind = if (mode == "audio") "audio" else (result.media_kind ?: "video"),
                     )
                 )
                 logToConsole("文件已保存: $targetPath/$fileName")

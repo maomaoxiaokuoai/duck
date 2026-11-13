@@ -61,7 +61,15 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
-@Database(entities = [DownloadLog::class], version = 5)
+
+/** Adds the media kind each saved entry belongs to. */
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN mediaKind TEXT")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 6)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }

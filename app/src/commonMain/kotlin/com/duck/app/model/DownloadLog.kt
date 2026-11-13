@@ -28,4 +28,6 @@ data class DownloadLog(
     val collectCount: Long? = null,
     /** Clip length in milliseconds. */
     val duration: Long? = null,
+    /** video, gallery or audio, so the list can say what was saved. */
+    val mediaKind: String? = null,
 )
