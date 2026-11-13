@@ -111,6 +111,8 @@ import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.runtime.mutableIntStateOf
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -1100,16 +1102,30 @@ fun MainDownloaderTab(
 
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            
-            .padding(horizontal = 24.dp)
-            .verticalScroll(rememberScrollState())
-            .padding(top = 108.dp + contentPadding.calculateTopPadding(), bottom = 120.dp + contentPadding.calculateBottomPadding()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        // Whether the content is tall enough to scroll is what decides whether a drag
+        // should do anything. On a short screen (one card, no grid) the column fits, and
+        // letting it scroll anyway meant a stray swipe could shift the whole page.
+        var contentHeight by remember { mutableIntStateOf(0) }
+        var viewportHeight by remember { mutableIntStateOf(0) }
+        val canScroll = contentHeight > viewportHeight
+        val scrollState = rememberScrollState()
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .onSizeChanged { viewportHeight = it.height }
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState, enabled = canScroll)
+                .onSizeChanged { contentHeight = it.height }
+                .padding(
+                    top = 108.dp + contentPadding.calculateTopPadding(),
+                    // The floating bar sits over the bottom of this column. 168dp clears
+                    // it with room for the last row of a gallery grid.
+                    bottom = 168.dp + contentPadding.calculateBottomPadding(),
+                ),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
         Text("duck", 
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary,
