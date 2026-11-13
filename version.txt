@@ -1,2 +1,2 @@
-versionCode = 20000071
-versionName = "2.5.0"
+versionCode = 20000072
+versionName = "2.5.1"
