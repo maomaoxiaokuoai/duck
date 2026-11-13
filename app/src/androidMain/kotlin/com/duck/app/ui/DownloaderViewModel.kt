@@ -94,7 +94,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
     
     private val prefs = application.getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
-    )
     
     var isNavBarBlurEnabled = mutableStateOf(prefs.getBoolean("nav_bar_blur", true))
     var isNavBarOpaque = mutableStateOf(prefs.getBoolean("nav_bar_opaque", false))
