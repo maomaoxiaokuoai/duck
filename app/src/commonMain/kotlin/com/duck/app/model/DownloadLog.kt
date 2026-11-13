@@ -26,4 +26,6 @@ data class DownloadLog(
     val commentCount: Long? = null,
     val shareCount: Long? = null,
     val collectCount: Long? = null,
+    /** Clip length in milliseconds. */
+    val duration: Long? = null,
 )

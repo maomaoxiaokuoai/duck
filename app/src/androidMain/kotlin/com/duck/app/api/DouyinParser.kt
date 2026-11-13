@@ -441,6 +441,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             comment_count = stats?.get("comment_count")?.asString()?.toLongOrNull(),
             share_count = stats?.get("share_count")?.asString()?.toLongOrNull(),
             collect_count = stats?.get("collect_count")?.asString()?.toLongOrNull(),
+            duration = detail["video"]?.asObject()?.get("duration")?.asString()?.toLongOrNull(),
             thumbnail = detail["video"]?.asObject()
                 ?.get("cover")?.asObject()
                 ?.get("url_list")?.asArray()?.firstOrNull()?.asString() ?: items.first().url,

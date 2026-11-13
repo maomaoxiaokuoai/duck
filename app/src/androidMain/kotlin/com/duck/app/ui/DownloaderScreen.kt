@@ -129,6 +129,18 @@ internal fun formatCount(value: Long): String = when {
     else -> value.toString()
 }
 
+/** Clip length as m:ss, from the milliseconds the platform reports. */
+internal fun formatDuration(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return if (minutes > 0) {
+        minutes.toString() + ":" + seconds.toString().padStart(2, '0')
+    } else {
+        "0:" + seconds.toString().padStart(2, '0')
+    }
+}
+
 /** Publish date as yyyy-MM-dd from the platform epoch seconds. */
 internal fun formatPostDate(epochSeconds: Long): String {
     if (epochSeconds !in 1_000_000_000L..9_999_999_999L) return ""
@@ -1000,152 +1012,139 @@ fun MainDownloaderTab(
         }
 
         // Metadata Preview Box
-        AnimatedVisibility(visible = preview != null) {
-            preview?.let { meta ->
-                val isImageOrGallery = meta.is_gallery == true || 
-                                       meta.ext in IMAGE_EXTENSIONS
-                
+        //
+        // Only a resolved post gets a card. An unrecognised link used to render an
+        // empty "Unknown Title" placeholder, which looked like a result while saying
+        // nothing, so nothing is drawn until there is something to show.
+        val resolved = preview?.takeIf { it.status == "success" }
+        AnimatedVisibility(visible = resolved != null) {
+            resolved?.let { meta ->
+                val isImageOrGallery = meta.is_gallery == true ||
+                    meta.ext in IMAGE_EXTENSIONS
+
                 Card(
                     onClick = { showPreviewSheet = true },
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
                 ) {
-                    if (isImageOrGallery) {
-                        Column {
-                            val imageUrls = meta.urls ?: listOf(meta.thumbnail ?: meta.url ?: "")
-                            val validImageUrls = imageUrls.filter { !it.isNullOrBlank() }
-                            
-                            if (validImageUrls.isNotEmpty()) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(220.dp)
-                                        .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    Column {
+                        // Cover with the platform badge and, for video, the length. The
+                        // badges sit on the image because they describe it.
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(if (isImageOrGallery) 220.dp else 180.dp)
+                                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                        ) {
+                            val galleryUrls = meta.urls
+                                ?.filter { it.isNotBlank() }
+                                ?: listOfNotNull(meta.thumbnail)
+
+                            if (!meta.thumbnail.isNullOrBlank()) {
+                                AsyncImage(
+                                    model = meta.thumbnail,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                )
+                            } else if (galleryUrls.isNotEmpty()) {
+                                AsyncImage(
+                                    model = galleryUrls.first(),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop,
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = if (meta.ext == "mp3") Icons.Default.MusicNote else Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    modifier = Modifier.align(Alignment.Center).size(40.dp),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Surface(
+                                    color = Color.Black.copy(alpha = 0.55f),
+                                    shape = RoundedCornerShape(100),
                                 ) {
-                                    val pagerState = rememberPagerState(pageCount = { validImageUrls.size })
-                                    HorizontalPager(
-                                        state = pagerState,
-                                        modifier = Modifier.fillMaxSize()
-                                    ) { page ->
-                                        AsyncImage(
-                                            model = validImageUrls[page],
-                                            contentDescription = null,
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    }
-                                    
-                                    if (validImageUrls.size > 1) {
-                                        Surface(
-                                            color = Color.Black.copy(alpha = 0.6f),
-                                            shape = RoundedCornerShape(24.dp),
-                                            modifier = Modifier
-                                                .padding(12.dp)
-                                                .align(Alignment.TopEnd)
-                                        ) {
-                                            Text(
-                                                text = "${pagerState.currentPage + 1} / ${validImageUrls.size}",
-                                                color = Color.White,
-                                                style = MaterialTheme.typography.labelSmall,
-                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                            )
-                                        }
+                                    Text(
+                                        meta.platform ?: "抖音",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                    )
+                                }
+
+                                val badges = buildList {
+                                    meta.duration?.takeIf { it > 0 }
+                                        ?.let { add(formatDuration(it)) }
+                                    if (isImageOrGallery && galleryUrls.size > 1) {
+                                        add(galleryUrls.size.toString() + " 张")
                                     }
                                 }
-                            }
-                            
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(meta.title ?: "Gallery Image", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 2)
-                                Spacer(Modifier.height(4.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(meta.author ?: "Unknown Author", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    if (meta.urls != null && meta.urls.size > 1) {
-                                        Text("${meta.urls.size} images", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                                if (badges.isNotEmpty()) {
+                                    Surface(
+                                        color = Color.Black.copy(alpha = 0.55f),
+                                        shape = RoundedCornerShape(100),
+                                    ) {
+                                        Text(
+                                            badges.joinToString(" · "),
+                                            color = Color.White,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                        )
                                     }
                                 }
                             }
                         }
-                    } else {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(110.dp, 70.dp)
-                                    .clip(RoundedCornerShape(24.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                            ) {
-                                if (!meta.thumbnail.isNullOrBlank()) {
-                                    AsyncImage(
-                                        model = meta.thumbnail,
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = if (meta.ext == "mp3") Icons.Default.MusicNote else Icons.Default.PlayArrow,
-                                        contentDescription = null,
-                                        modifier = Modifier.align(Alignment.Center).size(32.dp),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                meta.title ?: "无标题",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            )
+
+                            if (!meta.author.isNullOrBlank()) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    meta.author,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                )
                             }
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(meta.title ?: "Unknown Title", style = MaterialTheme.typography.titleSmall, maxLines = 2, fontWeight = FontWeight.Bold)
-                                Spacer(Modifier.height(4.dp))
-                                Text(meta.author ?: "Unknown Author", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                            val stats = listOfNotNull(
+                                meta.like_count?.takeIf { it > 0 }?.let { "赞 " + formatCount(it) },
+                                meta.comment_count?.takeIf { it > 0 }?.let { "评 " + formatCount(it) },
+                                meta.share_count?.takeIf { it > 0 }?.let { "转 " + formatCount(it) },
+                                meta.collect_count?.takeIf { it > 0 }?.let { "藏 " + formatCount(it) },
+                            )
+                            if (stats.isNotEmpty()) {
+                                Spacer(Modifier.height(10.dp))
+                                Text(
+                                    stats.joinToString("   "),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
                         }
                     }
                 }
             }
         }
-        // Full-screen progress, shown while a download is running.
-    //
-    // The download is a foreground activity of its own rather than a banner on the home
-    // Download action, shown only once a post has resolved.
-        //
-        // The bolt moves here from the floating bar: the button now sits with the post it
-        // downloads, so there is no guessing which link it will act on.
-        AnimatedVisibility(visible = preview != null && preview?.status == "success") {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Button(
-                    onClick = {
-                        val text = url.trim()
-                        if (text.isNotEmpty()) {
-                            onStartDownload(text)
-                        }
-                    },
-                    modifier = Modifier.weight(1f).height(52.dp),
-                    shape = RoundedCornerShape(100),
-                ) {
-                    Icon(Icons.Default.Bolt, null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("下载", maxLines = 1)
-                }
-
-                OutlinedButton(
-                    onClick = { openDouyin(url, context) },
-                    modifier = Modifier.height(52.dp),
-                    shape = RoundedCornerShape(100),
-                ) {
-                    Icon(Icons.Default.OpenInNew, null, modifier = Modifier.size(18.dp))
-                }
-            }
-        }
-
-
         if (showPreviewSheet && preview != null) {
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             val meta = preview

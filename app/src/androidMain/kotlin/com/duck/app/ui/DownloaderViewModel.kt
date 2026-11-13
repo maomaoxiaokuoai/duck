@@ -43,7 +43,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
-        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4)
+        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4, com.duck.app.db.MIGRATION_4_5)
         .fallbackToDestructiveMigration()
         .build()
     private val logDao = db.downloadLogDao()
@@ -625,6 +625,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 commentCount = result.comment_count,
                 shareCount = result.share_count,
                 collectCount = result.collect_count,
+                duration = result.duration,
             )
         )
         notificationHelper.showProgressNotification(notificationId, title, 100)
@@ -681,6 +682,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         commentCount = result.comment_count,
                         shareCount = result.share_count,
                         collectCount = result.collect_count,
+                        duration = result.duration,
                     )
                 )
                 logToConsole("文件已保存: $targetPath/$fileName")

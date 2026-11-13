@@ -53,7 +53,15 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     }
 }
 
-@Database(entities = [DownloadLog::class], version = 4)
+
+/** Adds the clip length the preview card shows. */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN duration INTEGER")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 5)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }

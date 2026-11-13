@@ -33,4 +33,6 @@ data class ExtractionResult(
     val comment_count: Long? = null,
     val share_count: Long? = null,
     val collect_count: Long? = null,
+    /** Clip length in milliseconds, null when the source did not report it. */
+    val duration: Long? = null,
 )
