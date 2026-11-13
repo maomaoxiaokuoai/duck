@@ -804,6 +804,36 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         }
     }.getOrNull()
 
+    /**
+     * Saves one image from a gallery post.
+     *
+     * A gallery download saves every page at once; this is for the grid, where the
+     * user taps one tile and expects only that image on disk.
+     */
+    fun downloadOneImage(imageUrl: String) {
+        currentDownloadJob?.cancel()
+        currentDownloadJob = viewModelScope.launch {
+            val notificationId = System.currentTimeMillis().toInt()
+            lastNotificationId = notificationId
+            try {
+                _uiState.value = DownloadState.Downloading(0f)
+                val name = "image_" + System.currentTimeMillis() + ".jpg"
+                downloader.downloadFile(
+                    url = imageUrl,
+                    fileName = name,
+                    relativePath = "Pictures/duck",
+                ).collect { state ->
+                    _uiState.value = state
+                    if (state is DownloadState.Success) {
+                        downloader.finalizeFile(Uri.parse(state.path), name)
+                        logToConsole("图片已保存: Pictures/duck/" + name)
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = DownloadState.Error(e.message ?: "图片下载失败")
+            }
+        }
+    }
     private fun sanitizeFileName(title: String): String {
         val cleaned = title
             .replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_")

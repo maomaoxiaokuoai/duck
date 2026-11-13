@@ -1208,12 +1208,73 @@ fun MainDownloaderTab(
                     shape = RoundedCornerShape(24.dp),
                 ) {
                     Column {
-                        // Cover with the platform badge and, for video, the length. The
-                        // badges sit on the image because they describe it.
+                        // A gallery is a set of images, not one cover. Showing only the
+                        // first hid what the post actually contains, so every page gets a
+                        // tile and each tile downloads on its own.
+                        if (isImageOrGallery && !meta.urls.isNullOrEmpty()) {
+                            val galleryUrls = meta.urls.filter { it.isNotBlank() }
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        "共 " + galleryUrls.size + " 张",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                    Text(
+                                        "点图片单独下载",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.outline,
+                                    )
+                                }
+
+                                // Three per row, fixed height, so a 10-image post reads
+                                // as a contact sheet rather than a long scroll.
+                                galleryUrls.chunked(3).forEach { rowUrls ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        rowUrls.forEach { imageUrl ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .height(110.dp)
+                                                    .clip(RoundedCornerShape(12.dp))
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                                    .clickable {
+                                                        viewModel.downloadOneImage(imageUrl)
+                                                    },
+                                            ) {
+                                                AsyncImage(
+                                                    model = imageUrl,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.Crop,
+                                                )
+                                            }
+                                        }
+                                        // Keep the last row aligned with the grid above.
+                                        repeat(3 - rowUrls.size) {
+                                            Spacer(modifier = Modifier.weight(1f))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Videos get a single cover. Galleries render as a grid
+                        // below instead, so their cover would be a duplicate.
+                        if (!isImageOrGallery) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(if (isImageOrGallery) 220.dp else 180.dp)
+                                .height(180.dp)
                                 .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                         ) {
@@ -1283,6 +1344,7 @@ fun MainDownloaderTab(
                                     }
                                 }
                             }
+                        }
                         }
 
                         Column(modifier = Modifier.padding(16.dp)) {
