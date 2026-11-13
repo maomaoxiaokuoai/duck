@@ -442,6 +442,14 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             share_count = stats?.get("share_count")?.asString()?.toLongOrNull(),
             collect_count = stats?.get("collect_count")?.asString()?.toLongOrNull(),
             duration = detail["video"]?.asObject()?.get("duration")?.asString()?.toLongOrNull(),
+            media_size = detail["video"]?.asObject()
+                ?.get("play_addr")?.asObject()
+                ?.get("data_size")?.asString()?.toLongOrNull(),
+            media_kind = when {
+                (detail["images"]?.asArray()?.size ?: 0) > 0 -> "gallery"
+                else -> "video"
+            },
+            resolved_at = System.currentTimeMillis(),
             // The post carries a separate mp3 of its soundtrack, distinct from the
             // video container. Downloading that is what makes an audio save actually
             // audio rather than a renamed mp4.

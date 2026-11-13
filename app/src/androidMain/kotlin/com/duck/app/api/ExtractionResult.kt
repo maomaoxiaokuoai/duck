@@ -35,4 +35,10 @@ data class ExtractionResult(
     val collect_count: Long? = null,
     /** Clip length in milliseconds, null when the source did not report it. */
     val duration: Long? = null,
+    /** Byte size the platform reports for the primary media. */
+    val media_size: Long? = null,
+    /** video, gallery or audio. */
+    val media_kind: String? = null,
+    /** Unix millis when this resolution completed, for the preview card. */
+    val resolved_at: Long? = null,
 )
