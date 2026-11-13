@@ -172,24 +172,45 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     var isCheckingUpdates = mutableStateOf(false)
     var updateCheckMessage = mutableStateOf<String?>(null)
 
+    /**
+     * Downloads the release APK and hands it to the package installer.
+     *
+     * The request carries a User-Agent because the mirrors reject bare requests, and a
+     * failure is surfaced as a short Chinese message rather than the raw exception: the
+     * user cannot act on a stack of query parameters.
+     */
     fun downloadUpdate(context: android.content.Context, url: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            var connection: java.net.HttpURLConnection? = null
             try {
                 updateDownloadProgress.value = 0f
-                val connection = java.net.URL(url).openConnection()
-                connection.connect()
-                
-                val fileLength = connection.contentLength
-                val input = connection.getInputStream()
-                
-                val fileName = "update.apk"
-                val apkFile = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), fileName)
+                connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 20_000
+                    readTimeout = 120_000
+                    instanceFollowRedirects = true
+                    setRequestProperty("User-Agent", "duck-updater")
+                    setRequestProperty("Accept", "application/octet-stream")
+                }
+
+                val status = connection.responseCode
+                if (status !in 200..299) {
+                    throw java.io.IOException("HTTP " + status)
+                }
+
+                val fileLength = connection.contentLengthLong
+                val input = connection.inputStream
+
+                val apkFile = java.io.File(
+                    android.os.Environment.getExternalStoragePublicDirectory(
+                        android.os.Environment.DIRECTORY_DOWNLOADS,
+                    ),
+                    "duck-update.apk",
+                )
                 val output = java.io.FileOutputStream(apkFile)
-                
+
                 val data = ByteArray(8192)
-                var total: Long = 0
+                var total = 0L
                 var count: Int
-                
                 while (input.read(data).also { count = it } != -1) {
                     total += count
                     if (fileLength > 0) {
@@ -197,21 +218,33 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     }
                     output.write(data, 0, count)
                 }
-                
+
                 output.flush()
                 output.close()
                 input.close()
-                
+
                 updateDownloadProgress.value = -1f
                 updateAvailable.value = null
                 withContext(Dispatchers.Main) {
-                    com.duck.app.util.AppUpdater(context).installApk(fileName)
+                    com.duck.app.util.AppUpdater(context).installApk(apkFile.name)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     updateDownloadProgress.value = -1f
-                    android.widget.Toast.makeText(context, "Download failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    val reason = when {
+                        e.message?.contains("HTTP") == true -> e.message.orEmpty()
+                        e is java.net.UnknownHostException -> "网络不可用"
+                        e is java.net.SocketTimeoutException -> "连接超时"
+                        else -> "下载中断"
+                    }
+                    android.widget.Toast.makeText(
+                        context,
+                        "更新下载失败：" + reason + "，请稍后重试",
+                        android.widget.Toast.LENGTH_LONG,
+                    ).show()
                 }
+            } finally {
+                connection?.disconnect()
             }
         }
     }
@@ -332,7 +365,25 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             }
             i++
         }
-        return out.toString().trim()
+        return stripMarkdown(out.toString())
+    }
+
+    /**
+     * Flattens release notes to plain text.
+     *
+     * The dialog renders Text, not Markdown, so headings and emphasis markers would
+     * otherwise show up as literal asterisks and hashes.
+     */
+    private fun stripMarkdown(raw: String): String {
+        return raw.lineSequence()
+            .joinToString(chr(10)) { line ->
+                line
+                    .replace(Regex("^#{1,6}\\s*"), "")
+                    .replace("**", "")
+                    .replace(Regex("^\\s*[-*+]\\s+"), "· ")
+                    .trimEnd()
+            }
+            .trim()
     }
 
     /** True when [remote] is a higher semantic version than [local]. */
