@@ -2491,10 +2491,13 @@ fun LogsTab(
                                         Spacer(Modifier.height(4.dp))
                                         // Type and publish date, so the list says what each
                                         // entry is without opening it.
+                                        // Local save time, not the post's publish date: an
+                                        // entry in this list is a download, and when it was
+                                        // downloaded is what the list is about.
                                         val itemFacts = listOfNotNull(
                                             log.platform ?: "抖音",
                                             log.duration?.let { formatDuration(it) },
-                                            log.createTime?.let { formatPostDateTime(it) },
+                                            formatPostDateTime(log.timestamp / 1000),
                                         )
                                         Text(
                                             itemFacts.joinToString(" · "),
