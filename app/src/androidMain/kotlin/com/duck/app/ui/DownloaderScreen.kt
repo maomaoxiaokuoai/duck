@@ -1339,6 +1339,7 @@ fun MainDownloaderTab(
                                     }
                                 }
                             }
+                        }
                         // Videos get a single cover. Galleries render as a grid
                         // below instead, so their cover would be a duplicate.
                         if (!isImageOrGallery) {
