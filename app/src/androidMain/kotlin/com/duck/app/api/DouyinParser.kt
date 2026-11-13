@@ -376,6 +376,9 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
                 clean += (pixels * 1_000_000L + bytes) to best
             }
 
+            // play_addr_265 is the HEVC encode and is often the only 720p+ option on a
+            // post whose H.264 stream is capped at 576p, so it must be considered.
+            considerClean(video["play_addr_265"]?.asObject())
             considerClean(video["play_addr_h264"]?.asObject())
             considerClean(video["play_addr"]?.asObject())
             video["bit_rate"]?.asArray()?.forEach { entry ->
