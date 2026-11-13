@@ -43,8 +43,15 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
-        .addMigrations(com.duck.app.db.MIGRATION_1_2, com.duck.app.db.MIGRATION_2_3, com.duck.app.db.MIGRATION_3_4, com.duck.app.db.MIGRATION_4_5, com.duck.app.db.MIGRATION_5_6)
-        .fallbackToDestructiveMigration()
+        .addMigrations(
+            com.duck.app.db.MIGRATION_1_2,
+            com.duck.app.db.MIGRATION_2_3,
+            com.duck.app.db.MIGRATION_3_4,
+            com.duck.app.db.MIGRATION_4_5,
+            com.duck.app.db.MIGRATION_5_6,
+        )
+        // No destructive fallback: a missing migration should fail loudly in testing
+        // rather than quietly erase the history people expect to keep.
         .build()
     private val logDao = db.downloadLogDao()
     private val notificationHelper = NotificationHelper(application)
