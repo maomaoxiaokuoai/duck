@@ -51,9 +51,21 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
         return try {
             val finalUrl = followRedirects(pageUrl)
+            val awemeId = extractAwemeId(finalUrl)
 
-            // Douyin only renders the SSR payload for a signed request. The first call
-            // just mints __ac_nonce; the signature derived from it unlocks the second.
+            // Videos are tried through slidesinfo first. It needs no signature and, as of
+            // this writing, is not behind the captcha that the SSR page now shows for
+            // video posts. Galleries are refused by that endpoint (filter reason 8), so a
+            // failure here falls through to the signed page below.
+            if (awemeId != null) {
+                val fast = runCatching { resolveFromSlidesInfo(awemeId) }.getOrNull()
+                if (fast != null && fast.status == "success") {
+                    return fast
+                }
+            }
+
+            // Douyin renders the SSR payload only for a signed request: the first call
+            // just mints __ac_nonce, the signature unlocks the second.
             val nonce = fetchNonce(finalUrl)
             val signature = nonce?.let { signer?.sign(it) }
             val html = httpGet(finalUrl, nonce, signature)
@@ -64,12 +76,30 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         }
     }
 
+    /** The numeric id in a douyin URL, or null when the shape is unfamiliar. */
+    private fun extractAwemeId(url: String): String? =
+        Regex("/?(?:video|note|share/video|share/note|share/slides)/(\\d{15,})")
+            .find(url)?.groupValues?.get(1)
+            ?: Regex("(\\d{18,20})").find(url)?.groupValues?.get(1)
+
     // ---------------------------------------------------------------- URL handling
 
     /** Pulls the first http(s) link out of a share text and drops known tracking params. */
+    /**
+     * Pulls the post link out of whatever the user pasted.
+     *
+     * Douyin's share text is a sentence with the link buried in it, often followed by
+     * tracking tokens like "jCU:/ 08/01". A naive first-match grabs the link correctly,
+     * but the whole sentence is scanned for a Douyin host first so a stray URL earlier
+     * in the text cannot win.
+     */
     fun extractUrl(input: String): String {
-        val raw = Regex("https?://[^\\s]+").find(input.trim())?.value ?: input.trim()
-        return raw
+        val text = input.trim()
+        val all = Regex("https?://[^\\s\u3000]+").findAll(text).map { it.value }.toList()
+
+        val chosen = all.firstOrNull { isDouyinUrl(it) } ?: all.firstOrNull() ?: text
+
+        return chosen
             .substringBefore('#')
             .replace(
                 Regex(
@@ -269,15 +299,15 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         }
 
         val routerData = extractRouterData(html)
-            ?: return resolveFromSlidesInfo(pageUrl)
+            ?: return extractAwemeId(pageUrl)?.let { resolveFromSlidesInfo(it) } ?: ExtractionResult(status = "error", message = "无法识别作品 ID")
 
         val loaderData = routerData["loaderData"]?.asObject()
-            ?: return resolveFromSlidesInfo(pageUrl)
+            ?: return extractAwemeId(pageUrl)?.let { resolveFromSlidesInfo(it) } ?: ExtractionResult(status = "error", message = "无法识别作品 ID")
         val videoKey = loaderData.keys.firstOrNull {
             it.startsWith("video_(id)") || it.startsWith("note_(id)")
         }
         val page = videoKey?.let { loaderData[it]?.asObject() }
-            ?: return resolveFromSlidesInfo(pageUrl)
+            ?: return extractAwemeId(pageUrl)?.let { resolveFromSlidesInfo(it) } ?: ExtractionResult(status = "error", message = "无法识别作品 ID")
 
         var title: String? = null
         var author: String? = null
@@ -300,7 +330,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             items = extractMediaFromPage(page)
         }
 
-        if (items.isEmpty()) return resolveFromSlidesInfo(pageUrl)
+        if (items.isEmpty()) return extractAwemeId(pageUrl)?.let { resolveFromSlidesInfo(it) } ?: ExtractionResult(status = "error", message = "无法识别作品 ID")
 
         return ExtractionResult(
             status = "success",
@@ -374,14 +404,9 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * Reads the slideshow metadata endpoint. It answers with a JSON object holding the same
      * url_list shapes, so the extraction logic above is reused for the video-only case.
      */
-    private fun resolveFromSlidesInfo(pageUrl: String): ExtractionResult {
-        val awemeId = Regex("/(?:video|note|share/video|share/note)/(\\d+)")
-            .find(pageUrl)?.groupValues?.get(1)
-            ?: Regex("\\d{15,}").find(pageUrl)?.value
-            ?: return ExtractionResult(status = "error", message = "无法从链接中识别作品 ID")
-
+    private fun resolveFromSlidesInfo(awemeId: String): ExtractionResult {
         val body = runCatching {
-            httpGet(SLIDES_INFO_ENDPOINT + "?aweme_id=" + awemeId)
+            httpGet(SLIDES_INFO_ENDPOINT + "?aweme_ids=[" + awemeId + "]")
         }.getOrElse {
             return ExtractionResult(status = "error", message = "抖音作品信息获取失败：" + it.message)
         }
@@ -389,7 +414,10 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         val root = runCatching { json.parseToJsonElement(body) }.getOrNull()?.asObject()
             ?: return ExtractionResult(status = "error", message = "抖音返回了无法识别的数据")
 
-        val detail = root["aweme_detail"]?.asObject()
+        // The endpoint answers with a list under "aweme_details"; aweme_detail and data are
+        // kept as fallbacks for the older single-object shape.
+        val detail = root["aweme_details"]?.asArray()?.firstOrNull()?.asObject()
+            ?: root["aweme_detail"]?.asObject()
             ?: root["data"]?.asObject()
             ?: return ExtractionResult(status = "error", message = "抖音作品不存在或已被删除")
 
