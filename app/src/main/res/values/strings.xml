@@ -43,7 +43,6 @@
     <string name="make_floating_navigation_solid">使浮动导航栏变为纯色</string>
     <string name="theme_mode">主题模式</string>
     <string name="color_scheme">配色方案</string>
-    <string name="terminal_theme">终端主题</string>
     <string name="downloads">下载</string>
     <string name="download_repository">下载存储库</string>
     <string name="files_will_be_saved_in_your_se">文件将保存在您选择的文件夹中</string>

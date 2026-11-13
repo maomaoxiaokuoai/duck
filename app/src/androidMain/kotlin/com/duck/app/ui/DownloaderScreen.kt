@@ -1985,58 +1985,6 @@ fun CustomisationScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, cont
                 }
             }
         }
-
-        Spacer(Modifier.height(16.dp))
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.terminal_theme), style = MaterialTheme.typography.titleMedium)
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val themes = TerminalTheme.values().toList()
-                    themes.chunked(2).forEach { rowThemes ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                            rowThemes.forEachIndexed { index, theme ->
-                                val isSelected = viewModel.terminalTheme.value == theme
-                                val shape = RoundedCornerShape(
-                                    topStart = if (index == 0) 100.dp else 8.dp,
-                                    bottomStart = if (index == 0) 100.dp else 8.dp,
-                                    topEnd = if (index == rowThemes.lastIndex) 100.dp else 8.dp,
-                                    bottomEnd = if (index == rowThemes.lastIndex) 100.dp else 8.dp
-                                )
-                                val colors = if (isSelected) {
-                                    ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                        contentColor = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else {
-                                    ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                FilledTonalButton(
-                                    onClick = { viewModel.updateTerminalTheme(theme) },
-                                    shape = shape,
-                                    colors = colors,
-                                    modifier = Modifier.weight(1f),
-                                    contentPadding = PaddingValues(horizontal = 4.dp)
-                                ) {
-                                    Text(theme.displayName, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                }
-                            }
-                            if (rowThemes.size < 2) {
-                                repeat(2 - rowThemes.size) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 

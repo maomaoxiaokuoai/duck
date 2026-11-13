@@ -35,17 +35,6 @@ import com.duck.app.ui.theme.AppTheme
 
 import kotlinx.coroutines.Job
 
-enum class TerminalTheme(
-    val displayName: String,
-    val background: Long,
-    val text: Long,
-    val header: Long
-) {
-    CLASSIC("经典绿", 0xFF0C0C0C, 0xFF00FF66, 0xFF1E1E1E),
-    MOCHA("摩卡", 0xFF1E1E2E, 0xFFF5E0DC, 0xFF181825),
-    PINK("樱花粉", 0xFF1F121F, 0xFFFF85A2, 0xFF2E1A2E),
-    DRACULA("德古拉", 0xFF282A36, 0xFFF8F8F2, 0xFF21222C)
-}
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
     /** Builds the __ac_signature the Douyin page needs; a hidden WebView runs their JSVM. */
@@ -105,9 +94,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
     
     private val prefs = application.getSharedPreferences("duck_prefs", android.content.Context.MODE_PRIVATE)
-    
-    var terminalTheme = mutableStateOf(
-        TerminalTheme.valueOf(prefs.getString("terminal_theme", TerminalTheme.MOCHA.name) ?: TerminalTheme.MOCHA.name)
     )
     
     var isNavBarBlurEnabled = mutableStateOf(prefs.getBoolean("nav_bar_blur", true))
@@ -126,12 +112,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     fun toggleNavBarTrueGlass(enabled: Boolean) {
         isNavBarTrueGlass.value = enabled
         prefs.edit().putBoolean("nav_bar_true_glass", enabled).apply()
-    }
-    
-    fun updateTerminalTheme(theme: TerminalTheme) {
-        terminalTheme.value = theme
-        prefs.edit().putString("terminal_theme", theme.name).apply()
-        logToConsole("Terminal theme changed to: ${theme.displayName}")
     }
 
     fun resetDownloadState() {
