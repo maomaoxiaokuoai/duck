@@ -108,7 +108,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Videocam
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -2085,13 +2086,13 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
         // Two rows rather than one: images and video genuinely land in different
         // folders, and showing a single path made it look like both went there.
         StorageRow(
-            icon = Icons.Default.Image,
+            icon = Icons.Default.Photo,
             title = "图片",
             path = "Pictures/duck",
         )
 
         StorageRow(
-            icon = Icons.Default.PlayArrow,
+            icon = Icons.Default.Videocam,
             title = "视频",
             path = "Movies/duck",
         )
