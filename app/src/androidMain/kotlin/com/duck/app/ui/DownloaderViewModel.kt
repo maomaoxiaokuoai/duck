@@ -799,7 +799,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * is what the history row should show. Returns null when the query fails.
      */
     private fun queryFileSize(uri: Uri): Long? = runCatching {
-        application.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+        getApplication<android.app.Application>().contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
             pfd.statSize.takeIf { it > 0 }
         }
     }.getOrNull()
