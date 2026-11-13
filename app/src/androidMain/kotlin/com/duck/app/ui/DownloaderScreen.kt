@@ -1220,8 +1220,10 @@ fun MainDownloaderTab(
                 val isImageOrGallery = meta.is_gallery == true ||
                     meta.ext in IMAGE_EXTENSIONS
 
-                Card(
-                    onClick = { showPreviewSheet = true },
+                // A gallery card has its own tappable grid, and a card-level click
+                // wins over the tiles inside it. Only non-gallery cards open the
+                // preview sheet from the card body.
+                Card(                    onClick = { if (!isImageOrGallery) showPreviewSheet = true },
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(24.dp),
