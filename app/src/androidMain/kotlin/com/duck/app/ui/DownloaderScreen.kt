@@ -125,6 +125,36 @@ internal fun formatCount(value: Long): String = when {
     else -> value.toString()
 }
 
+/** Human label for the kind of media behind a link. */
+internal fun kindLabel(kind: String): String = when (kind) {
+    "gallery" -> "图文"
+    "audio" -> "音频"
+    else -> "视频"
+}
+
+/** Byte size as MB or KB, one decimal. */
+internal fun formatBytes(bytes: Long): String = when {
+    bytes >= 1024L * 1024L ->
+        String.format(java.util.Locale.CHINA, "%.1f MB", bytes / 1024.0 / 1024.0)
+    bytes >= 1024L -> String.format(java.util.Locale.CHINA, "%.0f KB", bytes / 1024.0)
+    else -> bytes.toString() + " B"
+}
+
+/** Publish date and time, to the minute. */
+internal fun formatPostDateTime(epochSeconds: Long): String {
+    if (epochSeconds !in 1_000_000_000L..9_999_999_999L) return ""
+    val date = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.CHINA)
+        .format(java.util.Date(epochSeconds * 1000))
+    val clock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.CHINA)
+        .format(java.util.Date(epochSeconds * 1000))
+    return date + " " + clock
+}
+
+/** Wall clock of a resolve, for the preview card. */
+internal fun formatClock(epochMillis: Long): String =
+    java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.CHINA)
+        .format(java.util.Date(epochMillis))
+
 /** Clip length as m:ss, from the milliseconds the platform reports. */
 internal fun formatDuration(ms: Long): String {
     val totalSeconds = ms / 1000
@@ -1122,6 +1152,25 @@ fun MainDownloaderTab(
                                 )
                             }
 
+                            // Facts about the post and about this resolution: what kind of
+                            // media it is, how big the file is, when it was published and
+                            // when we fetched it. Kept as one wrapped line so the card stays
+                            // compact however many of them are present.
+                            val facts = listOfNotNull(
+                                meta.media_kind?.let { kindLabel(it) },
+                                meta.media_size?.takeIf { it > 0 }?.let { formatBytes(it) },
+                                meta.create_time?.let { formatPostDateTime(it) },
+                                meta.resolved_at?.let { "解析于 " + formatClock(it) },
+                            )
+                            if (facts.isNotEmpty()) {
+                                Spacer(Modifier.height(10.dp))
+                                Text(
+                                    facts.joinToString(" · "),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+
                             val stats = listOfNotNull(
                                 meta.like_count?.takeIf { it > 0 }?.let { "赞 " + formatCount(it) },
                                 meta.comment_count?.takeIf { it > 0 }?.let { "评 " + formatCount(it) },
@@ -1129,7 +1178,7 @@ fun MainDownloaderTab(
                                 meta.collect_count?.takeIf { it > 0 }?.let { "藏 " + formatCount(it) },
                             )
                             if (stats.isNotEmpty()) {
-                                Spacer(Modifier.height(10.dp))
+                                Spacer(Modifier.height(6.dp))
                                 Text(
                                     stats.joinToString("   "),
                                     style = MaterialTheme.typography.labelMedium,
