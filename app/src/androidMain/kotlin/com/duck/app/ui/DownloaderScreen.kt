@@ -461,12 +461,12 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                     ).show()
                                                 }
                                                 else -> {
-                                                    // Paste and resolve only. The preview card
-                                                    // appears and the download waits for an
-                                                    // explicit tap, so a stray clipboard link
-                                                    // cannot start writing files on its own.
+                                                    // The bolt is the one-tap path: it takes the
+                                                    // clipboard link straight through to a
+                                                    // download. The field's paste button is the
+                                                    // one that stops at a preview.
                                                     url = text
-                                                    viewModel.fetchPreview(text, quality, downloadMode)
+                                                    viewModel.downloadMedia(text, quality, downloadMode)
                                                 }
                                             }
                                         },
