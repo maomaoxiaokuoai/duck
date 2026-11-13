@@ -898,7 +898,7 @@ fun MainDownloaderTab(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(R.string.gabi), 
+        Text("duck", 
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -2091,7 +2091,7 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
                         fontWeight = FontWeight.Medium
                     )
                     if (viewModel.selectedFolderUri.value == null) {
-                        Text(stringResource(R.string.default_movies_gabi), style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.default_movies_path), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }

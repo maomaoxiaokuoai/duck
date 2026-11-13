@@ -18,11 +18,7 @@ kotlin {
         }
     }
     
-    jvm("desktop")
-    
     sourceSets {
-        val desktopMain by getting
-        
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -30,7 +26,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
             implementation("dev.chrisbanes.haze:haze:0.7.2")
             
             // Ktor
@@ -45,21 +40,13 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             
-            // Koin Dependency Injection
-            implementation("io.insert-koin:koin-core:3.5.3")
-            implementation("io.insert-koin:koin-compose:1.1.2")
+            
         }
         
         androidMain.dependencies {
             implementation("androidx.core:core-ktx:1.12.0")
             implementation("androidx.core:core-splashscreen:1.0.1")
             implementation("androidx.activity:activity-compose:1.8.2")
-            
-            // Koin Android
-            implementation("io.insert-koin:koin-android:3.5.3")
-            implementation("io.insert-koin:koin-androidx-compose:3.5.3")
-            
-            implementation("androidx.graphics:graphics-shapes:1.0.1")
             
             // Old Android-only dependencies (will break if moved to commonMain)
             implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -79,11 +66,6 @@ kotlin {
             implementation("androidx.media3:media3-exoplayer:1.2.1")
             implementation("androidx.media3:media3-ui:1.2.1")
             
-        }
-        
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
         }
     }
 }
@@ -176,13 +158,3 @@ dependencies {
     add("kspAndroid", "androidx.room:room-compiler:2.6.1")
 }
 
-compose.desktop {
-    application {
-        mainClass = "com.material.downloader.MainKt"
-        nativeDistributions {
-            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi, org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb)
-            packageName = "duck"
-            packageVersion = "3.5.0"
-        }
-    }
-}

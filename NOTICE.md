@@ -30,8 +30,8 @@ duck 以 **MIT** 分发，条款见 [LICENSE-MIT](LICENSE-MIT)。
 | Room | 本地数据库 | Apache-2.0 | https://developer.android.com/room |
 | Coil | 图片加载 | Apache-2.0 | https://coil-kt.github.io/coil/ |
 | kotlinx.serialization | JSON 解析 | Apache-2.0 | https://github.com/Kotlin/kotlinx.serialization |
-| Haze | 模糊效果 | Apache-2.0 | https://github.com/chrisbanes/haze |
 
 ## 致谢
 
-界面设计参考了 [gabi](https://github.com/Hotaro26/gabi) 的 Material 3 Expressive 布局。
+早期版本的界面布局参考过 [gabi](https://github.com/Hotaro26/gabi) 的 Material 3 Expressive 风格，
+当前实现已完全重写，与上游无代码关联。
