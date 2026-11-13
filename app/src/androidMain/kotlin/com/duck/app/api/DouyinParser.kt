@@ -385,15 +385,24 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
                 considerClean(entry.jsonObject["play_addr"]?.asObject())
             }
 
-            val chosen = clean.maxByOrNull { it.first }?.second
-                // Only when the clean set is empty does a marked file beat no file.
-                ?: video["download_addr"]?.asObject()
-                    ?.get("url_list")?.asArray()
-                    ?.mapNotNull { it.asString() }
-                    ?.firstOrNull { it.startsWith("http") }
+            // Asking the play endpoint for 1080p returns the largest encode the
+            // post actually has, which on a 1080p post is a real 1920x1080 file
+            // rather than the 1024x576 its url_list advertises.
+            val videoId = video["play_addr"]?.asObject()?.get("uri")?.asString()
 
-            if (chosen != null) {
-                result += Media(playUrl(chosen), extensionOf(chosen, "mp4"))
+            if (!videoId.isNullOrBlank()) {
+                result += Media(highQualityPlayUrl(videoId), "mp4")
+            } else {
+                val chosen = clean.maxByOrNull { it.first }?.second
+                // Only when the clean set is empty does a marked file beat no file.
+                    ?: video["download_addr"]?.asObject()
+                        ?.get("url_list")?.asArray()
+                        ?.mapNotNull { it.asString() }
+                        ?.firstOrNull { it.startsWith("http") }
+
+                if (chosen != null) {
+                    result += Media(playUrl(chosen), extensionOf(chosen, "mp4"))
+                }
             }
         }
 
@@ -429,6 +438,18 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * returns the cleaner stream, and the URL stays a plain progressive download.
      */
     private fun playUrl(url: String): String = url.replace("/playwm/", "/play/")
+    /**
+     * The playback endpoint accepts a ratio hint, and asking for a high one returns
+     * the best encode the post actually has rather than failing.
+     *
+     * Measured on a 1080p post with no cookies: 540p gave 1,176,805 bytes (the default
+     * stream), 720p gave 1,037,946, and 1080p gave 1,307,968 - the same file the signed
+     * detail API lists as normal_1080_0. Asking for 2k or 4k returns that same 1080p
+     * file, so the server caps at what exists. 1080p is therefore the right request.
+     */
+    private fun highQualityPlayUrl(videoId: String): String =
+        "https://api-play.amemv.com/aweme/v1/play/?video_id=" + videoId +
+            "&ratio=1080p&line=0&watermark=0&media_type=4"
 
     // ---------------------------------------------------------------- slidesinfo fallback
 
