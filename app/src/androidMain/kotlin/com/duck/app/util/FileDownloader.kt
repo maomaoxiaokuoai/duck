@@ -58,6 +58,11 @@ class FileDownloader(private val context: Context, private val client: HttpClien
                 } ?: throw Exception("Could not create destination file")
                 
                 onUriCreated?.invoke(uri)
+
+                // The total is known as soon as the headers arrive, so report it right
+                // away. Otherwise the screen sits at "0%" with dashes until the first
+                // 500 ms chunk lands, which reads as a stalled download.
+                emit(DownloadState.Downloading(0f, 0L, contentLength, 0L))
                 
                 // A MediaStore row is inserted with IS_PENDING=1 and only cleared once
                 // the bytes are all there. If the transfer dies half way, that flag stays
@@ -77,15 +82,31 @@ class FileDownloader(private val context: Context, private val client: HttpClien
                                 bytesSinceLastEmit += read
                                 val now = System.currentTimeMillis()
                                 val timeDiff = now - lastEmitTime
-                                if (timeDiff >= 500 || channel.isClosedForRead) {
+                                // Emit on a short cadence so the number moves; a 500 ms
+                                // throttle made a slow start look frozen.
+                                if (timeDiff >= 200) {
                                     val speedBps = (bytesSinceLastEmit * 1000L) / timeDiff.coerceAtLeast(1L)
-                                    val prog = if (contentLength > 0) bytesRead.toFloat() / contentLength else 0f
+                                    val prog = if (contentLength > 0) {
+                                        (bytesRead.toFloat() / contentLength).coerceIn(0f, 1f)
+                                    } else {
+                                        0f
+                                    }
                                     emit(DownloadState.Downloading(prog, bytesRead, contentLength, speedBps))
                                     lastEmitTime = now
                                     bytesSinceLastEmit = 0L
                                 }
                             }
                         }
+                        // One final emit with the real totals, so the screen shows 100%
+                        // rather than whatever the last 200 ms tick happened to see.
+                        emit(
+                            DownloadState.Downloading(
+                                1f,
+                                bytesRead,
+                                if (contentLength > 0) contentLength else bytesRead,
+                                0L,
+                            )
+                        )
                     }
                 } catch (inner: Exception) {
                     runCatching { context.contentResolver.delete(uri, null, null) }

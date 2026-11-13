@@ -356,13 +356,34 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             }
         }
 
-        val direct = item["video"]?.asObject()
-            ?.get("play_addr")?.asObject()
-            ?.get("url_list")?.asArray()
-            ?.mapNotNull { it.asString() }
-            ?.firstOrNull { it.startsWith("http") }
-        if (direct != null) {
-            result += Media(playUrl(direct), extensionOf(direct, "mp4"))
+        // Douyin lists several renditions. play_addr is the playback stream, capped
+        // lower than the file it serves for download; download_addr and the bit_rate
+        // entries carry the full-resolution encode. Pick the largest geometry, then the
+        // largest byte count, so the saved file is the best one offered.
+        val video = item["video"]?.asObject()
+        if (video != null) {
+            val candidates = mutableListOf<Pair<Long, String>>()
+
+            fun consider(addr: JsonObject?) {
+                if (addr == null) return
+                val urls = addr["url_list"]?.asArray()?.mapNotNull { it.asString() }.orEmpty()
+                val best = urls.firstOrNull { it.startsWith("http") } ?: return
+                val pixels = (addr["width"]?.asString()?.toLongOrNull() ?: 0L) *
+                    (addr["height"]?.asString()?.toLongOrNull() ?: 0L)
+                val bytes = addr["data_size"]?.asString()?.toLongOrNull() ?: 0L
+                candidates += (pixels * 1_000_000L + bytes) to best
+            }
+
+            consider(video["download_addr"]?.asObject())
+            consider(video["play_addr_h264"]?.asObject())
+            consider(video["play_addr"]?.asObject())
+            video["bit_rate"]?.asArray()?.forEach { entry ->
+                consider(entry.jsonObject["play_addr"]?.asObject())
+            }
+
+            candidates.maxByOrNull { it.first }?.let { (_, url) ->
+                result += Media(playUrl(url), extensionOf(url, "mp4"))
+            }
         }
 
         return result
