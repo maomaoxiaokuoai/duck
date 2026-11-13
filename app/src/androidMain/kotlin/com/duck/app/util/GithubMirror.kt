@@ -32,6 +32,13 @@ class GithubMirror {
     )
 
     private val mirrors = listOf(
+        // Our own Worker. It costs nothing to keep and cannot be shut down by a
+        // third party, so it belongs in the race even when a public mirror is faster.
+        Mirror(
+            label = "accelerate.772399.xyz",
+            api = "https://accelerate.772399.xyz/https://api.github.com" + API_PATH,
+            downloadPrefix = "https://accelerate.772399.xyz/https://github.com/",
+        ),
         Mirror(
             label = "gh-proxy.com",
             api = "https://gh-proxy.com/https://api.github.com" + API_PATH,
