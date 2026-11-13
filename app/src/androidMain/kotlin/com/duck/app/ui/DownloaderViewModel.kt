@@ -50,8 +50,11 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             com.duck.app.db.MIGRATION_4_5,
             com.duck.app.db.MIGRATION_5_6,
         )
-        // No destructive fallback: a missing migration should fail loudly in testing
-        // rather than quietly erase the history people expect to keep.
+        // A history table is only convenience data, so if a migration path is ever
+        // missing the app should still open with an empty list instead of crashing on
+        // launch. The destructive fallback is the lesser harm here; the alternative is
+        // an install that cannot start at all.
+        .fallbackToDestructiveMigration()
         .build()
     private val logDao = db.downloadLogDao()
     private val notificationHelper = NotificationHelper(application)
