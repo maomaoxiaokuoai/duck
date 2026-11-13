@@ -1340,10 +1340,6 @@ fun MainDownloaderTab(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-
-                            // The floating navigation bar overlaps the bottom of the
-                            // scrolling column; this keeps the last line readable.
-                            Spacer(Modifier.height(72.dp))
                         }
                     }
                 }
