@@ -252,19 +252,28 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 val body = release.body
-                val tagRegex = "\"tag_name\"\\s*:\\s*\"([^\"]+)\"".toRegex()
-                val urlRegex = "\"browser_download_url\"\\s*:\\s*\"([^\"]+\\.apk)\"".toRegex()
-                val match = tagRegex.find(body)
-                if (match == null) {
+
+                // The feed is XML; pull the first entry, which is the newest release.
+                val entry = body.substringAfter("<entry>", "").substringBefore("</entry>")
+                if (entry.isBlank()) {
                     if (manual) updateCheckMessage.value = "没有找到发布版本"
                     return@launch
                 }
 
-                val latestVersion = match.groupValues[1]
-                val rawUrl = urlRegex.find(body)?.groupValues?.getOrNull(1)
-                val apkUrl = rawUrl?.let {
-                    githubMirror.accelerateDownloadUrl(it, release.downloadPrefix)
-                } ?: return@launch
+                val latestVersion = Regex("<title>([^<]+)</title>")
+                    .find(entry)?.groupValues?.get(1)?.trim()
+                    ?: run {
+                        if (manual) updateCheckMessage.value = "无法识别版本号"
+                        return@launch
+                    }
+
+                // The feed carries the release page, not the asset. The asset name
+                // follows a fixed pattern, so build the direct link from the tag.
+                val tag = latestVersion.removePrefix("v")
+                val assetName = "duck-" + tag + "-arm64-v8a-release.apk"
+                val rawUrl = "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
+                    latestVersion + "/" + assetName
+                val apkUrl = githubMirror.accelerateDownloadUrl(rawUrl, release.downloadPrefix)
 
                 val current = com.duck.app.BuildConfig.VERSION_NAME
                 val isNewer = isVersionNewer(latestVersion, current)
@@ -273,7 +282,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     updateAvailable.value = UpdateInfo(
                         version = latestVersion,
                         apkUrl = apkUrl,
-                        notes = extractReleaseNotes(body),
+                        notes = extractReleaseNotes(entry),
                     )
                     updateCheckMessage.value = "发现新版本 " + latestVersion
                     logToConsole("更新可用: " + latestVersion + " via " + release.mirrorLabel)
@@ -290,43 +299,32 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     /**
-     * Pulls the human-written notes out of the GitHub release JSON.
+     * Pulls the notes out of a feed entry.
      *
-     * The value arrives JSON-escaped, so newlines and quotes are unescaped here;
-     * otherwise the dialog would show literal backslash-n sequences.
+     * The feed embeds HTML that is itself entity-escaped, so tags are stripped and the
+     * common entities decoded before the text reaches the dialog.
      */
-    private fun extractReleaseNotes(body: String): String {
-        val keyIndex = body.indexOf("body")
-        if (keyIndex < 0) return ""
+    private fun extractReleaseNotes(entry: String): String {
+        val raw = Regex("<content[^>]*>(.*?)</content>", RegexOption.DOT_MATCHES_ALL)
+            .find(entry)?.groupValues?.get(1)
+            ?: return ""
 
-        val colonIndex = body.indexOf(':', keyIndex)
-        if (colonIndex < 0) return ""
+        val decoded = raw
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&amp;", "&")
+            .replace("&#39;", "'")
 
-        var i = body.indexOf('"', colonIndex)
-        if (i < 0) return ""
-        i++
+        val text = decoded
+            .replace(Regex("<li[^>]*>"), "\n\u00B7 ")
+            .replace(Regex("</(h[1-6]|p|li|ul)>"), "\n")
+            .replace(Regex("<[^>]+>"), "")
+            .replace(Regex("\n{3,}"), "\n\n")
+            .replace("\n\u00B7 ".toRegex()) { "\n\u00B7 " }
+            .trim()
 
-        val out = StringBuilder()
-        var escaped = false
-        while (i < body.length) {
-            val c = body[i]
-            if (escaped) {
-                when (c) {
-                    'n' -> out.append('\n')
-                    't' -> out.append("  ")
-                    else -> out.append(c)
-                }
-                escaped = false
-            } else if (c == '\\') {
-                escaped = true
-            } else if (c == '"') {
-                break
-            } else {
-                out.append(c)
-            }
-            i++
-        }
-        return stripMarkdown(out.toString())
+        return stripMarkdown(text)
     }
 
     /**

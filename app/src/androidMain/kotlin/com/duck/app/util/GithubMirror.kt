@@ -12,64 +12,63 @@ import java.net.URL
 /**
  * Finds the fastest working route to this project's GitHub releases.
  *
- * github.com is slow or blocked on many networks, so every launch races a set of
- * mirrors instead of trusting a remembered one: the network the app runs on changes
- * (home, mobile data, VPN), and a cached winner would be the wrong one. The probe is
- * cheap - one small JSON request per mirror, all in parallel - and it runs behind the
- * UI, so the user never waits for it.
+ * The version comes from the releases atom feed rather than the REST API. The API
+ * allows 60 requests per hour per IP, and the free Cloudflare Workers that proxy it
+ * share one egress address, so through a mirror it reports zero remaining most of the
+ * time. The atom feed is served from github.com itself, carries the same tag, notes and
+ * link, and is not rate limited.
  *
- * A mirror only counts as usable when it returns the release JSON itself. A mirror
- * that answers 200 with an error page, or 307 to somewhere unreachable, is discarded.
+ * Every launch races the mirrors instead of trusting a remembered one: the network
+ * changes between home, mobile data and a VPN, and a cached winner is often the slow
+ * one. The probe is one small request per mirror, in parallel, behind the UI.
  */
 class GithubMirror {
 
-    /** One mirror: where to read metadata, and how to rewrite a download link. */
+    /** One mirror: where to read the feed, and how to rewrite a download link. */
     private data class Mirror(
         val label: String,
-        val api: String,
-        /** Prefix a github.com download path gets prepended with, empty for direct. */
+        val feed: String,
         val downloadPrefix: String,
     )
 
     private val mirrors = listOf(
-        // Our own Worker. It costs nothing to keep and cannot be shut down by a
-        // third party, so it belongs in the race even when a public mirror is faster.
+        // Self-hosted: it cannot be shut down by someone else, so it belongs in the
+        // race even when a public mirror happens to be faster today.
         Mirror(
             label = "accelerate.772399.xyz",
-            api = "https://accelerate.772399.xyz/https://api.github.com" + API_PATH,
+            feed = "https://accelerate.772399.xyz/https://github.com/OWNER/REPO/releases.atom",
             downloadPrefix = "https://accelerate.772399.xyz/https://github.com/",
         ),
         Mirror(
             label = "gh-proxy.com",
-            api = "https://gh-proxy.com/https://api.github.com" + API_PATH,
+            feed = "https://gh-proxy.com/https://github.com/OWNER/REPO/releases.atom",
             downloadPrefix = "https://gh-proxy.com/https://github.com/",
         ),
         Mirror(
             label = "gh.noki.icu",
-            api = "https://gh.noki.icu/https://api.github.com" + API_PATH,
+            feed = "https://gh.noki.icu/https://github.com/OWNER/REPO/releases.atom",
             downloadPrefix = "https://gh.noki.icu/https://github.com/",
         ),
         Mirror(
-            label = "api.github.com",
-            api = "https://api.github.com" + API_PATH,
+            label = "github.com",
+            feed = "https://github.com/OWNER/REPO/releases.atom",
             downloadPrefix = "https://github.com/",
         ),
-    )
+    ).map { it.copy(feed = it.feed.replace("OWNER", OWNER).replace("REPO", REPO)) }
 
     /**
-     * Races every mirror and returns the release served by the fastest one.
+     * Races every mirror and returns the feed served by the fastest one.
      *
-     * Null means nothing was reachable; callers surface that as a check failure
-     * rather than silently retrying forever.
+     * Null means nothing was reachable; callers surface that as a check failure.
      */
     suspend fun fetchLatestRelease(): Release? = withContext(Dispatchers.IO) {
         val results = coroutineScope {
             mirrors.map { mirror ->
                 async {
                     val started = System.currentTimeMillis()
-                    val body = getText(mirror.api)
+                    val body = getText(mirror.feed)
                     val elapsed = System.currentTimeMillis() - started
-                    if (body != null && body.contains(MARK_VERSION)) {
+                    if (body != null && body.contains(MARK_ENTRY)) {
                         Log.d(TAG, mirror.label + " answered in " + elapsed + "ms")
                         Triple(mirror, body, elapsed)
                     } else {
@@ -93,15 +92,9 @@ class GithubMirror {
     /**
      * Rewrites a github.com download link to travel through the chosen mirror.
      *
-     * Takes the path from "/releases/download/" onward so the result points at the
-     * same asset; a link without that marker is returned untouched.
-     */
-    /**
-     * Rewrites a github.com download link to travel through the chosen mirror.
-     *
-     * Everything after "github.com/" is carried over, because that tail still holds the
-     * owner and repository. Slicing from "/releases/download/" instead dropped both, and
-     * the mirror answered 403 for a path that does not exist.
+     * Everything after "github.com/" is carried over, because that tail holds the
+     * owner and repository. Slicing from "/releases/download/" dropped both, and the
+     * mirror answered 403 for a path that does not exist.
      */
     fun accelerateDownloadUrl(url: String, downloadPrefix: String): String {
         val host = "github.com/"
@@ -119,7 +112,7 @@ class GithubMirror {
                 instanceFollowRedirects = true
                 requestMethod = "GET"
                 setRequestProperty("User-Agent", "duck-updater")
-                setRequestProperty("Accept", "application/vnd.github+json")
+                setRequestProperty("Accept", "application/atom+xml")
             }
             if (connection.responseCode !in 200..299) return null
             connection.inputStream.bufferedReader().use { it.readText() }
@@ -131,7 +124,7 @@ class GithubMirror {
         }
     }
 
-    /** Release metadata plus the route that served it. */
+    /** Feed body plus the route that served it. */
     data class Release(
         val body: String,
         val mirrorLabel: String,
@@ -141,7 +134,8 @@ class GithubMirror {
     private companion object {
         const val TAG = "GithubMirror"
         const val PROBE_TIMEOUT_MS = 10_000
-        const val MARK_VERSION = "\"tag_name\""
-        const val API_PATH = "/repos/maomaoxiaokuoai/duck/releases/latest"
+        const val MARK_ENTRY = "<entry>"
+        const val OWNER = "maomaoxiaokuoai"
+        const val REPO = "duck"
     }
 }
