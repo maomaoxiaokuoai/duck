@@ -43,6 +43,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val githubMirror = com.duck.app.util.GithubMirror()
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
+    private val redBookParser = com.duck.app.api.RedBookParser()
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(
             com.duck.app.db.MIGRATION_1_2,
@@ -448,9 +449,17 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      */
     private suspend fun performExtraction(url: String): ExtractionResult =
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            logToConsole("解析抖音链接: ${douyinParser.extractUrl(url)}")
+            // Both parsers accept a share sentence, so each cleans the input
+            // itself and only the matching site is contacted.
+            val redBookLink = redBookParser.extractUrl(url)
+            val isRedBook = redBookParser.isRedBookUrl(redBookLink)
+            if (isRedBook) {
+                logToConsole("解析小红书链接: " + redBookLink)
+            } else {
+                logToConsole("解析抖音链接: " + douyinParser.extractUrl(url))
+            }
 
-            val result = douyinParser.resolve(url)
+val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve(url)
             if (result.status == "success") {
                 if (result.is_gallery == true) {
                     logToConsole("解析成功：图集，共 ${result.urls?.size ?: 0} 个直链")
@@ -501,9 +510,21 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * not a URL and cannot be checked as one. Callers run it through here first, then ask
      * whether the result is a Douyin link.
      */
-    fun extractUrl(input: String): String = douyinParser.extractUrl(input)
+    /**
+     * The bare link inside a share sentence, whichever site it belongs to.
+     *
+     * Each parser knows its own hosts, so the RedBook one is asked first and
+     * only falls through to the Douyin cleaner when it finds nothing.
+     */
+    fun extractUrl(input: String): String {
+        val redBook = redBookParser.extractUrl(input)
+        if (redBookParser.isRedBookUrl(redBook)) return redBook
+        return douyinParser.extractUrl(input)
+    }
 
-    fun isDouyinUrl(url: String): Boolean = douyinParser.isDouyinUrl(url)
+    /** True for a link this app can parse, from either site. */
+    fun isDouyinUrl(url: String): Boolean =
+        douyinParser.isDouyinUrl(url) || redBookParser.isRedBookUrl(url)
 
     fun clearPreview() {
         _previewMetadata.value = null

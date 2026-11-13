@@ -633,7 +633,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                     if (!viewModel.isDouyinUrl(link)) {
                                                         android.widget.Toast.makeText(
                                                             context,
-                                                            "剪贴板内容不是抖音链接",
+                                                            "剪贴板内容不是抖音或小红书链接",
                                                             android.widget.Toast.LENGTH_SHORT,
                                                         ).show()
                                                         return@FloatingActionButton
@@ -773,7 +773,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            "当前版本仅支持抖音直链解析，其余平台已移除。",
+                            "支持抖音与小红书链接解析（视频 / 图文 / 音频）。",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1124,7 +1124,7 @@ fun MainDownloaderTab(
                     top = 108.dp + contentPadding.calculateTopPadding(),
                     // The floating bar sits over the bottom of this column. 168dp clears
                     // it with room for the last row of a gallery grid.
-                    bottom = 168.dp + contentPadding.calculateBottomPadding(),
+                    bottom = 96.dp + contentPadding.calculateBottomPadding(),
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1223,7 +1223,8 @@ fun MainDownloaderTab(
                 // A gallery card has its own tappable grid, and a card-level click
                 // wins over the tiles inside it. Only non-gallery cards open the
                 // preview sheet from the card body.
-                Card(                    onClick = { if (!isImageOrGallery) showPreviewSheet = true },
+                Card(
+                    onClick = { if (!isImageOrGallery) showPreviewSheet = true },
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(24.dp),
