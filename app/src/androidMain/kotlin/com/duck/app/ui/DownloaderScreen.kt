@@ -311,9 +311,11 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
     // The context is a ComponentActivity in every real window, but a preview or a
     // wrapped context would make this cast fail, and the !! then crashed on launch.
     // Falling back to Compact just means the narrow layout, which is always safe.
+    // calculateWindowSizeClass is itself composable, so it cannot live inside remember.
+    // Calling it unconditionally and using the result is safe; only the cast can fail.
     val activity = LocalContext.current as? androidx.activity.ComponentActivity
     val isExpanded = if (activity != null) {
-        val windowSize = remember(activity) { calculateWindowSizeClass(activity) }
+        val windowSize = calculateWindowSizeClass(activity)
         windowSize.widthSizeClass != WindowWidthSizeClass.Compact
     } else {
         false
