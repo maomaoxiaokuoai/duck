@@ -376,7 +376,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      */
     private fun stripMarkdown(raw: String): String {
         return raw.lineSequence()
-            .joinToString(chr(10)) { line ->
+            .joinToString("\n") { line ->
                 line
                     .replace(Regex("^#{1,6}\\s*"), "")
                     .replace("**", "")
