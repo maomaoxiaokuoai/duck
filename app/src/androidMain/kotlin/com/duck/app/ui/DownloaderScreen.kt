@@ -1148,11 +1148,13 @@ fun MainDownloaderTab(
                             // media it is, how big the file is, when it was published and
                             // when we fetched it. Kept as one wrapped line so the card stays
                             // compact however many of them are present.
+                            // What the post is, not when we fetched it: the resolve time
+                            // belongs on the detail sheet, where it is a fact about this
+                            // entry rather than about the clip.
                             val facts = listOfNotNull(
                                 meta.media_kind?.let { kindLabel(it) },
                                 meta.media_size?.takeIf { it > 0 }?.let { formatBytes(it) },
                                 meta.create_time?.let { formatPostDateTime(it) },
-                                meta.resolved_at?.let { "解析于 " + formatClock(it) },
                             )
                             if (facts.isNotEmpty()) {
                                 Spacer(Modifier.height(10.dp))
@@ -2360,9 +2362,24 @@ fun LogsTab(
                                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                         )
                                         Spacer(Modifier.height(4.dp))
+                                        // Type and publish date, so the list says what each
+                                        // entry is without opening it.
+                                        val itemFacts = listOfNotNull(
+                                            log.platform ?: "抖音",
+                                            log.duration?.let { formatDuration(it) },
+                                            log.createTime?.let { formatPostDateTime(it) },
+                                        )
+                                        Text(
+                                            itemFacts.joinToString(" · "),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                        )
+                                        Spacer(Modifier.height(2.dp))
                                         Text(
                                             log.status, 
-                                            style = MaterialTheme.typography.bodySmall, 
+                                            style = MaterialTheme.typography.labelSmall, 
                                             color = if (log.status == "Success") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
                                         )
                                     }
@@ -2453,12 +2470,21 @@ fun LogsTab(
 
                 val metaLine = listOfNotNull(
                     log.platform ?: "抖音",
+                    log.duration?.let { formatDuration(it) },
                     log.createTime?.let { formatPostDate(it) },
                 ).joinToString(" · ")
                 Text(
                     metaLine,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                // When this entry was produced. It describes the record rather than the
+                // clip, so it sits under the facts about the post.
+                Text(
+                    "下载于 " + formatClock(log.timestamp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
                 )
 
                 val stats = listOfNotNull(
