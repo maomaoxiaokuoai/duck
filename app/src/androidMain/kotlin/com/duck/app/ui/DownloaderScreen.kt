@@ -1255,17 +1255,24 @@ fun MainDownloaderTab(
                         // Two downloads, one per rendition. Both are plain filled
                         // buttons so the pair reads as equal choices, and each starts
                         // downloading immediately rather than describing the stream.
+                        // Both are the tonal style, so the pair reads as two equal
+                        // renderings of the same post rather than a primary action
+                        // beside a secondary one.
                         Button(
                             onClick = {
                                 showPreviewSheet = false
                                 viewModel.downloadMedia(url = url, quality = quality, mode = "video")
                             },
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier.weight(1f).height(52.dp),
+                            shape = RoundedCornerShape(100),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ),
                         ) {
                             Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("视频", maxLines = 1)
+                            Text("Video", maxLines = 1)
                         }
 
                         Button(
@@ -1273,12 +1280,16 @@ fun MainDownloaderTab(
                                 showPreviewSheet = false
                                 viewModel.downloadMedia(url = url, quality = quality, mode = "audio")
                             },
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier.weight(1f).height(52.dp),
+                            shape = RoundedCornerShape(100),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ),
                         ) {
                             Icon(Icons.Default.MusicNote, null, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("音频", maxLines = 1)
+                            Text("Music", maxLines = 1)
                         }
                     }
                     Spacer(Modifier.height(16.dp))
