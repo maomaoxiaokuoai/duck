@@ -619,20 +619,26 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                         android.widget.Toast.LENGTH_SHORT,
                                                     ).show()
                                                 }
-                                                !viewModel.isDouyinUrl(text) -> {
-                                                    android.widget.Toast.makeText(
-                                                        context,
-                                                        "剪贴板内容不是抖音链接",
-                                                        android.widget.Toast.LENGTH_SHORT,
-                                                    ).show()
-                                                }
                                                 else -> {
+                                                    // Resolve first, then check. The clipboard
+                                                    // holds a whole share-sentence, and asking
+                                                    // URL() to parse that fails, which is why
+                                                    // this route used to reject valid links.
+                                                    val link = viewModel.extractUrl(text)
+                                                    if (!viewModel.isDouyinUrl(link)) {
+                                                        android.widget.Toast.makeText(
+                                                            context,
+                                                            "剪贴板内容不是抖音链接",
+                                                            android.widget.Toast.LENGTH_SHORT,
+                                                        ).show()
+                                                        return@FloatingActionButton
+                                                    }
                                                     // The bolt is the one-tap path: it takes the
                                                     // clipboard link straight through to a
                                                     // download. The field's paste button is the
                                                     // one that stops at a preview.
-                                                    url = text
-                                                    viewModel.downloadMedia(text, quality, downloadMode)
+                                                    url = link
+                                                    viewModel.downloadMedia(link, quality, downloadMode)
                                                 }
                                             }
                                         },
@@ -1111,9 +1117,12 @@ fun MainDownloaderTab(
         }
 
         val performAction: () -> Unit = {
-            clipboardManager.getText()?.let { 
-                onUrlChange(it.text)
-                viewModel.fetchPreview(it.text, quality, downloadMode)
+            clipboardManager.getText()?.let { clip ->
+                // Put the resolved link in the field rather than the whole sentence the
+                // share button copied.
+                val link = viewModel.extractUrl(clip.text)
+                onUrlChange(link)
+                viewModel.fetchPreview(link, quality, downloadMode)
             }
         }
 
@@ -1128,9 +1137,19 @@ fun MainDownloaderTab(
             ) {
                 OutlinedTextField(
                     value = url,
-                    onValueChange = { 
-                        onUrlChange(it)
-                        if (it.isEmpty()) viewModel.clearPreview() 
+                    onValueChange = { typed ->
+                        // A pasted share is a sentence, and showing that sentence in a
+                        // field that claims to hold a link is confusing. When the text
+                        // looks like it contains a URL but is not one, keep only the link.
+                        val cleaned = if (typed.startsWith("http")) {
+                            typed
+                        } else if (typed.contains("http")) {
+                            viewModel.extractUrl(typed)
+                        } else {
+                            typed
+                        }
+                        onUrlChange(cleaned)
+                        if (cleaned.isEmpty()) viewModel.clearPreview()
                     },
                     placeholder = { Text(stringResource(R.string.search_or_paste_link)) },
                     modifier = Modifier.weight(1f),

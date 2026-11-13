@@ -232,7 +232,13 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             connectTimeoutMillis = 30_000
             socketTimeoutMillis = 30_000
         }
-
+        // Douyin hands out several links for the same clip and the first is often a 302
+        // to a signed CDN URL. Without this plugin the client treated that 302 as a
+        // failure, which is why one post downloaded and the next reported an error.
+        install(io.ktor.client.plugins.HttpRedirect) {
+            maxJumps = 5
+            checkHttpMethod = false
+        }
     }
 
     private val downloader = FileDownloader(application, client)
@@ -456,7 +462,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             result
         }
 
-    fun fetchPreview(url: String, quality: String, mode: String = "auto") {
+    fun fetchPreview(rawUrl: String, quality: String, mode: String = "auto") {
+        val url = douyinParser.extractUrl(rawUrl)
         currentPreviewJob?.cancel()
         currentPreviewJob = viewModelScope.launch {
             clearConsole()
@@ -486,6 +493,15 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     /** True when [url] looks like something the parser can handle. */
+    /**
+     * Pulls the link out of whatever was copied.
+     *
+     * A Douyin share is a sentence with the link inside it, so the raw clipboard text is
+     * not a URL and cannot be checked as one. Callers run it through here first, then ask
+     * whether the result is a Douyin link.
+     */
+    fun extractUrl(input: String): String = douyinParser.extractUrl(input)
+
     fun isDouyinUrl(url: String): Boolean = douyinParser.isDouyinUrl(url)
 
     fun clearPreview() {
@@ -503,7 +519,11 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * There is exactly one path now: parse, then plain HTTP download. A failed parse is
      * reported to the user; nothing falls back to a removed engine.
      */
-    fun downloadMedia(url: String, quality: String, mode: String = "auto") {
+    fun downloadMedia(rawUrl: String, quality: String, mode: String = "auto") {
+        // Everything downstream keys off the link, and callers may hand over a whole
+        // share-sentence. Normalising once here means the parser, the log rows and the
+        // duplicate check all see the same clean URL.
+        val url = douyinParser.extractUrl(rawUrl)
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
             _uiState.value = DownloadState.Downloading(0f)
