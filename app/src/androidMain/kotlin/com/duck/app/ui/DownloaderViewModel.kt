@@ -810,25 +810,49 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * A gallery download saves every page at once; this is for the grid, where the
      * user taps one tile and expects only that image on disk.
      */
-    fun downloadOneImage(imageUrl: String) {
+    /**
+     * Saves one image from a gallery post.
+     *
+     * [title] becomes the history row and the file name, so a saved page still
+     * says which post it came from.
+     */
+    fun downloadOneImage(imageUrl: String, title: String? = null) {
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
             val notificationId = System.currentTimeMillis().toInt()
-            lastNotificationId = notificationId
+lastNotificationId = notificationId
             try {
                 _uiState.value = DownloadState.Downloading(0f)
-                val name = "image_" + System.currentTimeMillis() + ".jpg"
+                val safe = sanitizeFileName(title ?: "image")
+                val name = safe + "_" + System.currentTimeMillis() + ".jpg"
+                val cachedThumb = saveThumbnailToCache(imageUrl, null)
+                var savedPath: String? = null
+                var savedSize = 0L
                 downloader.downloadFile(
                     url = imageUrl,
                     fileName = name,
                     relativePath = "Pictures/duck",
                 ).collect { state ->
                     _uiState.value = state
+                    if (state is DownloadState.Downloading) savedSize = state.downloadedBytes
                     if (state is DownloadState.Success) {
                         downloader.finalizeFile(Uri.parse(state.path), name)
+                        savedPath = state.path
                         logToConsole("图片已保存: Pictures/duck/" + name)
                     }
                 }
+                logDao.insertLog(
+                    DownloadLog(
+                        title = title ?: "图片",
+                        url = imageUrl,
+                        status = "Success",
+                        path = savedPath,
+                        thumbnailPath = cachedThumb,
+                        platform = "抖音",
+                        mediaKind = "gallery",
+                        fileSize = savedSize.takeIf { it > 0 },
+                    )
+                )
             } catch (e: Exception) {
                 _uiState.value = DownloadState.Error(e.message ?: "图片下载失败")
             }

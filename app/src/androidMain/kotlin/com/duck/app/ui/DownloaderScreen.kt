@@ -113,6 +113,9 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Download
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -1229,6 +1232,9 @@ fun MainDownloaderTab(
                         // tile and each tile downloads on its own.
                         if (isImageOrGallery && !meta.urls.isNullOrEmpty()) {
                             val galleryUrls = meta.urls.filter { it.isNotBlank() }
+                            // Nothing is selected until the user taps a tile,
+                            // so the grid starts neutral.
+                            val selected = remember { mutableStateListOf<String>() }
                             Column(
                                 modifier = Modifier.padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1239,12 +1245,20 @@ fun MainDownloaderTab(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        "共 " + galleryUrls.size + " 张",
+                                        if (selected.isEmpty()) {
+                                            "共 " + galleryUrls.size + " 张"
+                                        } else {
+                                            "已选 " + selected.size + " / " + galleryUrls.size + " 张"
+                                        },
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = if (selected.isEmpty()) {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        } else {
+                                            MaterialTheme.colorScheme.primary
+                                        },
                                     )
                                     Text(
-                                        "点图片单独下载",
+                                        if (selected.isEmpty()) "点图片开始选择" else "点图片取消选择",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.outline,
                                     )
@@ -1258,6 +1272,7 @@ fun MainDownloaderTab(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
                                         rowUrls.forEach { imageUrl ->
+                                            val isPicked = selected.contains(imageUrl)
                                             Box(
                                                 modifier = Modifier
                                                     .weight(1f)
@@ -1265,7 +1280,8 @@ fun MainDownloaderTab(
                                                     .clip(RoundedCornerShape(12.dp))
                                                     .background(MaterialTheme.colorScheme.surface)
                                                     .clickable {
-                                                        viewModel.downloadOneImage(imageUrl)
+                                                        if (isPicked) selected.remove(imageUrl)
+                                                        else selected.add(imageUrl)
                                                     },
                                             ) {
                                                 AsyncImage(
@@ -1274,6 +1290,22 @@ fun MainDownloaderTab(
                                                     modifier = Modifier.fillMaxSize(),
                                                     contentScale = ContentScale.Crop,
                                                 )
+
+                                                // A picked tile dims and shows a check so the
+                                                // chosen set is readable at a glance.
+                                                if (isPicked) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .background(Color.Black.copy(alpha = 0.45f)),
+                                                    )
+                                                    Icon(
+                                                        imageVector = Icons.Default.Check,
+                                                        contentDescription = null,
+                                                        tint = Color.White,
+                                                        modifier = Modifier.align(Alignment.Center).size(32.dp),
+                                                    )
+                                                }
                                             }
                                         }
                                         // Keep the last row aligned with the grid above.
@@ -1282,8 +1314,31 @@ fun MainDownloaderTab(
                                         }
                                     }
                                 }
+
+                                // Saves only the picked tiles. With nothing picked the bolt
+                                // in the bar still takes the whole set.
+                                if (selected.isNotEmpty()) {
+                                    Button(
+                                        onClick = {
+                                            val picks = selected.toList()
+                                            selected.clear()
+                                            picks.forEach { imageUrl ->
+                                                viewModel.downloadOneImage(imageUrl, meta.title)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                                        shape = RoundedCornerShape(100),
+                                        colors = ButtonDefaults.filledTonalButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        ),
+                                    ) {
+                                        Icon(Icons.Default.Download, null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("下载选中 " + selected.size + " 张")
+                                    }
+                                }
                             }
-                        }
                         // Videos get a single cover. Galleries render as a grid
                         // below instead, so their cover would be a duplicate.
                         if (!isImageOrGallery) {
