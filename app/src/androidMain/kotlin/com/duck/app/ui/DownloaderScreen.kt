@@ -630,6 +630,80 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
             )
         }
     }
+
+    viewModel.updateAvailable.value?.let { updateInfo ->
+        val progress = viewModel.updateDownloadProgress.value
+        val isDownloading = progress >= 0f
+
+        AlertDialog(
+            onDismissRequest = { if (!isDownloading) viewModel.updateAvailable.value = null },
+            title = {
+                Text(
+                    if (isDownloading) "正在下载更新"
+                    else "发现新版本 " + updateInfo.version,
+                )
+            },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    if (isDownloading) {
+                        Text("下载完成后会自动打开安装程序。")
+                        Spacer(Modifier.height(16.dp))
+                        LinearProgressIndicator(
+                            progress = { progress.coerceIn(0f, 1f) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text(
+                            text = (progress * 100).toInt().toString() + "%",
+                            modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    } else {
+                        if (updateInfo.notes.isNotBlank()) {
+                            Text(
+                                text = "更新内容",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(
+                                    text = updateInfo.notes.take(MAX_RELEASE_NOTES_CHARS),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(12.dp),
+                                )
+                            }
+                        } else {
+                            Text("GitHub 上有新版本可用。")
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (!isDownloading) {
+                            viewModel.downloadUpdate(context, updateInfo.apkUrl)
+                        }
+                    },
+                    enabled = !isDownloading,
+                ) {
+                    Text(if (isDownloading) "下载中…" else "立即更新")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.updateAvailable.value = null },
+                    enabled = !isDownloading,
+                ) {
+                    Text(stringResource(R.string.later))
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -815,79 +889,6 @@ fun MainDownloaderTab(
         }
     }
 
-    viewModel.updateAvailable.value?.let { updateInfo ->
-        val progress = viewModel.updateDownloadProgress.value
-        val isDownloading = progress >= 0f
-
-        AlertDialog(
-            onDismissRequest = { if (!isDownloading) viewModel.updateAvailable.value = null },
-            title = {
-                Text(
-                    if (isDownloading) "正在下载更新"
-                    else "发现新版本 " + updateInfo.version,
-                )
-            },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    if (isDownloading) {
-                        Text("下载完成后会自动打开安装程序。")
-                        Spacer(Modifier.height(16.dp))
-                        LinearProgressIndicator(
-                            progress = { progress.coerceIn(0f, 1f) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Text(
-                            text = (progress * 100).toInt().toString() + "%",
-                            modifier = Modifier.align(Alignment.End).padding(top = 8.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    } else {
-                        if (updateInfo.notes.isNotBlank()) {
-                            Text(
-                                text = "更新内容",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                Text(
-                                    text = updateInfo.notes.take(MAX_RELEASE_NOTES_CHARS),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    modifier = Modifier.padding(12.dp),
-                                )
-                            }
-                        } else {
-                            Text("GitHub 上有新版本可用。")
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (!isDownloading) {
-                            viewModel.downloadUpdate(context, updateInfo.apkUrl)
-                        }
-                    },
-                    enabled = !isDownloading,
-                ) {
-                    Text(if (isDownloading) "下载中…" else "立即更新")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { viewModel.updateAvailable.value = null },
-                    enabled = !isDownloading,
-                ) {
-                    Text(stringResource(R.string.later))
-                }
-            }
-        )
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
     Column(
