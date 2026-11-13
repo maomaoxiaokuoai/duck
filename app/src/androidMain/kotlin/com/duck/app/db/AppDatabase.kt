@@ -69,7 +69,15 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
-@Database(entities = [DownloadLog::class], version = 6)
+
+/** Adds the on-disk size the history rows display. */
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN fileSize INTEGER")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 7)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }

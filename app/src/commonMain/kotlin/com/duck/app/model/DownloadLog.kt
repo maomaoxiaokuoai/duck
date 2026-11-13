@@ -30,4 +30,6 @@ data class DownloadLog(
     val duration: Long? = null,
     /** video, gallery or audio, so the list can say what was saved. */
     val mediaKind: String? = null,
+    /** Bytes on disk, as reported by MediaStore after the write. */
+    val fileSize: Long? = null,
 )

@@ -50,6 +50,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             com.duck.app.db.MIGRATION_3_4,
             com.duck.app.db.MIGRATION_4_5,
             com.duck.app.db.MIGRATION_5_6,
+            com.duck.app.db.MIGRATION_6_7,
         )
         // A history table is only convenience data, so if a migration path is ever
         // missing the app should still open with an empty list instead of crashing on
@@ -675,6 +676,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 collectCount = result.collect_count,
                 duration = result.duration,
                 mediaKind = result.media_kind ?: if (result.is_gallery == true) "gallery" else "video",
+                fileSize = result.media_size,
             )
         )
         notificationHelper.showProgressNotification(notificationId, title, 100)
@@ -735,6 +737,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         collectCount = result.collect_count,
                         duration = result.duration,
                         mediaKind = if (mode == "audio") "audio" else (result.media_kind ?: "video"),
+                        fileSize = queryFileSize(savedUri) ?: result.media_size,
                     )
                 )
                 logToConsole("文件已保存: $targetPath/$fileName")
@@ -788,6 +791,19 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * path separators. A title made entirely of emoji collapses to underscores, and an
      * empty one would leave a name starting with "_"; both get a readable fallback.
      */
+
+    /**
+     * Bytes actually written for [uri].
+     *
+     * The platform-reported size is a hint; this asks the file that was just saved, which
+     * is what the history row should show. Returns null when the query fails.
+     */
+    private fun queryFileSize(uri: Uri): Long? = runCatching {
+        application.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+            pfd.statSize.takeIf { it > 0 }
+        }
+    }.getOrNull()
+
     private fun sanitizeFileName(title: String): String {
         val cleaned = title
             .replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_")

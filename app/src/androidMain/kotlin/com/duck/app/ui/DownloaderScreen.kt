@@ -1351,6 +1351,9 @@ fun MainDownloaderTab(
         }
         if (showPreviewSheet && preview != null) {
             val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            // Closing through hide() plays the sheet's own slide-down; clearing the flag
+            // alone removed it in a single frame.
+            val closeScope = rememberCoroutineScope()
             val meta = preview
             val isImageOrGallery = meta.is_gallery == true || meta.ext in IMAGE_EXTENSIONS
 
@@ -1468,7 +1471,10 @@ fun MainDownloaderTab(
                         // beside a secondary one.
                         Button(
                             onClick = {
-                                showPreviewSheet = false
+                                closeScope.launch {
+                                    sheetState.hide()
+                                    showPreviewSheet = false
+                                }
                                 viewModel.downloadMedia(url = url, quality = quality, mode = "video")
                             },
                             modifier = Modifier.weight(1f).height(52.dp),
@@ -1485,7 +1491,10 @@ fun MainDownloaderTab(
 
                         Button(
                             onClick = {
-                                showPreviewSheet = false
+                                closeScope.launch {
+                                    sheetState.hide()
+                                    showPreviewSheet = false
+                                }
                                 viewModel.downloadMedia(url = url, quality = quality, mode = "audio")
                             },
                             modifier = Modifier.weight(1f).height(52.dp),
@@ -2307,7 +2316,6 @@ fun DeveloperScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, contentP
                     Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary)
                     Column(modifier = Modifier.weight(1f)) {
                         Text("duck v${com.duck.app.BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-                        Text("纯 HTTP 直链下载 · 仅支持抖音", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
@@ -2397,7 +2405,18 @@ fun LogsTab(
                 Text(stringResource(R.string.no_history_yet), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.outline)
             }
         } else {
+            val listState = rememberLazyListState()
+
+            // A new download inserts at the top. Without this the list stayed wherever the
+            // user had scrolled, so the entry they just created was off-screen.
+            LaunchedEffect(history.firstOrNull()?.id) {
+                if (history.isNotEmpty()) {
+                    listState.animateScrollToItem(0)
+                }
+            }
+
             LazyColumn(
+                state = listState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp + contentPadding.calculateBottomPadding())
             ) {
@@ -2474,6 +2493,7 @@ fun LogsTab(
                                         // downloaded is what the list is about.
                                         val itemFacts = listOfNotNull(
                                             log.platform ?: "抖音",
+                                            log.fileSize?.takeIf { it > 0 }?.let { formatBytes(it) },
                                             log.duration?.let { formatDuration(it) },
                                             formatPostDateTime(log.timestamp / 1000),
                                         )
@@ -2683,8 +2703,17 @@ fun LogsTab(
                 
                 // Tonal rather than filled: closing a sheet is not the primary action
                 // of the screen, and a solid bar there read as a call to action.
+                //
+                // hide() runs the sheet's own slide-down before the state is cleared;
+                // setting the state alone makes it vanish in one frame.
+                val closeScope = rememberCoroutineScope()
                 Button(
-                    onClick = { selectedLog = null },
+                    onClick = {
+                        closeScope.launch {
+                            sheetState.hide()
+                            selectedLog = null
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
                     colors = ButtonDefaults.filledTonalButtonColors(
