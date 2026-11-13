@@ -59,28 +59,37 @@ class FileDownloader(private val context: Context, private val client: HttpClien
                 
                 onUriCreated?.invoke(uri)
                 
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    var bytesRead = 0L
-                    val buffer = ByteArray(8192)
-                    var lastEmitTime = System.currentTimeMillis()
-                    var bytesSinceLastEmit = 0L
-                    while (!channel.isClosedForRead) {
-                        val read = channel.readAvailable(buffer, 0, buffer.size)
-                        if (read > 0) {
-                            outputStream.write(buffer, 0, read)
-                            bytesRead += read
-                            bytesSinceLastEmit += read
-                            val now = System.currentTimeMillis()
-                            val timeDiff = now - lastEmitTime
-                            if (timeDiff >= 500 || channel.isClosedForRead) {
-                                val speedBps = (bytesSinceLastEmit * 1000L) / timeDiff.coerceAtLeast(1L)
-                                val prog = if (contentLength > 0) bytesRead.toFloat() / contentLength else 0f
-                                emit(DownloadState.Downloading(prog, bytesRead, contentLength, speedBps))
-                                lastEmitTime = now
-                                bytesSinceLastEmit = 0L
+                // A MediaStore row is inserted with IS_PENDING=1 and only cleared once
+                // the bytes are all there. If the transfer dies half way, that flag stays
+                // set and the entry is invisible in the gallery while still occupying
+                // storage. Removing it on failure keeps the library honest.
+                try {
+                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        var bytesRead = 0L
+                        val buffer = ByteArray(8192)
+                        var lastEmitTime = System.currentTimeMillis()
+                        var bytesSinceLastEmit = 0L
+                        while (!channel.isClosedForRead) {
+                            val read = channel.readAvailable(buffer, 0, buffer.size)
+                            if (read > 0) {
+                                outputStream.write(buffer, 0, read)
+                                bytesRead += read
+                                bytesSinceLastEmit += read
+                                val now = System.currentTimeMillis()
+                                val timeDiff = now - lastEmitTime
+                                if (timeDiff >= 500 || channel.isClosedForRead) {
+                                    val speedBps = (bytesSinceLastEmit * 1000L) / timeDiff.coerceAtLeast(1L)
+                                    val prog = if (contentLength > 0) bytesRead.toFloat() / contentLength else 0f
+                                    emit(DownloadState.Downloading(prog, bytesRead, contentLength, speedBps))
+                                    lastEmitTime = now
+                                    bytesSinceLastEmit = 0L
+                                }
                             }
                         }
                     }
+                } catch (inner: Exception) {
+                    runCatching { context.contentResolver.delete(uri, null, null) }
+                    throw inner
                 }
                 emit(DownloadState.Success(uri.toString()))
             }

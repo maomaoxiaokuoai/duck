@@ -761,8 +761,20 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             .build()
     }
 
-    private fun sanitizeFileName(title: String): String =
-        title.replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_").take(60)
+    /**
+     * A filename that survives every filesystem this app writes to.
+     *
+     * Everything outside letters, digits and CJK becomes an underscore, which also covers
+     * path separators. A title made entirely of emoji collapses to underscores, and an
+     * empty one would leave a name starting with "_"; both get a readable fallback.
+     */
+    private fun sanitizeFileName(title: String): String {
+        val cleaned = title
+            .replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_")
+            .trim('_')
+            .take(60)
+        return cleaned.ifBlank { "douyin" }
+    }
 
     fun openSavedFolder() {
         try {

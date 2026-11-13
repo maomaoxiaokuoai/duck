@@ -308,9 +308,16 @@ internal fun extractBareUrl(raw: String): String {
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    // The context is a ComponentActivity in every real window, but a preview or a
+    // wrapped context would make this cast fail, and the !! then crashed on launch.
+    // Falling back to Compact just means the narrow layout, which is always safe.
     val activity = LocalContext.current as? androidx.activity.ComponentActivity
-    val windowSize = calculateWindowSizeClass(activity!!)
-    val isExpanded = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
+    val isExpanded = if (activity != null) {
+        val windowSize = remember(activity) { calculateWindowSizeClass(activity) }
+        windowSize.widthSizeClass != WindowWidthSizeClass.Compact
+    } else {
+        false
+    }
     
     var selectedTab by remember { mutableIntStateOf(0) }
 
