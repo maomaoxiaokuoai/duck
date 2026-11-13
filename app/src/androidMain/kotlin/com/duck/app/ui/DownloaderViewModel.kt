@@ -355,13 +355,24 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      */
     private fun stripMarkdown(raw: String): String {
         return raw.lineSequence()
-            .joinToString("\n") { line ->
+            .map { line ->
                 line
                     .replace(Regex("^#{1,6}\\s*"), "")
                     .replace("**", "")
-                    .replace(Regex("^\\s*[-*+]\\s+"), "· ")
+                    .replace("__", "")
                     .trimEnd()
             }
+            .map { line ->
+                val bullet = Regex("^\\s*[-*+]\\s+(.*)$").find(line)
+                if (bullet != null) {
+                    val rest = bullet.groupValues[1].trim()
+                    if (rest.isEmpty()) "" else "\u00B7 " + rest
+                } else {
+                    line
+                }
+            }
+            .joinToString("\n")
+            .replace(Regex("\n{3,}"), "\n\n")
             .trim()
     }
 
