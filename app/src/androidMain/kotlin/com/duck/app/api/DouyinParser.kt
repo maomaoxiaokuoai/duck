@@ -356,33 +356,41 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             }
         }
 
-        // Douyin lists several renditions. play_addr is the playback stream, capped
-        // lower than the file it serves for download; download_addr and the bit_rate
-        // entries carry the full-resolution encode. Pick the largest geometry, then the
-        // largest byte count, so the saved file is the best one offered.
+        // Douyin lists several renditions and they are not interchangeable.
+        //
+        // download_addr is the largest file, but its watermark is burned into the
+        // picture, which defeats the point of this app. The play_addr family is the
+        // clean stream: no mark, slightly smaller. Between the clean candidates, take
+        // the biggest geometry then the biggest byte count.
         val video = item["video"]?.asObject()
         if (video != null) {
-            val candidates = mutableListOf<Pair<Long, String>>()
+            val clean = mutableListOf<Pair<Long, String>>()
 
-            fun consider(addr: JsonObject?) {
+            fun considerClean(addr: JsonObject?) {
                 if (addr == null) return
                 val urls = addr["url_list"]?.asArray()?.mapNotNull { it.asString() }.orEmpty()
                 val best = urls.firstOrNull { it.startsWith("http") } ?: return
                 val pixels = (addr["width"]?.asString()?.toLongOrNull() ?: 0L) *
                     (addr["height"]?.asString()?.toLongOrNull() ?: 0L)
                 val bytes = addr["data_size"]?.asString()?.toLongOrNull() ?: 0L
-                candidates += (pixels * 1_000_000L + bytes) to best
+                clean += (pixels * 1_000_000L + bytes) to best
             }
 
-            consider(video["download_addr"]?.asObject())
-            consider(video["play_addr_h264"]?.asObject())
-            consider(video["play_addr"]?.asObject())
+            considerClean(video["play_addr_h264"]?.asObject())
+            considerClean(video["play_addr"]?.asObject())
             video["bit_rate"]?.asArray()?.forEach { entry ->
-                consider(entry.jsonObject["play_addr"]?.asObject())
+                considerClean(entry.jsonObject["play_addr"]?.asObject())
             }
 
-            candidates.maxByOrNull { it.first }?.let { (_, url) ->
-                result += Media(playUrl(url), extensionOf(url, "mp4"))
+            val chosen = clean.maxByOrNull { it.first }?.second
+                // Only when the clean set is empty does a marked file beat no file.
+                ?: video["download_addr"]?.asObject()
+                    ?.get("url_list")?.asArray()
+                    ?.mapNotNull { it.asString() }
+                    ?.firstOrNull { it.startsWith("http") }
+
+            if (chosen != null) {
+                result += Media(playUrl(chosen), extensionOf(chosen, "mp4"))
             }
         }
 
