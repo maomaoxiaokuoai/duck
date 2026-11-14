@@ -294,12 +294,17 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             }
         }
 
-        val videoUrls = detail["video"]?.asObject()
-            ?.get("playAddr")?.asArray()
-            ?.mapNotNull { it.jsonObject["src"]?.asString() }
-            .orEmpty()
-        videoUrls.firstOrNull { it.startsWith("http") }?.let {
-            items += Media(playUrl(it), "mp4")
+        // The post-level video belongs to a video post. On a gallery it is a
+        // leftover (usually the background music), and appending it added a
+        // phantom second page that was not an image at all.
+        if (items.isEmpty()) {
+            val videoUrls = detail["video"]?.asObject()
+                ?.get("playAddr")?.asArray()
+                ?.mapNotNull { it.jsonObject["src"]?.asString() }
+                .orEmpty()
+            videoUrls.firstOrNull { it.startsWith("http") }?.let {
+                items += Media(playUrl(it), "mp4")
+            }
         }
 
         if (items.isEmpty()) return null
@@ -338,30 +343,31 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
      * keeps the clip under the post-level video.bitRateList, not on the image: a per-image
      * video.playAddr exists on newer payloads and is checked first.
      */
-    private fun liveClipFor(image: JsonObject, detail: JsonObject): String? {
-        image["video"]?.asObject()
-            ?.get("playAddr")?.asArray()
+    /**
+     * The clip that animates one page of a Douyin gallery.
+     *
+     * A moving image carries its own video object on the image itself: uri, duration,
+     * dataSize and a playAddr ARRAY. A post-level bitRateList exists too, but it holds
+     * the background music for galleries, so the per-image object is the only reliable
+     * source. Returns null for an ordinary still.
+     */
+    private fun liveClipFor(image: JsonObject, @Suppress("UNUSED_PARAMETER") detail: JsonObject): String? {
+        val video = image["video"]?.asObject() ?: return null
+        // A still has video == null, or a video whose uri is not a real clip id.
+        val uri = video["uri"]?.asString().orEmpty()
+        if (!uri.startsWith("v0")) return null
+
+        // playAddr is an array of { src } entries.
+        video["playAddr"]?.asArray()
             ?.firstOrNull { it is JsonObject }
             ?.jsonObject
             ?.get("src")?.asString()
             ?.takeIf { it.startsWith("http") }
-            ?.let { return playUrl(it) }
+            ?.let { return it }
 
-        // Post-level fallback: only meaningful when the page says it is a live photo.
-        val isLive = image["livePhotoType"]?.asString()?.toIntOrNull() == 1 ||
-            image["clipType"]?.asString()?.toIntOrNull() == 5
-        if (!isLive) return null
-
-        return detail["video"]?.asObject()
-            ?.get("bitRateList")?.asArray()
-            ?.firstOrNull { it is JsonObject }
-            ?.jsonObject
-            ?.get("playAddr")?.asArray()
-            ?.firstOrNull { it is JsonObject }
-            ?.jsonObject
-            ?.get("src")?.asString()
-            ?.takeIf { it.startsWith("http") }
-            ?.let { playUrl(it) }
+        // Fall back to the id-based endpoint, which serves the same encode.
+        return "https://api-play.amemv.com/aweme/v1/play/?video_id=" + uri +
+            "&ratio=1080p&line=0&watermark=0&media_type=4"
     }
     private fun parsePage(pageUrl: String, html: String): ExtractionResult {
         Log.d(TAG, "page len=" + html.length + " pace=" + html.split("__pace_f").size + " router=" + html.split("_ROUTER_DATA").size + " aweme=" + html.split("awemeId").size)
