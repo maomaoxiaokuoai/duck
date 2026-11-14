@@ -65,9 +65,6 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
             implementation("androidx.media3:media3-exoplayer:1.2.1")
             implementation("androidx.media3:media3-ui:1.2.1")
-            // Bilibili serves 1080P as separate video and audio tracks, so the two
-            // have to be joined before the file is playable anywhere.
-            implementation("androidx.media3:media3-transformer:1.2.1")
             
         }
     }

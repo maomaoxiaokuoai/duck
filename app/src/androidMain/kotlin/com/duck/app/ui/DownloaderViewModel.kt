@@ -38,6 +38,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import com.duck.app.util.MotionPhotoWriter
+import com.duck.app.util.TrackMuxer
 
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
