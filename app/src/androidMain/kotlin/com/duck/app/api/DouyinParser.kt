@@ -108,7 +108,18 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         val text = input.trim()
         val all = Regex("https?://[^\\s\u3000]+").findAll(text).map { it.value }.toList()
 
-        val chosen = all.firstOrNull { isDouyinUrl(it) } ?: all.firstOrNull() ?: text
+        // Text typed over an existing URL can fuse two links into one string whose
+        // host is garbage. A candidate only counts when its host is something the
+        // app can actually request, otherwise the fused link wins by being the only
+        // one present and every later step fails on it.
+        val usable = all.filter { candidate ->
+            runCatching { URL(candidate).host }.getOrNull()
+                ?.let { host -> host.contains(".") && !host.contains(":") } == true
+        }
+        val chosen = usable.firstOrNull { isDouyinUrl(it) }
+            ?: usable.firstOrNull()
+            ?: all.firstOrNull()
+            ?: text
 
         return chosen
             .substringBefore('#')
