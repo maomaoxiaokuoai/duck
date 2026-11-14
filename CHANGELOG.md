@@ -1,3 +1,36 @@
+## v2.9.2 — 2026-11-15
+
+### 修复（动图偏移错位）
+
+v2.9.1 改用官方 `Camera:` 命名空间后，长度计算还有 5 字节偏差：
+
+```
+声明的主图长度: 579325
+实际视频起点:   579330   ← 差 5
+```
+
+**原因**：主图长度数字会随着自己变长。`0` 只有 1 位，`579325` 有 6 位，
+第二遍写进去的数字把 XMP 撑大了 5 字节，但用的还是第一遍量出的尺寸。
+
+**修复**：改成迭代收敛。每轮重新算「JPEG + APP1 段」的总长，直到声明的长度
+和实际写出的字节数一致。实测 2 轮即收敛。
+
+### 验证
+
+按官方 [Motion Photo format 1.0](https://developer.android.com/media/platform/motion-photo-format)
+逐项检查生成的字节流，**27 项全部通过**：
+
+- JPEG 容器结构（SOI / APP1 / 长度字段）
+- XMP 包完整性（xpacket、xmpmeta、rdf:RDF）
+- 三个命名空间（Camera / Container / Item）
+- 无废弃的 `GCamera` 前缀
+- 相机属性（MotionPhoto / Version / TimestampUs）
+- Container 目录与 rdf:Seq
+- Item 顺序：Primary 第一、MotionPhoto 第二
+- **主图长度 + 视频长度 == 文件总长**
+- **偏移处确实能读到 `ftyp`（MP4 魔数）**
+- 视频结束位置 == 文件末尾，其后无多余字节
+
 ## v2.9.1 — 2026-11-15
 
 ### 修复（动图格式不合规）

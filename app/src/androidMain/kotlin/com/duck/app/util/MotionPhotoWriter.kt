@@ -32,10 +32,11 @@ object MotionPhotoWriter {
      * Returns [jpeg] with [video] appended and the XMP block inserted, or null when the
      * inputs do not look like the expected formats.
      *
-     * The XMP has to state how long the primary image is, and that length includes the
-     * APP1 segment being inserted - so the packet is built twice: once to learn its own
-     * size, then again with the real figure. A reader that needs the primary length
-     * would otherwise measure the video from the wrong offset.
+     * The packet states how long the primary image is, and that figure includes the APP1
+     * segment holding the packet itself - a value that depends on how many digits the
+     * figure has. Two passes narrow it: the first measures a placeholder packet, the
+     * second writes the real figure, and any growth the digits caused is corrected by
+     * rebuilding until the declared length matches the bytes actually written.
      */
     fun build(jpeg: ByteArray, video: ByteArray): ByteArray? {
         if (!isJpeg(jpeg) || !isMp4(video)) {
@@ -45,19 +46,23 @@ object MotionPhotoWriter {
 
         val namespace = "http://ns.adobe.com/xap/1.0/\u0000".toByteArray(Charsets.ISO_8859_1)
 
-        // First pass: no primary length, purely to measure the packet.
-        val probe = namespace + buildXmp(0, video.size).toByteArray(Charsets.UTF_8)
-        // The APP1 length field counts itself, so the whole segment is payload + 4
-        // (two marker bytes plus the two-byte length).
-        val app1Size = probe.size + 4
-        if (probe.size + 2 > 0xFFFF) {
-            Log.d(TAG, "xmp too large: " + probe.size)
-            return null
+        // A still is everything before the clip: the JPEG plus the segment inserted.
+        // The segment is 2 marker bytes + the length field, which counts itself.
+        var stillLength = jpeg.size
+        var payload = ByteArray(0)
+        // The figure feeds its own size, so settle it; two rounds are enough in
+        // practice because a length only shifts by a digit at a boundary.
+        repeat(4) {
+            val candidate = namespace +
+                buildXmp(stillLength, video.size).toByteArray(Charsets.UTF_8)
+            // 2 marker bytes + 2 length bytes + the payload itself.
+            val total = jpeg.size + 4 + candidate.size
+            if (total == stillLength && payload.isNotEmpty()) return@repeat
+            stillLength = total
+            payload = candidate
         }
 
-        // Second pass: the still now includes the segment that was not there before.
-        val payload = namespace + buildXmp(jpeg.size + app1Size, video.size)
-            .toByteArray(Charsets.UTF_8)
+        if (payload.isEmpty()) return null
         if (payload.size + 2 > 0xFFFF) {
             Log.d(TAG, "xmp too large: " + payload.size)
             return null
