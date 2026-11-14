@@ -971,15 +971,15 @@ fun MainDownloaderTab(
     onDownloadFinished: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
+    // Lifted out of the card so the bolt can read it. Keeping it there meant
+    // the bolt had no idea what was selected.
+    val pickedImages = remember { mutableStateListOf<String>() }
     var qualityExpanded by remember { mutableStateOf(false) }
     var modeExpanded by remember { mutableStateOf(false) }
     var showFullscreenLogs by remember { mutableStateOf(false) }
     var showPreviewSheet by remember { mutableStateOf(false) }
     var showTerminalCard by remember { mutableStateOf(viewModel.getSetting("show_terminal_card", "true").toBoolean()) }
     var duplicateWarningUrl by remember { mutableStateOf<String?>(null) }
-    // Lifted out of the card so the bolt can read it. Keeping it there meant the
-    // bolt had no idea what was selected and only the in-card button could use it.
-    val pickedImages = remember { mutableStateListOf<String>() }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     

@@ -37,6 +37,7 @@ import com.duck.app.ui.theme.AppTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import com.duck.app.util.MotionPhotoWriter
 
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
@@ -973,7 +974,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
     }
 
     /** Writes bytes straight into the gallery and clears the pending flag. */
-    private fun saveImageBytes(fileName: String, bytes: ByteArray) {
+    private suspend fun saveImageBytes(fileName: String, bytes: ByteArray) {
         val uri = downloader.createMediaStoreUri(fileName, "Pictures/duck")
             ?: throw Exception("无法创建文件")
         getApplication<android.app.Application>().contentResolver
