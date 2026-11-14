@@ -137,6 +137,8 @@ internal fun formatCount(value: Long): String = when {
 internal fun kindLabel(kind: String): String = when (kind) {
     "gallery" -> "图文"
     "audio" -> "音频"
+    // A live photo is a still and a clip in one file, so it is neither of the above.
+    "live" -> "动图"
     else -> "视频"
 }
 
@@ -639,12 +641,20 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                         ).show()
                                                         return@FloatingActionButton
                                                     }
-                                                    // The bolt is the one-tap path: it takes the
-                                                    // clipboard link straight through to a
-                                                    // download. The field's paste button is the
-                                                    // one that stops at a preview.
+                                                    // The bolt is the one-tap path. What it
+                                                    // saves depends on the grid: picks win,
+                                                    // and an untouched grid means everything.
                                                     url = link
-                                                    viewModel.downloadMedia(link, quality, downloadMode)
+                                                    if (pickedImages.isNotEmpty()) {
+                                                        val picks = pickedImages.toList()
+                                                        pickedImages.clear()
+                                                        val postTitle = preview?.title
+                                                        picks.forEach { imageUrl ->
+                                                            viewModel.downloadOneImage(imageUrl, postTitle)
+                                                        }
+                                                    } else {
+                                                        viewModel.downloadMedia(link, quality, downloadMode)
+                                                    }
                                                 }
                                             }
                                         },
@@ -967,6 +977,9 @@ fun MainDownloaderTab(
     var showPreviewSheet by remember { mutableStateOf(false) }
     var showTerminalCard by remember { mutableStateOf(viewModel.getSetting("show_terminal_card", "true").toBoolean()) }
     var duplicateWarningUrl by remember { mutableStateOf<String?>(null) }
+    // Lifted out of the card so the bolt can read it. Keeping it there meant the
+    // bolt had no idea what was selected and only the in-card button could use it.
+    val pickedImages = remember { mutableStateListOf<String>() }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     
@@ -1239,9 +1252,7 @@ fun MainDownloaderTab(
                         // tile and each tile downloads on its own.
                         if (isImageOrGallery && !meta.urls.isNullOrEmpty()) {
                             val galleryUrls = meta.urls.filter { it.isNotBlank() }
-                            // Nothing is selected until the user taps a tile,
-                            // so the grid starts neutral.
-                            val selected = remember { mutableStateListOf<String>() }
+                            val selected = pickedImages
                             Column(
                                 modifier = Modifier.padding(12.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -1342,27 +1353,6 @@ fun MainDownloaderTab(
 
                                 // Saves only the picked tiles. With nothing picked the bolt
                                 // in the bar still takes the whole set.
-                                if (selected.isNotEmpty()) {
-                                    Button(
-                                        onClick = {
-                                            val picks = selected.toList()
-                                            selected.clear()
-                                            picks.forEach { imageUrl ->
-                                                viewModel.downloadOneImage(imageUrl, meta.title)
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                                        shape = RoundedCornerShape(100),
-                                        colors = ButtonDefaults.filledTonalButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        ),
-                                    ) {
-                                        Icon(Icons.Default.Download, null, modifier = Modifier.size(18.dp))
-                                        Spacer(Modifier.width(8.dp))
-                                        Text("下载选中 " + selected.size + " 张")
-                                    }
-                                }
                             }
                         }
                         // Videos get a single cover. Galleries render as a grid

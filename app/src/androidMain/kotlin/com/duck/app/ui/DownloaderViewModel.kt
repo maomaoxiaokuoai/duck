@@ -874,14 +874,18 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
     /**
      * Saves one image from a gallery post.
      *
-     * [title] becomes the history row and the file name, so a saved page still
-     * says which post it came from.
+     * [title] becomes the history row and the file name, so a saved page still says
+     * which post it came from.
+     *
+     * When [liveVideoUrl] is present the page is a live photo: the still and the clip
+     * are written out as a single Android motion photo, which the system gallery then
+     * animates on its own. That is why the result is still a .jpg and not two files.
      */
-    fun downloadOneImage(imageUrl: String, title: String? = null) {
+    fun downloadOneImage(imageUrl: String, title: String? = null, liveVideoUrl: String? = null) {
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
             val notificationId = System.currentTimeMillis().toInt()
-lastNotificationId = notificationId
+            lastNotificationId = notificationId
             try {
                 _uiState.value = DownloadState.Downloading(0f)
                 val safe = sanitizeFileName(title ?: "image")
@@ -889,35 +893,92 @@ lastNotificationId = notificationId
                 val cachedThumb = saveThumbnailToCache(imageUrl, null)
                 var savedPath: String? = null
                 var savedSize = 0L
-                downloader.downloadFile(
-                    url = imageUrl,
-                    fileName = name,
-                    relativePath = "Pictures/duck",
-                ).collect { state ->
-                    _uiState.value = state
-                    if (state is DownloadState.Downloading) savedSize = state.downloadedBytes
-                    if (state is DownloadState.Success) {
-                        downloader.finalizeFile(Uri.parse(state.path), name)
-                        savedPath = state.path
-                        logToConsole("图片已保存: Pictures/duck/" + name)
+
+                if (!liveVideoUrl.isNullOrBlank()) {
+                    downloadMotionPhoto(imageUrl, liveVideoUrl, name, notificationId)?.let { bytes ->
+                        _uiState.value = DownloadState.Success(path = "Pictures/duck/" + name)
+                        savedPath = "Pictures/duck/" + name
+                        savedSize = bytes.toLong()
+                        logToConsole("动图已保存: Pictures/duck/" + name)
+                    }
+                } else {
+                    downloader.downloadFile(
+                        url = imageUrl,
+                        fileName = name,
+                        relativePath = "Pictures/duck",
+                    ).collect { state ->
+                        _uiState.value = state
+                        if (state is DownloadState.Downloading) savedSize = state.downloadedBytes
+                        if (state is DownloadState.Success) {
+                            downloader.finalizeFile(Uri.parse(state.path), name)
+                            savedPath = state.path
+                            logToConsole("图片已保存: Pictures/duck/" + name)
+                        }
                     }
                 }
-                logDao.insertLog(
-                    DownloadLog(
-                        title = title ?: "图片",
-                        url = imageUrl,
-                        status = "Success",
-                        path = savedPath,
-                        thumbnailPath = cachedThumb,
-                        platform = "抖音",
-                        mediaKind = "gallery",
-                        fileSize = savedSize.takeIf { it > 0 },
+
+                if (savedPath != null) {
+                    logDao.insertLog(
+                        DownloadLog(
+                            title = title ?: "图片",
+                            url = imageUrl,
+                            status = "Success",
+                            path = savedPath,
+                            thumbnailPath = cachedThumb,
+                            platform = "小红书",
+                            mediaKind = if (liveVideoUrl != null) "live" else "gallery",
+                            fileSize = savedSize.takeIf { it > 0 },
+                        )
                     )
-                )
+                }
             } catch (e: Exception) {
                 _uiState.value = DownloadState.Error(e.message ?: "图片下载失败")
             }
         }
+    }
+
+    /**
+     * Downloads a still and its clip, then writes them as one motion photo.
+     *
+     * Both halves are fetched into memory because the XMP block has to declare the
+     * clip's exact length before it can be prepended, and that length is only known
+     * once the clip has fully arrived.
+     */
+    private suspend fun downloadMotionPhoto(
+        imageUrl: String,
+        videoUrl: String,
+        fileName: String,
+        notificationId: Int,
+    ): ByteArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            val still = fetchBytes(imageUrl)
+            val clip = fetchBytes(videoUrl)
+            val merged = MotionPhotoWriter.build(still, clip)
+                ?: return@runCatching null
+            saveImageBytes(fileName, merged)
+            merged
+        }.getOrNull()
+    }
+
+    /** Reads a URL fully into memory; the live-photo halves are only a few hundred KB. */
+    private fun fetchBytes(url: String): ByteArray {
+        val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+            connectTimeout = 20_000
+            readTimeout = 30_000
+            instanceFollowRedirects = true
+            setRequestProperty("Referer", "https://www.xiaohongshu.com/")
+            setRequestProperty("User-Agent", System.getProperty("http.agent") ?: "duck")
+        }
+        return connection.inputStream.use { it.readBytes() }.also { connection.disconnect() }
+    }
+
+    /** Writes bytes straight into the gallery and clears the pending flag. */
+    private fun saveImageBytes(fileName: String, bytes: ByteArray) {
+        val uri = downloader.createMediaStoreUri(fileName, "Pictures/duck")
+            ?: throw Exception("无法创建文件")
+        getApplication<android.app.Application>().contentResolver
+            .openOutputStream(uri)?.use { it.write(bytes) } ?: throw Exception("无法写入文件")
+        downloader.finalizeFile(uri, fileName)
     }
     private fun sanitizeFileName(title: String): String {
         val cleaned = title

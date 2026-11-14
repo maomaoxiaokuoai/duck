@@ -41,4 +41,12 @@ data class ExtractionResult(
     val media_kind: String? = null,
     /** Unix millis when this resolution completed, for the preview card. */
     val resolved_at: Long? = null,
+    /**
+     * For each entry in [urls], the short clip that turns it into a live photo.
+     *
+     * Xiaohongshu's moving images are a still plus a two-second MP4; when this entry
+     * is present the pair can be written out as an Android motion photo, which the
+     * system gallery then plays. Null entries are ordinary static images.
+     */
+    val live_video_urls: List<String?>? = null,
 )

@@ -122,7 +122,8 @@ class RedBookParser {
             )
         }
 
-        val images = pickImages(note)
+        val pages = pickPages(note)
+        val images = pages.map { it.first }
         if (images.isEmpty()) {
             return ExtractionResult(status = "error", message = "笔记不存在或需要登录才能查看")
         }
@@ -138,6 +139,7 @@ class RedBookParser {
             platform = "小红书",
             is_gallery = images.size > 1,
             media_kind = "gallery",
+            live_video_urls = pages.map { it.second },
             like_count = countOf(stats, "likedCount"),
             comment_count = countOf(stats, "commentCount"),
             share_count = countOf(stats, "shareCount"),
@@ -192,7 +194,17 @@ class RedBookParser {
      * A live photo (小红书's moving image) is still one page here: it carries both a still
      * and a short clip, and the still is what the gallery grid shows.
      */
-    private fun pickImages(note: JsonObject): List<String> {
+    private fun pickImages(note: JsonObject): List<String> =
+        pickPages(note).map { it.first }
+
+    /**
+     * Every page, paired with the clip that animates it when the page is a live photo.
+     *
+     * A live photo is one page, not two: it carries a still and a short MP4. Keeping the
+     * pair together is what lets the downloader write a single motion photo instead of
+     * two files the user has to match up themselves.
+     */
+    private fun pickPages(note: JsonObject): List<Pair<String, String?>> {
         val list = note["imageList"]?.jsonArray ?: JsonArray(emptyList())
         return list.mapNotNull { entry ->
             val item = entry as? JsonObject ?: return@mapNotNull null
@@ -205,7 +217,21 @@ class RedBookParser {
                 ?.jsonObject
                 ?.get("url")?.jsonPrimitive?.content
             val url = fromInfo ?: flat ?: return@mapNotNull null
-            unwatermarked(url)
+
+            val isLive = item["livePhoto"]?.jsonPrimitive?.content == "true"
+            val clip = if (isLive) {
+                item["stream"]?.jsonObject
+                    ?.get("h264")?.jsonArray
+                    ?.firstOrNull { it is JsonObject }
+                    ?.jsonObject
+                    ?.get("masterUrl")?.jsonPrimitive?.content
+                    ?.takeIf { it.startsWith("http") }
+                    ?.replaceFirst("http://", "https://")
+            } else {
+                null
+            }
+
+            unwatermarked(url) to clip
         }
     }
 
