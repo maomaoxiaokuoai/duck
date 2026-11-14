@@ -1163,12 +1163,26 @@ fun MainDownloaderTab(
         }
 
         val performAction: () -> Unit = {
-            clipboardManager.getText()?.let { clip ->
-                // Put the resolved link in the field rather than the whole sentence the
-                // share button copied.
-                val link = viewModel.extractUrl(clip.text)
+            val clipText = clipboardManager.getText()?.text?.trim().orEmpty()
+            // An empty clipboard used to overwrite the field with "" and take the
+            // resolved preview with it, leaving the screen blank with no way to
+            // download what had just been parsed.
+            if (clipText.isNotEmpty()) {
+                // Put the resolved link in the field rather than the whole sentence
+                // the share button copied.
+                val link = viewModel.extractUrl(clipText)
                 onUrlChange(link)
                 viewModel.fetchPreview(link, quality, downloadMode)
+            } else if (url.isNotBlank()) {
+                // Nothing copied: parse whatever is already in the field instead of
+                // wiping it.
+                viewModel.fetchPreview(url, quality, downloadMode)
+            } else {
+                android.widget.Toast.makeText(
+                    context,
+                    "剪贴板是空的，请先复制链接",
+                    android.widget.Toast.LENGTH_SHORT,
+                ).show()
             }
         }
 
