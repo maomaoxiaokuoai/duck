@@ -985,6 +985,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             lastNotificationId = notificationId
             val savedPaths = mutableListOf<String>()
             var savedSize = 0L
+            // Whether any page was a moving image. A batch of only stills is a
+            // gallery; one that includes a live page is reported as a live one so
+            // the list does not call an animation a still.
+            var savedLiveCount = 0
             try {
                 logToConsole("批量下载开始: " + imageUrls.size + " 张")
                 _uiState.value = DownloadState.Downloading(0f)
@@ -1001,6 +1005,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         val merged = downloadMotionPhoto(imageUrl, clip, name, notificationId)
                         if (merged != null) {
                             savedPaths += "Pictures/duck/" + name
+                            savedLiveCount++
                             logToConsole("动图 " + (index + 1) + "/" + imageUrls.size + " 已保存")
                         }
                     } else {
@@ -1039,7 +1044,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         path = savedPaths.first(),
                         thumbnailPath = cachedThumb,
                         platform = platform,
-                        mediaKind = "gallery",
+                        mediaKind = if (savedLiveCount > 0) "live" else "gallery",
                         imageCount = savedPaths.size,
                         imagePaths = savedPaths.joinToString(","),
                         fileSize = savedSize.takeIf { it > 0 },
