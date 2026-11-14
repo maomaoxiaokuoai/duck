@@ -422,7 +422,8 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         var author: String? = null
         var thumbnail: String? = null
         var items: List<Media> = emptyList()
-
+        // Set inside the block below, so the result knows a gallery from a video.
+        var isGalleryPost = false
         page["videoInfoRes"]?.asObject()?.let { info ->
             val detail = info["item_list"]?.asArray()?.firstOrNull()?.asObject()
             if (detail != null) {
@@ -432,6 +433,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
                     ?.get("cover")?.asObject()
                     ?.get("url_list")?.asArray()?.firstOrNull()?.asString()
                 items = extractMediaFromItem(detail)
+                isGalleryPost = (detail["images"]?.asArray()?.size ?: 0) > 0
             }
         }
 
@@ -451,7 +453,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             ext = items.first().ext,
             // A gallery of one image is still a gallery: the post carries an image
             // list, which is what decides the kind, not how many entries it holds.
-            is_gallery = (item["images"]?.asArray()?.size ?: 0) > 0
+            is_gallery = isGalleryPost
         )
     }
 
