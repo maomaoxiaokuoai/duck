@@ -622,7 +622,13 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                             // The clipboard is the whole input here, so an
                                             // empty one has to say so instead of doing
                                             // nothing and looking broken.
-                                            val text = clipboardManager.getText()?.text?.trim()
+                                            // The field wins when it has something in it.
+                                            // Reading only the clipboard meant a link the
+                                            // user had just typed was ignored in favour of
+                                            // whatever happened to be copied earlier.
+                                            val typed = url.trim()
+                                            val text = typed.takeIf { it.isNotEmpty() }
+                                                ?: clipboardManager.getText()?.text?.trim()
                                             when {
                                                 text.isNullOrEmpty() -> {
                                                     android.widget.Toast.makeText(
