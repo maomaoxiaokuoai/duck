@@ -46,20 +46,28 @@ object MotionPhotoWriter {
 
         val namespace = "http://ns.adobe.com/xap/1.0/\u0000".toByteArray(Charsets.ISO_8859_1)
 
-        // A still is everything before the clip: the JPEG plus the segment inserted.
-        // The segment is 2 marker bytes + the length field, which counts itself.
+        // A still is everything before the clip: the original JPEG plus the APP1
+        // segment being inserted. The segment is the two marker bytes, the two length
+        // bytes, and the packet itself.
         var stillLength = jpeg.size
         var payload = ByteArray(0)
-        // The figure feeds its own size, so settle it; two rounds are enough in
-        // practice because a length only shifts by a digit at a boundary.
-        repeat(4) {
+        var settled = false
+        // The figure describes its own container, so it has to be solved rather than
+        // computed once: writing more digits can push the total up, which changes the
+        // figure again. Each round recomputes until the number equals the bytes.
+        for (attempt in 0 until 6) {
             val candidate = namespace +
                 buildXmp(stillLength, video.size).toByteArray(Charsets.UTF_8)
-            // 2 marker bytes + 2 length bytes + the payload itself.
             val total = jpeg.size + 4 + candidate.size
-            if (total == stillLength && payload.isNotEmpty()) return@repeat
-            stillLength = total
             payload = candidate
+            if (total == stillLength) {
+                settled = true
+                break
+            }
+            stillLength = total
+        }
+        if (!settled) {
+            Log.d(TAG, "still length did not settle, last=" + stillLength)
         }
 
         if (payload.isEmpty()) return null
