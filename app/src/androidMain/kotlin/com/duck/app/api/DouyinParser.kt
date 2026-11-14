@@ -302,6 +302,8 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         // clip under video.play_addr. Pairing them here is what lets the downloader
         // write one motion photo instead of a still and an unrelated video.
         val liveClips = mutableListOf<String?>()
+        // The image list is what makes the post a gallery; a single entry still counts.
+        val isGalleryPost = (detail["images"]?.asArray()?.size ?: 0) > 0
         detail["images"]?.asArray()?.forEach { image ->
             val urls = image.jsonObject["urlList"]?.asArray()
                 ?.mapNotNull { it.asString() }
@@ -345,8 +347,17 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             thumbnail = cover ?: items.first().url,
             ext = items.first().ext,
             platform = "抖音",
-            is_gallery = items.size > 1,
-            media_kind = if (items.size > 1) "gallery" else "video",
+            // A gallery of one image is still a gallery: the post carries an image
+            // list, which is what decides the kind, not how many entries it holds.
+            is_gallery = isGalleryPost,
+            media_kind = when {
+                liveClips.any { it != null } -> "live"
+                items.size > 1 -> "gallery"
+                // One image and no clip is still a gallery post; its label should
+                // say 图文 rather than 视频.
+                isGalleryPost -> "gallery"
+                else -> "video"
+            },
             live_video_urls = liveClips.takeIf { list -> list.any { it != null } },
             like_count = stats?.get("diggCount")?.longOrNull(),
             comment_count = stats?.get("commentCount")?.longOrNull(),
@@ -438,7 +449,9 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             author = author ?: "抖音",
             thumbnail = thumbnail ?: items.first().url,
             ext = items.first().ext,
-            is_gallery = items.size > 1
+            // A gallery of one image is still a gallery: the post carries an image
+            // list, which is what decides the kind, not how many entries it holds.
+            is_gallery = (detail["images"]?.asArray()?.size ?: 0) > 0
         )
     }
 
@@ -615,7 +628,9 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
                 ?.get("cover")?.asObject()
                 ?.get("url_list")?.asArray()?.firstOrNull()?.asString() ?: items.first().url,
             ext = items.first().ext,
-            is_gallery = items.size > 1
+            // A gallery of one image is still a gallery: the post carries an image
+            // list, which is what decides the kind, not how many entries it holds.
+            is_gallery = (detail["images"]?.asArray()?.size ?: 0) > 0
         )
     }
 
