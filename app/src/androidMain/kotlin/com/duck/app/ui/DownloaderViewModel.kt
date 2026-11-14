@@ -359,12 +359,18 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         else -> 1
                     }
                 }
-                val urls = ordered.map { name ->
-                    githubMirror.accelerateDownloadUrl(
-                        "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
-                            latestVersion + "/" + name,
-                        release.downloadPrefix,
-                    )
+                // A mirror can be up for the feed and still 404 the asset - caching a
+                // path it has never seen is not something it promises. Every name is
+                // therefore paired with every route, and github.com is tried first
+                // because it answers for the asset itself rather than a cache of it.
+                val urls = ordered.flatMap { name ->
+                    val direct = "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
+                        latestVersion + "/" + name
+                    listOf(direct) + githubMirror.allDownloadUrls(direct)
+                }.distinct()
+                if (urls.isEmpty()) {
+                    if (manual) updateCheckMessage.value = "没有可用的下载地址"
+                    return@launch
                 }
                 val apkUrl = urls.first()
 

@@ -112,6 +112,19 @@ class GithubMirror {
     }
 
     /**
+     * Every route that can serve [url], strongest first.
+     *
+     * A mirror that answers the feed can still 404 an asset it has not cached, so one
+     * route is not enough. github.com goes first because it is authoritative; the
+     * mirrors follow for networks where the direct host is blocked.
+     */
+    fun allDownloadUrls(url: String): List<String> =
+        mirrors
+            .filter { it.downloadPrefix != "https://github.com/" }
+            .map { accelerateDownloadUrl(url, it.downloadPrefix) }
+            .distinct()
+
+    /**
      * Rewrites a github.com download link to travel through the chosen mirror.
      *
      * Everything after "github.com/" is carried over, because that tail holds the
