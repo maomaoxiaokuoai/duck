@@ -2658,11 +2658,13 @@ fun LogsTab(
                                         Spacer(Modifier.height(2.dp))
                                         // What was actually saved, rather than the word
                                         // Success. Failed entries still show their reason.
-                                        val kindText = when {
-                                            log.status != "Success" -> log.status
-                                            log.mediaKind == "audio" -> "音频"
-                                            log.mediaKind == "gallery" -> "图文"
-                                            else -> "视频"
+                                        // kindLabel keeps this in one place; the copy
+                                        // here had missed "live" and labelled a
+                                        // motion photo as a video.
+                                        val kindText = if (log.status != "Success") {
+                                            log.status
+                                        } else {
+                                            kindLabel(log.mediaKind.orEmpty())
                                         }
                                         Text(
                                             kindText,
