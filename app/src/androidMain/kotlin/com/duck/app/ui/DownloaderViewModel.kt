@@ -830,6 +830,31 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         else -> "Movies/duck"
     }
 
+    /**
+     * The referer the CDN for [url] expects.
+     *
+     * Each site rejects downloads that claim to come from the other one, so the header
+     * has to follow the host rather than being fixed.
+     */
+    private fun previewReferer(url: String): Map<String, String> {
+        val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
+        return if (host.contains("xhscdn") || host.contains("xiaohongshu")) {
+            mapOf(
+                "Referer" to "https://www.xiaohongshu.com/",
+                "User-Agent" to MOBILE_USER_AGENT,
+            )
+        } else {
+            mapOf("Referer" to "https://www.douyin.com/")
+        }
+    }
+
+    private companion object {
+        const val MOBILE_USER_AGENT =
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) " +
+                "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 " +
+                "Mobile/15E148 Safari/604.1"
+    }
+
     private fun folderUriFor(targetPath: String): Uri {
         val mediaDir = when {
             targetPath.startsWith("Pictures") ->
@@ -910,6 +935,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                         url = imageUrl,
                         fileName = name,
                         relativePath = "Pictures/duck",
+                        httpHeaders = previewReferer(imageUrl),
                     ).collect { state ->
                         _uiState.value = state
                         if (state is DownloadState.Downloading) savedSize = state.downloadedBytes

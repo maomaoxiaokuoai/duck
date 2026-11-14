@@ -115,6 +115,7 @@ class RedBookParser {
                 platform = "小红书",
                 is_gallery = false,
                 media_kind = "video",
+                http_headers = CDN_HEADERS,
                 like_count = countOf(stats, "likedCount"),
                 comment_count = countOf(stats, "commentCount"),
                 share_count = countOf(stats, "shareCount"),
@@ -140,6 +141,7 @@ class RedBookParser {
             is_gallery = images.size > 1,
             media_kind = "gallery",
             live_video_urls = pages.map { it.second },
+            http_headers = CDN_HEADERS,
             like_count = countOf(stats, "likedCount"),
             comment_count = countOf(stats, "commentCount"),
             share_count = countOf(stats, "shareCount"),
@@ -315,6 +317,17 @@ class RedBookParser {
 
     private companion object {
         const val TAG = "RedBookParser"
+
+        /**
+         * Headers the CDN expects.
+         *
+         * The downloader defaults to a Douyin referer, which makes the Xiaohongshu
+         * CDN answer 403 — the request is recognisably from the wrong site.
+         */
+        val CDN_HEADERS = mapOf(
+            "Referer" to "https://www.xiaohongshu.com/",
+            "User-Agent" to MOBILE_USER_AGENT,
+        )
         const val CONNECT_TIMEOUT_MS = 15_000
         const val READ_TIMEOUT_MS = 20_000
         const val MAX_REDIRECTS = 5
