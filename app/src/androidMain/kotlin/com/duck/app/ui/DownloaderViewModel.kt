@@ -485,29 +485,31 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
     private suspend fun withGallerySize(result: ExtractionResult): ExtractionResult {
         val urls = result.urls.orEmpty().filter { it.isNotBlank() }
         if (result.is_gallery != true || urls.isEmpty()) return result
-        if (result.media_size != null && result.media_size!! > 0) return result
+        if ((result.media_size ?: 0L) > 0L) return result
 
-        val totals = kotlinx.coroutines.coroutineScope {
-            urls.map { url ->
-            kotlinx.coroutines.async(kotlinx.coroutines.Dispatchers.IO) {
-                runCatching {
-                    val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
-                        requestMethod = "HEAD"
-                        connectTimeout = 8_000
-                        readTimeout = 8_000
-                        instanceFollowRedirects = true
-                        setRequestProperty("Referer", "https://www.douyin.com/")
-                    }
-                    val length = connection.contentLengthLong
-                    connection.disconnect()
-                    if (length > 0) length else 0L
-                }.getOrDefault(0L)
+        val total = kotlinx.coroutines.coroutineScope {
+            val probes = urls.map { url ->
+                // A probe that fails is worth zero, not an exception: the preview
+                // already resolved, and a missing size is cosmetic.
+                async(Dispatchers.IO) {
+                    runCatching {
+                        val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                            requestMethod = "HEAD"
+                            connectTimeout = 8_000
+                            readTimeout = 8_000
+                            instanceFollowRedirects = true
+                            setRequestProperty("Referer", "https://www.douyin.com/")
+                        }
+                        val length = connection.contentLengthLong
+                        connection.disconnect()
+                        length.coerceAtLeast(0L)
+                    }.getOrDefault(0L)
+                }
             }
-        }.map { it.await() }
+            probes.sumOf { it.await() }
         }
 
-        val total = totals.sum()
-        return if (total > 0) result.copy(media_size = total) else result
+        return if (total > 0L) result.copy(media_size = total) else result
     }
 
     fun fetchPreview(url: String, quality: String, mode: String = "auto") {
