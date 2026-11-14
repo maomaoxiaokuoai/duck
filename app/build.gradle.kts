@@ -65,6 +65,9 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
             implementation("androidx.media3:media3-exoplayer:1.2.1")
             implementation("androidx.media3:media3-ui:1.2.1")
+            // Bilibili serves 1080P as separate video and audio tracks, so the two
+            // have to be joined before the file is playable anywhere.
+            implementation("androidx.media3:media3-transformer:1.2.1")
             
         }
     }
@@ -78,8 +81,8 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 20000111
-        versionName = "3.0.2"
+        versionCode = 20000112
+        versionName = "3.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 

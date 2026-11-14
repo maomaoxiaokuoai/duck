@@ -800,6 +800,45 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         val fileName = "${sanitizeFileName(title)}_${System.currentTimeMillis()}.$extension"
 
         logToConsole("正在下载: $fileName")
+
+        // Bilibili hands back a silent video plus a separate audio track above
+        // 720P. Joining them is what makes the 1080P download watchable.
+        if (!result.audio_url.isNullOrBlank() && !isImage && mode != "audio") {
+            val muxed = downloadAndMux(
+                videoUrl = downloadUrl,
+                audioUrl = result.audio_url,
+                fileName = fileName,
+                targetPath = targetPath,
+                headers = result.http_headers,
+            )
+            if (muxed != null) {
+                val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
+                logDao.insertLog(
+                    DownloadLog(
+                        title = title,
+                        url = sourceUrl,
+                        status = "Success",
+                        path = muxed.toString(),
+                        thumbnailPath = cachedThumb,
+                        author = result.author,
+                        createTime = result.create_time,
+                        platform = result.platform ?: "抖音",
+                        likeCount = result.like_count,
+                        commentCount = result.comment_count,
+                        shareCount = result.share_count,
+                        collectCount = result.collect_count,
+                        playCount = result.play_count,
+                        duration = result.duration,
+                        mediaKind = "video",
+                        fileSize = queryFileSize(muxed),
+                    )
+                )
+                _uiState.value = DownloadState.Success(path = muxed.toString())
+                logToConsole("已保存: " + muxed)
+                return
+            }
+            logToConsole("合成失败，改为直接下载视频")
+        }
         logToConsole("保存目录: $targetPath")
 
         val liveClip = result.urls.orEmpty().indexOf(downloadUrl)
@@ -1165,6 +1204,53 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
         /**
+     * Downloads a video and its separate audio track, then writes one MP4.
+     *
+     * Bilibili serves 1080P as two files; a download that only takes the video plays
+     * silent. Both are fetched to the cache first, joined, and the result goes into the
+     * gallery. If the join fails the silent video is kept rather than losing the post.
+     */
+    private suspend fun downloadAndMux(
+        videoUrl: String,
+        audioUrl: String,
+        fileName: String,
+        targetPath: String,
+        headers: Map<String, String>?,
+    ): Uri? = withContext(Dispatchers.IO) {
+        val cacheDir = getApplication<android.app.Application>().cacheDir
+        val videoFile = java.io.File(cacheDir, "mux_video_" + System.currentTimeMillis() + ".mp4")
+        val audioFile = java.io.File(cacheDir, "mux_audio_" + System.currentTimeMillis() + ".m4a")
+        val outputFile = java.io.File(cacheDir, "mux_out_" + System.currentTimeMillis() + ".mp4")
+        try {
+            videoFile.writeBytes(fetchBytes(videoUrl, headers))
+            logToConsole("视频流: " + videoFile.length() / 1024 / 1024 + " MB")
+            audioFile.writeBytes(fetchBytes(audioUrl, headers))
+            logToConsole("音频流: " + audioFile.length() / 1024 + " KB")
+
+            if (!TrackMuxer.mux(videoFile, audioFile, outputFile)) {
+                logToConsole("音视频合成失败，保留无声视频")
+                return@withContext null
+            }
+            logToConsole("合成完成: " + outputFile.length() / 1024 / 1024 + " MB")
+
+            val uri = downloader.createMediaStoreUri(fileName, targetPath)
+                ?: return@withContext null
+            getApplication<android.app.Application>().contentResolver
+                .openOutputStream(uri)?.use { out -> outputFile.inputStream().use { it.copyTo(out) } }
+                ?: return@withContext null
+            downloader.finalizeFile(uri, fileName)
+            uri
+        } catch (e: Exception) {
+            logToConsole("音视频处理失败: " + (e.message ?: ""))
+            null
+        } finally {
+            runCatching { videoFile.delete() }
+            runCatching { audioFile.delete() }
+            runCatching { outputFile.delete() }
+        }
+    }
+
+    /**
      * Downloads a still and its clip, then writes them as one motion photo.
      *
      * Both halves are held in memory because the XMP block has to declare the clip's
@@ -1196,7 +1282,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     /** Reads a URL fully into memory; the live-photo halves are only a few hundred KB. */
-    private fun fetchBytes(url: String): ByteArray {
+    private fun fetchBytes(url: String, extra: Map<String, String>? = null): ByteArray {
         // The system agent is a short "Dalvik/..." string and CDNs answer it with a 403,
         // which surfaced as a merge failure rather than a network error.
         val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
@@ -1211,6 +1297,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             instanceFollowRedirects = true
             setRequestProperty("Referer", referer)
             setRequestProperty("User-Agent", FETCH_USER_AGENT)
+            extra?.forEach { (k, v) -> setRequestProperty(k, v) }
         }
         return connection.inputStream.use { it.readBytes() }.also { connection.disconnect() }
     }
