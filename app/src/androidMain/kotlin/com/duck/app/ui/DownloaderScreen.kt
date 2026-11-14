@@ -626,8 +626,14 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                             // Reading only the clipboard meant a link the
                                             // user had just typed was ignored in favour of
                                             // whatever happened to be copied earlier.
+                                            // Field first, then the resolved post, then
+                                            // the clipboard. The field is cleared once a
+                                            // preview lands, so without the middle
+                                            // fallback the bolt had nothing to act on
+                                            // and silently did nothing.
                                             val typed = url.trim()
                                             val text = typed.takeIf { it.isNotEmpty() }
+                                                ?: preview?.url?.takeIf { it.isNotBlank() }
                                                 ?: clipboardManager.getText()?.text?.trim()
                                             when {
                                                 text.isNullOrEmpty() -> {
@@ -1171,6 +1177,9 @@ fun MainDownloaderTab(
                 // Put the resolved link in the field rather than the whole sentence
                 // the share button copied.
                 val link = viewModel.extractUrl(clipText)
+                // The resolved link stays in the field. Clearing it left the user
+                // looking at a card with no way to tell what it belonged to, and
+                // the bolt with nothing to act on.
                 onUrlChange(link)
                 viewModel.fetchPreview(link, quality, downloadMode)
             } else if (url.isNotBlank()) {
