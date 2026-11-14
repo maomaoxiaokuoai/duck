@@ -315,6 +315,9 @@ internal fun extractBareUrl(raw: String): String {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
+    // Lives here rather than in the tab: the bolt is drawn by this screen, and a
+    // grid selection the bolt cannot see is a selection that does nothing.
+    val pickedImages = remember { mutableStateListOf<String>() }
     val context = androidx.compose.ui.platform.LocalContext.current
     // The context is a ComponentActivity in every real window, but a preview or a
     // wrapped context would make this cast fail, and the !! then crashed on launch.
@@ -760,6 +763,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             onModeChange = { },
                             onStartDownload = { viewModel.downloadMedia(it, quality, downloadMode) },
                             onDownloadFinished = { selectedTab = 1 },
+                            pickedImages = pickedImages,
                             contentPadding = padding,
                         )
                         1 -> LogsTab(
@@ -970,10 +974,9 @@ fun MainDownloaderTab(
     /** Called once a download lands, so the shell can move to the history list. */
     onDownloadFinished: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    /** Grid picks owned by the shell so the bolt can act on them. */
+    pickedImages: MutableList<String>,
 ) {
-    // Lifted out of the card so the bolt can read it. Keeping it there meant
-    // the bolt had no idea what was selected.
-    val pickedImages = remember { mutableStateListOf<String>() }
     var qualityExpanded by remember { mutableStateOf(false) }
     var modeExpanded by remember { mutableStateOf(false) }
     var showFullscreenLogs by remember { mutableStateOf(false) }
