@@ -951,6 +951,77 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
      * are written out as a single Android motion photo, which the system gallery then
      * animates on its own. That is why the result is still a .jpg and not two files.
      */
+    /**
+     * Saves several picked pages of a gallery.
+     *
+     * Calling [downloadOneImage] in a loop cancelled itself: each call cancels the
+     * previous job first, so only the last pick ever landed. This runs them in one
+     * job and reports a single history row for the batch.
+     */
+    fun downloadPickedImages(imageUrls: List<String>, title: String? = null) {
+        if (imageUrls.isEmpty()) return
+        currentDownloadJob?.cancel()
+        currentDownloadJob = viewModelScope.launch {
+            val notificationId = System.currentTimeMillis().toInt()
+            lastNotificationId = notificationId
+            val savedPaths = mutableListOf<String>()
+            var savedSize = 0L
+            try {
+                _uiState.value = DownloadState.Downloading(0f)
+                val safe = sanitizeFileName(title ?: "image")
+                val platform = platformOf(imageUrls.first())
+                val cachedThumb = saveThumbnailToCache(imageUrls.first(), null)
+
+                imageUrls.forEachIndexed { index, imageUrl ->
+                    val name = safe + "_" + (index + 1) + "_" + System.currentTimeMillis() + ".jpg"
+                    downloader.downloadFile(
+                        url = imageUrl,
+                        fileName = name,
+                        relativePath = "Pictures/duck",
+                        httpHeaders = previewReferer(imageUrl),
+                    ).collect { state ->
+                        if (state is DownloadState.Downloading) {
+                            // Overall progress across the batch, not per file.
+                            val done = (index + state.progress) / imageUrls.size
+                            _uiState.value = DownloadState.Downloading(done.coerceIn(0f, 1f))
+                        }
+                        if (state is DownloadState.Success) {
+                            downloader.finalizeFile(Uri.parse(state.path), name)
+                            savedPaths += state.path
+                            logToConsole("图片 " + (index + 1) + "/" + imageUrls.size + " 已保存")
+                        }
+                    }
+                }
+
+                if (savedPaths.isEmpty()) {
+                    throw Exception("没有图片保存成功")
+                }
+
+                savedPaths.forEach { path ->
+                    queryFileSize(Uri.parse(path))?.let { savedSize += it }
+                }
+
+                logDao.insertLog(
+                    DownloadLog(
+                        title = title ?: "图片",
+                        url = imageUrls.first(),
+                        status = "Success",
+                        path = savedPaths.first(),
+                        thumbnailPath = cachedThumb,
+                        platform = platform,
+                        mediaKind = "gallery",
+                        imageCount = savedPaths.size,
+                        imagePaths = savedPaths.joinToString(","),
+                        fileSize = savedSize.takeIf { it > 0 },
+                    )
+                )
+                _uiState.value = DownloadState.Success(path = savedPaths.first())
+            } catch (e: Exception) {
+                _uiState.value = DownloadState.Error(e.message ?: "图片下载失败")
+            }
+        }
+    }
+
     fun downloadOneImage(imageUrl: String, title: String? = null, liveVideoUrl: String? = null) {
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {

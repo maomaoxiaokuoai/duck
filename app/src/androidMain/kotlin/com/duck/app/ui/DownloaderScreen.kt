@@ -658,10 +658,10 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                     if (pickedImages.isNotEmpty()) {
                                                         val picks = pickedImages.toList()
                                                         pickedImages.clear()
-                                                        val postTitle = preview?.title
-                                                        picks.forEach { imageUrl ->
-                                                            viewModel.downloadOneImage(imageUrl, postTitle)
-                                                        }
+                                                        // One call, not a loop: downloadOneImage
+                                                        // cancels the previous job, so looping
+                                                        // over it saved only the last pick.
+                                                        viewModel.downloadPickedImages(picks, preview?.title)
                                                     } else {
                                                         viewModel.downloadMedia(link, quality, downloadMode)
                                                     }
