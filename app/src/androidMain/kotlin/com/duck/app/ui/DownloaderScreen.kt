@@ -1461,8 +1461,14 @@ fun MainDownloaderTab(
                                 ?: listOfNotNull(meta.thumbnail)
 
                             if (!meta.thumbnail.isNullOrBlank()) {
+                                // Bilibili's image host answers 403 without a referer,
+                                // so the cover renders blank unless one is supplied.
                                 AsyncImage(
-                                    model = meta.thumbnail,
+                                    model = coil.request.ImageRequest.Builder(LocalContext.current)
+                                        .data(meta.thumbnail)
+                                        .addHeader("Referer", "https://www.bilibili.com/")
+                                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+                                        .build(),
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop,
@@ -2590,6 +2596,8 @@ fun LogsTab(
     onItemClick: (com.duck.app.model.DownloadLog) -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+    // Needed to build image requests that carry the referer a platform demands.
+    val listContext = androidx.compose.ui.platform.LocalContext.current
     var itemToDelete by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
     var selectedLog by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
     // The tile whose full view is open; null when the sheet is the only thing showing.
@@ -2683,7 +2691,12 @@ fun LogsTab(
                                     ) {
                                         if (!thumbPath.isNullOrEmpty()) {
                                             coil.compose.AsyncImage(
-                                                model = thumbPath,
+                                                // A remote thumb from Bilibili needs a
+                                                // referer; a local file ignores it.
+                                                model = coil.request.ImageRequest.Builder(listContext)
+                                                    .data(thumbPath)
+                                                    .addHeader("Referer", "https://www.bilibili.com/")
+                                                    .build(),
                                                 contentDescription = null,
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
