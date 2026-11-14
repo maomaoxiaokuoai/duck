@@ -106,7 +106,9 @@ class BiliParser {
             urls = listOf(videoUrl),
             title = data["title"]?.asStringOrNull()?.takeIf { it.isNotBlank() } ?: "B 站视频",
             author = owner?.get("name")?.asStringOrNull(),
-            thumbnail = data["pic"]?.asStringOrNull(),
+            // The API hands out http:// image links, which are blocked as mixed
+            // content in an https app, so the cover came out blank.
+            thumbnail = data["pic"]?.asStringOrNull()?.replaceFirst("http://", "https://"),
             ext = "mp4",
             platform = "B站",
             is_gallery = false,
