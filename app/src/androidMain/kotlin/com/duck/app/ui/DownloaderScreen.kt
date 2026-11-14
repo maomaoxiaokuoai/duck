@@ -2733,7 +2733,14 @@ fun LogsTab(
         val log = selectedLog!!
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val ext = log.path?.substringAfterLast('.', "") ?: ""
-        val isGallery = ext.equals("jpg", true) || ext.equals("png", true) || ext.equals("jpeg", true) || ext.equals("webp", true) || ext.equals("gif", true) || (log.title.contains("Gallery", true) && !ext.equals("mp4", true))
+        // The saved kind is authoritative. Deriving it from the extension alone
+        // failed for gallery rows, whose path is a content URI without a suffix, so
+        // the sheet opened a video player on a set of images.
+        val isGalleryRow = log.mediaKind == "gallery" || log.mediaKind == "live"
+        val isGallery = isGalleryRow ||
+            ext.equals("jpg", true) || ext.equals("png", true) ||
+            ext.equals("jpeg", true) || ext.equals("webp", true) ||
+            ext.equals("gif", true)
 
         ModalBottomSheet(
             onDismissRequest = { selectedLog = null },
