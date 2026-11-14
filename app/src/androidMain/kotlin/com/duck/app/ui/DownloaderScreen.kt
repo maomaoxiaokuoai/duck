@@ -2694,18 +2694,72 @@ fun LogsTab(
             shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
             windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
         ) {
+            // The content scrolls; the button row below does not, so closing the
+            // sheet never depends on how far the user has scrolled.
             Column(
                 modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 if (isGallery) {
-                    coil.compose.AsyncImage(
-                        model = log.path,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().height(300.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                    )
+                    // Only the files this entry actually wrote. Reading the post again
+                    // would show pages the user never downloaded.
+                    val saved = log.imagePaths
+                        ?.split(",")
+                        ?.map { it.trim() }
+                        ?.filter { it.isNotBlank() }
+                        .orEmpty()
+
+                    if (saved.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                "已下载 " + saved.size + " 张",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+
+                        saved.chunked(3).forEach { rowItems ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                rowItems.forEach { savedPath ->
+                                    coil.compose.AsyncImage(
+                                        model = savedPath,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(110.dp)
+                                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                    )
+                                }
+                                repeat(3 - rowItems.size) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    } else if (!log.path.isNullOrEmpty()) {
+                        coil.compose.AsyncImage(
+                            model = log.path,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth().height(300.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                        )
+                    }
                 } else {
                     val streamUrlToPlay = log.path ?: ""
                     if (streamUrlToPlay.isNotBlank()) {
@@ -2819,66 +2873,57 @@ fun LogsTab(
                         }
                     }
                 }
+            }
 
+                // Both actions sit in one row: closing is the way out of this sheet,
+                // and copying next to it is the other thing people come here to do.
                 val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                    modifier = Modifier.clickable {
-                        // Only the bare link: sharing a whole share-sentence is noise for
-                        // whoever receives it.
-                        clipboardManager.setText(
-                            androidx.compose.ui.text.buildAnnotatedString {
-                                append(extractBareUrl(log.url))
-                            },
-                        )
-                        android.widget.Toast.makeText(context, "已复制链接", android.widget.Toast.LENGTH_SHORT).show()
-                    },
+                val closeScope = rememberCoroutineScope()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    Button(
+                        onClick = {
+                            clipboardManager.setText(
+                                androidx.compose.ui.text.buildAnnotatedString {
+                                    append(extractBareUrl(log.url))
+                                },
+                            )
+                            android.widget.Toast.makeText(context, "已复制链接", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.weight(1f).height(52.dp),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     ) {
-                        Icon(
-                            Icons.Default.Link,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            "复制链接",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        Icon(Icons.Default.Link, null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("复制链接")
+                    }
+
+                    Button(
+                        onClick = {
+                            closeScope.launch {
+                                sheetState.hide()
+                                selectedLog = null
+                            }
+                        },
+                        modifier = Modifier.weight(1f).height(52.dp),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.close))
                     }
                 }
-                
-                // Tonal rather than filled: closing a sheet is not the primary action
-                // of the screen, and a solid bar there read as a call to action.
-                //
-                // hide() runs the sheet's own slide-down before the state is cleared;
-                // setting the state alone makes it vanish in one frame.
-                val closeScope = rememberCoroutineScope()
-                Button(
-                    onClick = {
-                        closeScope.launch {
-                            sheetState.hide()
-                            selectedLog = null
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-                ) {
-                    Text(stringResource(R.string.close))
-                }
-                Spacer(Modifier.height(16.dp))
-            }
         }
+            }
     }
 }
 

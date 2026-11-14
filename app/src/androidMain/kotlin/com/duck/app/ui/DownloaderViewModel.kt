@@ -55,6 +55,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             com.duck.app.db.MIGRATION_4_5,
             com.duck.app.db.MIGRATION_5_6,
             com.duck.app.db.MIGRATION_6_7,
+            com.duck.app.db.MIGRATION_7_8,
         )
         // A history table is only convenience data, so if a migration path is ever
         // missing the app should still open with an empty list instead of crashing on
@@ -679,6 +680,9 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         val targetPath = mediaTargetPath(mode, isImage = true)
         val sanitizedTitle = sanitizeFileName(title)
         var succeededCount = 0
+        // Every saved URI, so the detail sheet can show what this entry actually
+        // wrote rather than re-reading the post and showing images never downloaded.
+        val savedPaths = mutableListOf<String>()
 
         logToConsole("开始下载图集，共 ${urls.size} 个文件...")
 
@@ -709,6 +713,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 if (state is DownloadState.Success) {
                     succeededCount++
                     downloader.finalizeFile(Uri.parse(state.path), fileName)
+                    savedPaths += state.path
                     logToConsole("文件 ${index + 1}/${urls.size} 已保存")
                 }
                 if (state is DownloadState.Error) {
@@ -738,6 +743,8 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 collectCount = result.collect_count,
                 duration = result.duration,
                 mediaKind = result.media_kind ?: if (result.is_gallery == true) "gallery" else "video",
+                imageCount = succeededCount,
+                imagePaths = savedPaths.joinToString(",").takeIf { it.isNotBlank() },
                 fileSize = result.media_size,
             )
         )
@@ -870,6 +877,15 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
      * Each site rejects downloads that claim to come from the other one, so the header
      * has to follow the host rather than being fixed.
      */
+    /** The site a direct link belongs to, by host. */
+    private fun platformOf(url: String): String {
+        val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
+        return when {
+            host.contains("xiaohongshu") || host.contains("xhscdn") || host.contains("xhslink") -> "小红书"
+            host.contains("douyin") || host.contains("amemv") || host.contains("iesdouyin") -> "抖音"
+            else -> "抖音"
+        }
+    }
     private fun previewReferer(url: String): Map<String, String> {
         val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
         return if (host.contains("xhscdn") || host.contains("xiaohongshu")) {
@@ -983,7 +999,10 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                             status = "Success",
                             path = savedPath,
                             thumbnailPath = cachedThumb,
-                            platform = "小红书",
+                            // Follow the URL, not an assumption: this path also
+                            // serves Douyin galleries, and labelling those as
+                            // Xiaohongshu made the history list lie.
+                            platform = platformOf(imageUrl),
                             mediaKind = if (liveVideoUrl != null) "live" else "gallery",
                             fileSize = savedSize.takeIf { it > 0 },
                         )

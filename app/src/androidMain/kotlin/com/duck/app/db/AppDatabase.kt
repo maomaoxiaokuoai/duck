@@ -77,7 +77,16 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
     }
 }
 
-@Database(entities = [DownloadLog::class], version = 7)
+// A gallery entry records how many files it saved and where they all are, so the
+// detail sheet can page through exactly what was downloaded rather than the post.
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN imageCount INTEGER")
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN imagePaths TEXT")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 8)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }
