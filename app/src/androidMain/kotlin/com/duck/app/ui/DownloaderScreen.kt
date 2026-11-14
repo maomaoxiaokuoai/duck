@@ -122,7 +122,8 @@ import androidx.compose.foundation.border
 /** Release notes can be long; the dialog shows a readable prefix. */
 private const val MAX_RELEASE_NOTES_CHARS = 1200
 /** Containers the preview renders as an image gallery rather than a video. */
-private val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
+/** Extensions the app treats as still images. */
+internal val IMAGE_EXTENSIONS = setOf("jpg", "jpeg", "png", "webp", "gif")
 
 /** Compact count: 12345 renders as 1.2万, the way the source app shows it. */
 internal fun formatCount(value: Long): String = when {

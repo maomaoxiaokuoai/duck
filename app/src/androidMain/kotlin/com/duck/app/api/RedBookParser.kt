@@ -324,10 +324,11 @@ class RedBookParser {
          * The downloader defaults to a Douyin referer, which makes the Xiaohongshu
          * CDN answer 403 — the request is recognisably from the wrong site.
          */
-        val CDN_HEADERS = mapOf(
-            "Referer" to "https://www.xiaohongshu.com/",
-            "User-Agent" to MOBILE_USER_AGENT,
-        )
+        val CDN_HEADERS: Map<String, String>
+            get() = mapOf(
+                "Referer" to "https://www.xiaohongshu.com/",
+                "User-Agent" to MOBILE_USER_AGENT,
+            )
         const val CONNECT_TIMEOUT_MS = 15_000
         const val READ_TIMEOUT_MS = 20_000
         const val MAX_REDIRECTS = 5
