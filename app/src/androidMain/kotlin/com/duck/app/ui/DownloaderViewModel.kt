@@ -1076,6 +1076,11 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                             platform = platformOf(imageUrl),
                             mediaKind = if (liveVideoUrl != null) "live" else "gallery",
                             fileSize = savedSize.takeIf { it > 0 },
+                            // The sheet reads these; without them a single-pick
+                            // record had nothing to show and fell back to the
+                            // post's first image over and over.
+                            imageCount = 1,
+                            imagePaths = savedPath,
                         )
                     )
                 }
