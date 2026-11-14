@@ -33,6 +33,8 @@ data class ExtractionResult(
     val comment_count: Long? = null,
     val share_count: Long? = null,
     val collect_count: Long? = null,
+    /** Views; only some platforms publish this. */
+    val play_count: Long? = null,
     /** Clip length in milliseconds, null when the source did not report it. */
     val duration: Long? = null,
     /** Byte size the platform reports for the primary media. */

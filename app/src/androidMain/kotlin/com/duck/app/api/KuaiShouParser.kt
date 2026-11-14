@@ -109,6 +109,8 @@ class KuaiShouParser {
         val like = photo["likeCount"]?.jsonPrimitive?.content?.toLongOrNull()
         val comment = photo["commentCount"]?.jsonPrimitive?.content?.toLongOrNull()
         val share = photo["shareCount"]?.jsonPrimitive?.content?.toLongOrNull()
+        // Kuaishou publishes this; the other sites mostly do not.
+        val views = photo["viewCount"]?.jsonPrimitive?.content?.toLongOrNull()
 
         val images = pickImages(photo)
         val videoUrl = photo["mainMvUrls"]?.jsonArray?.firstOrNull()
@@ -131,6 +133,7 @@ class KuaiShouParser {
                 like_count = like,
                 comment_count = comment,
                 share_count = share,
+                play_count = views,
             )
         }
 
@@ -149,6 +152,7 @@ class KuaiShouParser {
                 like_count = like,
                 comment_count = comment,
                 share_count = share,
+                play_count = views,
             )
         }
 

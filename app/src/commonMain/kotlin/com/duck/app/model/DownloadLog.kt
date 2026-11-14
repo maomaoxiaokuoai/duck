@@ -26,6 +26,9 @@ data class DownloadLog(
     val commentCount: Long? = null,
     val shareCount: Long? = null,
     val collectCount: Long? = null,
+
+    /** Views; null when the platform does not publish one. */
+    val playCount: Long? = null,
     /** Clip length in milliseconds. */
     val duration: Long? = null,
     /** video, gallery or audio, so the list can say what was saved. */

@@ -669,7 +669,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                     if (!viewModel.isDouyinUrl(link)) {
                                                         android.widget.Toast.makeText(
                                                             context,
-                                                            "剪贴板内容不是抖音或小红书链接",
+                                                            "不是抖音、小红书、快手或 B 站的链接",
                                                             android.widget.Toast.LENGTH_SHORT,
                                                         ).show()
                                                         return@FloatingActionButton
@@ -1569,6 +1569,7 @@ fun MainDownloaderTab(
                             }
 
                             val stats = listOfNotNull(
+                                meta.play_count?.takeIf { it > 0 }?.let { "播放 " + formatCount(it) },  
                                 meta.like_count?.takeIf { it > 0 }?.let { "赞 " + formatCount(it) },
                                 meta.comment_count?.takeIf { it > 0 }?.let { "评 " + formatCount(it) },
                                 meta.share_count?.takeIf { it > 0 }?.let { "转 " + formatCount(it) },
@@ -2946,6 +2947,7 @@ fun LogsTab(
                 )
 
                 val stats = listOfNotNull(
+                    log.playCount?.takeIf { it > 0 }?.let { "播放 " + formatCount(it) },
                     log.likeCount?.takeIf { it > 0 }?.let { "点赞 " + formatCount(it) },
                     log.commentCount?.takeIf { it > 0 }?.let { "评论 " + formatCount(it) },
                     log.shareCount?.takeIf { it > 0 }?.let { "分享 " + formatCount(it) },

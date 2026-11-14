@@ -86,7 +86,15 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
-@Database(entities = [DownloadLog::class], version = 8)
+// Views are published by some platforms and not others, so the column is
+// nullable and an older row simply has nothing to show.
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE download_logs ADD COLUMN playCount INTEGER")
+    }
+}
+
+@Database(entities = [DownloadLog::class], version = 9)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadLogDao(): DownloadLogDao
 }

@@ -333,6 +333,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             comment_count = stats?.get("commentCount")?.longOrNull(),
             share_count = stats?.get("shareCount")?.longOrNull(),
             collect_count = stats?.get("collectCount")?.longOrNull(),
+            play_count = stats?.get("playCount")?.longOrNull()?.takeIf { it > 0 },
         )
     }
 
@@ -575,6 +576,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             comment_count = stats?.get("comment_count")?.longOrNull(),
             share_count = stats?.get("share_count")?.longOrNull(),
             collect_count = stats?.get("collect_count")?.longOrNull(),
+            play_count = stats?.get("play_count")?.longOrNull()?.takeIf { it > 0 },
             duration = detail["video"]?.asObject()?.get("duration")?.asString()?.toLongOrNull(),
             media_size = detail["video"]?.asObject()
                 ?.get("play_addr")?.asObject()

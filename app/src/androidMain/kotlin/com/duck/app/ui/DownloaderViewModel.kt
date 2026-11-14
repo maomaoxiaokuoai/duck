@@ -48,6 +48,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinParser = DouyinParser(douyinSigner)
     private val redBookParser = com.duck.app.api.RedBookParser()
     private val kuaiShouParser = com.duck.app.api.KuaiShouParser()
+    private val biliParser = com.duck.app.api.BiliParser()
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(
             com.duck.app.db.MIGRATION_1_2,
@@ -57,6 +58,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             com.duck.app.db.MIGRATION_5_6,
             com.duck.app.db.MIGRATION_6_7,
             com.duck.app.db.MIGRATION_7_8,
+            com.duck.app.db.MIGRATION_8_9,
         )
         // A history table is only convenience data, so if a migration path is ever
         // missing the app should still open with an empty list instead of crashing on
@@ -460,17 +462,21 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             // before any network call and the others never see the link.
             val redBookLink = redBookParser.extractUrl(url)
             val kuaiShouLink = kuaiShouParser.extractUrl(url)
+            val biliLink = biliParser.extractUrl(url)
             val isRedBook = redBookParser.isRedBookUrl(redBookLink)
             val isKuaiShou = !isRedBook && kuaiShouParser.isKuaiShouUrl(kuaiShouLink)
+            val isBili = !isRedBook && !isKuaiShou && biliParser.isBiliUrl(biliLink)
             when {
                 isRedBook -> logToConsole("解析小红书链接: " + redBookLink)
                 isKuaiShou -> logToConsole("解析快手链接: " + kuaiShouLink)
+                isBili -> logToConsole("解析 B 站链接: " + biliLink)
                 else -> logToConsole("解析抖音链接: " + douyinParser.extractUrl(url))
             }
 
             val result = when {
                 isRedBook -> redBookParser.resolve(url)
                 isKuaiShou -> kuaiShouParser.resolve(url)
+                isBili -> biliParser.resolve(url)
                 else -> douyinParser.resolve(url)
             }
             if (result.status == "success") {
@@ -533,7 +539,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         if (!isDouyinUrl(link)) {
             _previewMetadata.value = ExtractionResult(
                 status = "error",
-                message = "只支持抖音、小红书、快手的链接",
+                message = "只支持抖音、小红书、快手和 B 站的链接",
             )
             return
         }
@@ -583,6 +589,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         if (redBookParser.isRedBookUrl(redBook)) return redBook
         val kuaiShou = kuaiShouParser.extractUrl(input)
         if (kuaiShouParser.isKuaiShouUrl(kuaiShou)) return kuaiShou
+        val bili = biliParser.extractUrl(input)
+        if (biliParser.isBiliUrl(bili)) return bili
         return douyinParser.extractUrl(input)
     }
 
@@ -590,7 +598,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     fun isDouyinUrl(url: String): Boolean =
         douyinParser.isDouyinUrl(url) ||
             redBookParser.isRedBookUrl(url) ||
-            kuaiShouParser.isKuaiShouUrl(url)
+            kuaiShouParser.isKuaiShouUrl(url) ||
+            biliParser.isBiliUrl(url)
 
     fun clearPreview() {
         _previewMetadata.value = null
@@ -762,6 +771,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 commentCount = result.comment_count,
                 shareCount = result.share_count,
                 collectCount = result.collect_count,
+                playCount = result.play_count,
                 duration = result.duration,
                 mediaKind = result.media_kind ?: if (result.is_gallery == true) "gallery" else "video",
                 imageCount = succeededCount,
@@ -815,6 +825,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         commentCount = result.comment_count,
                         shareCount = result.share_count,
                         collectCount = result.collect_count,
+                        playCount = result.play_count,
                         duration = result.duration,
                         mediaKind = "live",
                         fileSize = queryFileSize(mergedUri),
@@ -859,6 +870,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         commentCount = result.comment_count,
                         shareCount = result.share_count,
                         collectCount = result.collect_count,
+                        playCount = result.play_count,
                         duration = result.duration,
                         mediaKind = if (mode == "audio") "audio" else (result.media_kind ?: "video"),
                         fileSize = queryFileSize(savedUri) ?: result.media_size,
@@ -904,6 +916,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         return when {
             host.contains("xiaohongshu") || host.contains("xhscdn") || host.contains("xhslink") -> "小红书"
             host.contains("kuaishou") || host.contains("kwaicdn") || host.contains("yximgs") -> "快手"
+            host.contains("bilibili") || host.contains("hdslb") || host.contains("b23.tv") -> "B站"
             host.contains("douyin") || host.contains("amemv") || host.contains("iesdouyin") -> "抖音"
             else -> "抖音"
         }
