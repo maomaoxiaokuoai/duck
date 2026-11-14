@@ -1,3 +1,23 @@
+## v2.8.4 — 2026-11-14
+
+### 优化
+
+- **快手改用官方 H5 接口**：`POST /rest/wd/ugH5App/photo/simple/info` 免签名、免 Cookie、
+  免登录，直接返回完整的 `photo` 对象。比之前解析 SSR 页面更稳（不依赖页面结构），
+  也更省流量（10KB vs 180KB）
+
+### 快手实况照片：确认做不到
+
+逆向研究结论（已实测）：
+
+- `photoType` 枚举只有 `VIDEO / SINGLE_PICTURE / VERTICAL_ATLAS / HORIZONTAL_ATLAS / SPHERICAL_VIDEO`，**没有实况类型**
+- 图片作品的 `ext_params.atlas` 只有 8 个键，payload 里 `.mp4`/`.mov` 出现 0 次
+- 采样 48 条推荐流，`photoType` 只有 VIDEO(40) + 卡片(8)，零实况
+- App 接口需要 `__NS_sig3` + 设备指纹，且响应码 50/2001 说明风控在验签之前就拦了
+- 第三方解析站独立佐证：「快手分享页里，实况作品只有照片和配乐，会动的那段视频根本不在里面」
+
+**结论：不是签名问题，是实况视频分量不在任何可匿名接口里。**
+
 ## v2.8.3 — 2026-11-14
 
 ### 修复
