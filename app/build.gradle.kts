@@ -116,17 +116,17 @@ android {
         create("arm64") {
             dimension = "abi"
             ndk { abiFilters += "arm64-v8a" }
-            versionCodeOverride = versionCode * 10 + 1
+            versionCode = 200001021
         }
         create("arm32") {
             dimension = "abi"
             ndk { abiFilters += "armeabi-v7a" }
-            versionCodeOverride = versionCode * 10 + 2
+            versionCode = 200001022
         }
         create("universal") {
             dimension = "abi"
             ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64") }
-            versionCodeOverride = versionCode * 10 + 9
+            versionCode = 200001029
         }
     }
 
