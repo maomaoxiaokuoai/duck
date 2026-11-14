@@ -117,6 +117,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.foundation.border
+import androidx.compose.ui.zIndex
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -505,6 +506,11 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            // The scrolling content draws above the bottom bar in a
+                            // Scaffold, and a tall card could cover the bolt so taps
+                            // landed on the card instead. Lifting the bar fixes the
+                            // hit order rather than padding around it.
+                            .zIndex(2f)
                             .navigationBarsPadding()
                             .padding(bottom = 24.dp, start = 16.dp, end = 16.dp),
                         horizontalArrangement = Arrangement.Center,
@@ -1151,7 +1157,7 @@ fun MainDownloaderTab(
                     // The Scaffold bottom bar IS the floating navigation bar, so
                     // calculateBottomPadding already equals its full height. Adding
                     // more on top of it left ~200dp of empty space below a gallery.
-                    bottom = contentPadding.calculateBottomPadding() + 20.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 96.dp,
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
