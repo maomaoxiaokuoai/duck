@@ -121,7 +121,7 @@ class BiliParser {
             duration = data["duration"]?.asStringOrNull()?.toLongOrNull()?.times(1000),
             max_resolution = resolution,
             // The separated audio track is saved beside the video when present.
-            audio_url = audioTracks?.bestAudioUrl(),
+            audio_urls = audioTracks?.audioUrls()?.takeIf { it.isNotEmpty() },
             http_headers = CDN_HEADERS,
         )
     }
@@ -176,10 +176,24 @@ class BiliParser {
         bestVideoTrack()?.get("baseUrl")?.asStringOrNull()
             ?: bestVideoTrack()?.get("base_url")?.asStringOrNull()
 
-    private fun JsonArray.bestAudioUrl(): String? =
+    /**
+     * Audio tracks, best bitrate first, each with its backup addresses.
+     *
+     * Bilibili returns the same track on several CDNs and any one of them can refuse
+     * a request, so every address is kept and the caller retries the next on failure.
+     */
+    private fun JsonArray.audioUrls(): List<String> =
         mapNotNull { it as? JsonObject }
-            .maxByOrNull { (it["id"]?.asStringOrNull()?.toIntOrNull() ?: 0) }
-            ?.let { it["baseUrl"]?.asStringOrNull() ?: it["base_url"]?.asStringOrNull() }
+            .sortedByDescending { it["id"]?.asStringOrNull()?.toIntOrNull() ?: 0 }
+            .flatMap { track ->
+                val primary = track["baseUrl"]?.asStringOrNull()
+                    ?: track["base_url"]?.asStringOrNull()
+                val backups = track["backupUrl"]?.jsonArray
+                    ?.mapNotNull { it.asStringOrNull() }
+                    .orEmpty()
+                listOfNotNull(primary) + backups
+            }
+            .distinct()
 
     private fun JsonElement?.asStringOrNull(): String? =
         (this as? JsonPrimitive)?.takeIf { it !is JsonNull }?.content

@@ -22,6 +22,15 @@ data class ExtractionResult(
     val is_gallery: Boolean? = null,
     val message: String? = null,
     val audio_url: String? = null,
+
+    /**
+     * Every audio track that pairs with the video, best first.
+     *
+     * Bilibili lists one track on several CDNs and one can refuse a request the
+     * another answers, so the caller walks this list rather than committing to the
+     * first address.
+     */
+    val audio_urls: List<String>? = null,
     val max_resolution: String? = null,
     val available_qualities: List<String>? = null,
     val http_headers: Map<String, String>? = null,

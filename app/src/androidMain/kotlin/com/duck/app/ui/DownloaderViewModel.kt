@@ -804,10 +804,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
 
         // Bilibili hands back a silent video plus a separate audio track above
         // 720P. Joining them is what makes the 1080P download watchable.
-        if (!result.audio_url.isNullOrBlank() && !isImage && mode != "audio") {
+        if (!result.audio_urls.isNullOrEmpty() && !isImage && mode != "audio") {
             val muxed = downloadAndMux(
                 videoUrl = downloadUrl,
-                audioUrl = result.audio_url,
+                audioUrls = result.audio_urls.orEmpty(),
                 fileName = fileName,
                 targetPath = targetPath,
                 headers = result.http_headers,
@@ -1213,7 +1213,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      */
     private suspend fun downloadAndMux(
         videoUrl: String,
-        audioUrl: String,
+        audioUrls: List<String>,
         fileName: String,
         targetPath: String,
         headers: Map<String, String>?,
@@ -1225,8 +1225,26 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         try {
             videoFile.writeBytes(fetchBytes(videoUrl, headers))
             logToConsole("视频流: " + videoFile.length() / 1024 / 1024 + " MB")
-            audioFile.writeBytes(fetchBytes(audioUrl, headers))
-            logToConsole("音频流: " + audioFile.length() / 1024 + " KB")
+
+            // The same audio is offered on several CDNs and one of them may refuse or
+            // hang, so every address is tried before giving up.
+            var audioOk = false
+            for ((i, url) in audioUrls.withIndex()) {
+                try {
+                    audioFile.writeBytes(fetchBytes(url, headers))
+                    if (audioFile.length() > 0) {
+                        logToConsole("音频流: " + audioFile.length() / 1024 + " KB")
+                        audioOk = true
+                        break
+                    }
+                } catch (e: Exception) {
+                    logToConsole("音频源 " + (i + 1) + "/" + audioUrls.size + " 失败")
+                }
+            }
+            if (!audioOk) {
+                logToConsole("所有音频源都失败，保留无声视频")
+                return@withContext null
+            }
 
             if (!TrackMuxer.mux(videoFile, audioFile, outputFile)) {
                 logToConsole("音视频合成失败，保留无声视频")
