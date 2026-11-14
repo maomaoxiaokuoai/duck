@@ -1,3 +1,12 @@
+## v3.1.1 — 2026-11-15
+
+### 修复
+
+- **B站音频下载 403**：`fetchBytes` 的 Referer 兜底写死成 `douyin.com`，B站 CDN
+  只认 `bilibili.com`。现在按 host 区分四家平台的 Referer
+- **错误日志只打印 URL**：`FileNotFoundException` 的 message 是整个 URL，
+  几千个字符刷满日志还看不出原因。现在归类成「服务器拒绝请求/网络超时」等
+
 ## v3.1.0 — 2026-11-15
 
 ### 突破：B站 1080P 无 Cookie 可得

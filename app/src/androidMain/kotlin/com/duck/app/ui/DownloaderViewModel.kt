@@ -1242,7 +1242,14 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             downloader.finalizeFile(uri, fileName)
             uri
         } catch (e: Exception) {
-            logToConsole("音视频处理失败: " + (e.message ?: ""))
+            // A FileNotFoundException carries the whole URL as its message, which
+            // tells the reader nothing about what went wrong.
+            val reason = when (e) {
+                is java.io.FileNotFoundException -> "服务器拒绝请求（可能是 Referer 或链接过期）"
+                is java.net.SocketTimeoutException -> "网络超时"
+                else -> e.message?.takeIf { !it.startsWith("http") } ?: e::class.simpleName ?: "未知错误"
+            }
+            logToConsole("音视频处理失败: " + reason)
             null
         } finally {
             runCatching { videoFile.delete() }
@@ -1290,6 +1297,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         val referer = when {
             host.contains("xhscdn") || host.contains("xiaohongshu") -> "https://www.xiaohongshu.com/"
             host.contains("douyin") || host.contains("amemv") || host.contains("iesdouyin") -> "https://www.douyin.com/"
+            // Bilibili's CDN rejects any other referer, which is what made the audio
+            // download fail and left the 1080P video silent.
+            host.contains("bilivideo") || host.contains("hdslb") || host.contains("bilibili") -> "https://www.bilibili.com/"
+            host.contains("kuaishou") || host.contains("kwaicdn") || host.contains("yximgs") -> "https://www.kuaishou.com/"
             else -> "https://www.douyin.com/"
         }
         val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
