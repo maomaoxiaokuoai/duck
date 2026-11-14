@@ -1119,12 +1119,22 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         notificationId: Int,
     ): ByteArray? = withContext(Dispatchers.IO) {
         runCatching {
+            logToConsole("动图合成: 下载静态图")
             val still = fetchBytes(imageUrl)
+            logToConsole("动图合成: 静态图 " + still.size + " 字节")
+            logToConsole("动图合成: 下载视频")
             val clip = fetchBytes(videoUrl)
+            logToConsole("动图合成: 视频 " + clip.size + " 字节")
             val merged = MotionPhotoWriter.build(still, clip)
-                ?: return@runCatching null
+            if (merged == null) {
+                logToConsole("动图合成失败: 格式不符")
+                return@runCatching null
+            }
+            logToConsole("动图合成完成: " + merged.size + " 字节")
             saveImageBytes(fileName, merged)
             merged
+        }.onFailure { e ->
+            logToConsole("动图合成异常: " + (e.message ?: e.toString()))
         }.getOrNull()
     }
 
