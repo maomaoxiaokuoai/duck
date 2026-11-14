@@ -177,7 +177,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 }
 
                 val fileLength = connection.contentLengthLong
-                val input = connection.inputStream
 
                 val apkFile = java.io.File(
                     android.os.Environment.getExternalStoragePublicDirectory(
@@ -185,22 +184,25 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     ),
                     "duck-update.apk",
                 )
-                val output = java.io.FileOutputStream(apkFile)
 
-                val data = ByteArray(8192)
-                var total = 0L
-                var count: Int
-                while (input.read(data).also { count = it } != -1) {
-                    total += count
-                    if (fileLength > 0) {
-                        updateDownloadProgress.value = total.toFloat() / fileLength.toFloat()
+                // Both streams are closed by use {}: a dropped connection throws straight
+                // out of the copy loop, and the explicit close() calls after it were never
+                // reached, leaving the half-written APK open until the process died.
+                connection.inputStream.use { input ->
+                    java.io.FileOutputStream(apkFile).use { output ->
+                        val data = ByteArray(8192)
+                        var total = 0L
+                        var count: Int
+                        while (input.read(data).also { count = it } != -1) {
+                            total += count
+                            if (fileLength > 0) {
+                                updateDownloadProgress.value = total.toFloat() / fileLength.toFloat()
+                            }
+                            output.write(data, 0, count)
+                        }
+                        output.flush()
                     }
-                    output.write(data, 0, count)
                 }
-
-                output.flush()
-                output.close()
-                input.close()
 
                 updateDownloadProgress.value = -1f
                 updateAvailable.value = null

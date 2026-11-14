@@ -5,10 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -90,7 +92,7 @@ class RedBookParser {
             ?.get("noteData")?.jsonObject
             ?: run {
                 val noteNode = root["note"]?.jsonObject ?: return@run null
-                val id = noteNode["currentNoteId"]?.jsonPrimitive?.content
+                val id = noteNode["currentNoteId"].stringOrNull()
                 if (id.isNullOrBlank() || id == "undefined") null
                 else noteNode["noteDetailMap"]?.jsonObject
                     ?.get(id)?.jsonObject
@@ -100,7 +102,7 @@ class RedBookParser {
 
         val stats = note["interactInfo"]?.jsonObject
         val author = note["user"]?.jsonObject
-            ?.let { it["nickName"]?.jsonPrimitive?.content ?: it["nickname"]?.jsonPrimitive?.content }
+            ?.let { it["nickName"].stringOrNull() ?: it["nickname"].stringOrNull() }
 
         val videoUrl = pickVideoUrl(note)
         if (videoUrl.isNotBlank()) {
@@ -157,15 +159,15 @@ class RedBookParser {
      * showed the fallback string for those until this looked in both places.
      */
     private fun noteTitle(note: JsonObject): String? =
-        note["title"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
-            ?: note["desc"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+        note["title"].stringOrNull()?.takeIf { it.isNotBlank() }
+            ?: note["desc"].stringOrNull()?.takeIf { it.isNotBlank() }
 
     /** The still shown on the card: the first page of the gallery, else the video frame. */
     private fun pickCover(note: JsonObject): String? =
         pickImages(note).firstOrNull()
             ?: note["video"]?.jsonObject
                 ?.get("image")?.jsonObject
-                ?.get("firstFrame")?.jsonPrimitive?.content
+                ?.get("firstFrame").stringOrNull()
 
     /**
      * The h265 stream first.
@@ -182,7 +184,7 @@ class RedBookParser {
             stream[codec]?.jsonArray
                 ?.firstOrNull { it is JsonObject }
                 ?.jsonObject
-                ?.get("masterUrl")?.jsonPrimitive?.content
+                ?.get("masterUrl").stringOrNull()
                 ?.takeIf { it.startsWith("http") }
                 ?.replaceFirst("http://", "https://")
                 ?.let { return it }
@@ -212,21 +214,21 @@ class RedBookParser {
             val item = entry as? JsonObject ?: return@mapNotNull null
             // urlDefault/url are the flat fields; infoList carries the same URLs keyed by
             // scene, with H5_DTL being the full-size one.
-            val flat = item["urlDefault"]?.jsonPrimitive?.content
-                ?: item["url"]?.jsonPrimitive?.content
+            val flat = item["urlDefault"].stringOrNull()
+                ?: item["url"].stringOrNull()
             val fromInfo = item["infoList"]?.jsonArray
-                ?.firstOrNull { it is JsonObject && it.jsonObject["imageScene"]?.jsonPrimitive?.content == "H5_DTL" }
+                ?.firstOrNull { it is JsonObject && it.jsonObject["imageScene"].stringOrNull() == "H5_DTL" }
                 ?.jsonObject
-                ?.get("url")?.jsonPrimitive?.content
+                ?.get("url").stringOrNull()
             val url = fromInfo ?: flat ?: return@mapNotNull null
 
-            val isLive = item["livePhoto"]?.jsonPrimitive?.content == "true"
+            val isLive = item["livePhoto"].stringOrNull() == "true"
             val clip = if (isLive) {
                 item["stream"]?.jsonObject
                     ?.get("h264")?.jsonArray
                     ?.firstOrNull { it is JsonObject }
                     ?.jsonObject
-                    ?.get("masterUrl")?.jsonPrimitive?.content
+                    ?.get("masterUrl").stringOrNull()
                     ?.takeIf { it.startsWith("http") }
                     ?.replaceFirst("http://", "https://")
             } else {
@@ -269,7 +271,7 @@ class RedBookParser {
      * separators and a K/M suffix — `22.9K` is common on large notes.
      */
     private fun countOf(stats: JsonObject?, key: String): Long? {
-        val text = stats?.get(key)?.jsonPrimitive?.content?.trim() ?: return null
+        val text = stats?.get(key).stringOrNull()?.trim() ?: return null
         if (text.isEmpty()) return null
         val multiplier = when {
             text.endsWith("K", ignoreCase = true) -> 1_000L
@@ -314,6 +316,16 @@ class RedBookParser {
             connection?.disconnect()
         }
     }
+
+    /**
+     * Reads a JSON leaf that may be null or missing.
+     *
+     * jsonPrimitive throws when the element is not a primitive, and an explicitly-null
+     * field is one: a note whose title was null took the whole parse down instead of
+     * falling back to desc.
+     */
+    private fun JsonElement?.stringOrNull(): String? =
+        (this as? JsonPrimitive)?.takeIf { it !is JsonNull }?.content
 
     private companion object {
         const val TAG = "RedBookParser"

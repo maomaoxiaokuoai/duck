@@ -5,7 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -205,7 +207,10 @@ class KuaiShouParser {
             ?: return emptyList()
         val list = atlas["list"]?.jsonArray ?: JsonArray(emptyList())
         return list.mapNotNull { entry ->
-            val path = entry.jsonPrimitive.content
+            // jsonPrimitive throws on a null or non-string element, which used to
+            // abort the whole atlas; a broken entry is skipped instead.
+            val path = (entry as? JsonPrimitive)?.takeIf { it !is JsonNull }?.content
+                ?: return@mapNotNull null
             if (path.isBlank()) null else "https://" + cdn + "/" + path.removePrefix("/")
         }
     }

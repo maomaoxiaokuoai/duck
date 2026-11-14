@@ -434,43 +434,46 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             }
         }
 
-        // Douyin lists several renditions and they are not interchangeable.
-        //
-        // download_addr is the largest file, but its watermark is burned into the
-        // picture, which defeats the point of this app. The play_addr family is the
-        // clean stream: no mark, slightly smaller. Between the clean candidates, take
-        // the biggest geometry then the biggest byte count.
+        // Asking the play endpoint for 1080p returns the largest encode the post
+        // actually has, which on a 1080p post is a real 1920x1080 file rather than the
+        // 1024x576 its url_list advertises, so it is the answer whenever play_addr
+        // carries a uri.
         val video = item["video"]?.asObject()
         if (video != null) {
-            val clean = mutableListOf<Pair<Long, String>>()
-
-            fun considerClean(addr: JsonObject?) {
-                if (addr == null) return
-                val urls = addr["url_list"]?.asArray()?.mapNotNull { it.asString() }.orEmpty()
-                val best = urls.firstOrNull { it.startsWith("http") } ?: return
-                val pixels = (addr["width"]?.asString()?.toLongOrNull() ?: 0L) *
-                    (addr["height"]?.asString()?.toLongOrNull() ?: 0L)
-                val bytes = addr["data_size"]?.asString()?.toLongOrNull() ?: 0L
-                clean += (pixels * 1_000_000L + bytes) to best
-            }
-
-            // play_addr_265 is the HEVC encode and is often the only 720p+ option on a
-            // post whose H.264 stream is capped at 576p, so it must be considered.
-            considerClean(video["play_addr_265"]?.asObject())
-            considerClean(video["play_addr_h264"]?.asObject())
-            considerClean(video["play_addr"]?.asObject())
-            video["bit_rate"]?.asArray()?.forEach { entry ->
-                considerClean(entry.jsonObject["play_addr"]?.asObject())
-            }
-
-            // Asking the play endpoint for 1080p returns the largest encode the
-            // post actually has, which on a 1080p post is a real 1920x1080 file
-            // rather than the 1024x576 its url_list advertises.
             val videoId = video["play_addr"]?.asObject()?.get("uri")?.asString()
 
             if (!videoId.isNullOrBlank()) {
                 result += Media(highQualityPlayUrl(videoId), "mp4")
             } else {
+                // Only uri-less shapes reach here, and only here is the rendition list
+                // read. Collecting it on every item ranked candidates this branch never
+                // looked at, which is what made the ranking look unused.
+                //
+                // download_addr is the largest file, but its watermark is burned into
+                // the picture. The play_addr family is the clean stream: no mark,
+                // slightly smaller. Between the clean candidates, take the biggest
+                // geometry then the biggest byte count.
+                val clean = mutableListOf<Pair<Long, String>>()
+
+                fun considerClean(addr: JsonObject?) {
+                    if (addr == null) return
+                    val urls = addr["url_list"]?.asArray()?.mapNotNull { it.asString() }.orEmpty()
+                    val best = urls.firstOrNull { it.startsWith("http") } ?: return
+                    val pixels = (addr["width"]?.asString()?.toLongOrNull() ?: 0L) *
+                        (addr["height"]?.asString()?.toLongOrNull() ?: 0L)
+                    val bytes = addr["data_size"]?.asString()?.toLongOrNull() ?: 0L
+                    clean += (pixels * 1_000_000L + bytes) to best
+                }
+
+                // play_addr_265 is the HEVC encode and is often the only 720p+ option
+                // on a post whose H.264 stream is capped at 576p, so it is considered.
+                considerClean(video["play_addr_265"]?.asObject())
+                considerClean(video["play_addr_h264"]?.asObject())
+                considerClean(video["play_addr"]?.asObject())
+                video["bit_rate"]?.asArray()?.forEach { entry ->
+                    considerClean(entry.jsonObject["play_addr"]?.asObject())
+                }
+
                 val chosen = clean.maxByOrNull { it.first }?.second
                 // Only when the clean set is empty does a marked file beat no file.
                     ?: video["download_addr"]?.asObject()

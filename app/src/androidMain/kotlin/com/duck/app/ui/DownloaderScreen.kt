@@ -119,6 +119,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.foundation.border
 import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.foundation.layout.aspectRatio
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -2590,6 +2591,8 @@ fun LogsTab(
 ) {
     var itemToDelete by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
     var selectedLog by remember { mutableStateOf<com.duck.app.model.DownloadLog?>(null) }
+    // The tile whose full view is open; null when the sheet is the only thing showing.
+    var previewImage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     
     if (itemToDelete != null) {
@@ -2809,15 +2812,39 @@ fun LogsTab(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 rowItems.forEach { savedPath ->
-                                    coil.compose.AsyncImage(
-                                        model = savedPath,
-                                        contentDescription = null,
+                                    Box(
                                         modifier = Modifier
                                             .weight(1f)
                                             .height(110.dp)
-                                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
-                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                    )
+                                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                                            .clickable { previewImage = savedPath },
+                                    ) {
+                                        coil.compose.AsyncImage(
+                                            model = savedPath,
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                        )
+                                        // A motion photo is a JPEG with a clip inside; a
+                                        // thumbnail can only show its still, so the tile
+                                        // says what it is and opens the moving version.
+                                        if (log.mediaKind == "live") {
+                                            Surface(
+                                                color = Color.Black.copy(alpha = 0.55f),
+                                                shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .padding(6.dp),
+                                            ) {
+                                                Text(
+                                                    "动图",
+                                                    color = Color.White,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                                 repeat(3 - rowItems.size) {
                                     Spacer(modifier = Modifier.weight(1f))
@@ -2997,6 +3024,50 @@ fun LogsTab(
         }
             }
     }
+
+// A saved motion photo is a JPEG with a clip inside it; the still is all a
+// thumbnail or an image loader can show, so opening one plays the clip that
+// makes it a moving image.
+if (previewImage != null) {
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = { previewImage = null },
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.95f))
+                .clickable { previewImage = null },
+            contentAlignment = Alignment.Center,
+        ) {
+            val previewPlayer = remember(previewImage) {
+                androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
+            }
+            DisposableEffect(previewImage) {
+                val item = androidx.media3.common.MediaItem.fromUri(
+                    android.net.Uri.parse(previewImage),
+                )
+                previewPlayer.setMediaItem(item)
+                previewPlayer.prepare()
+                previewPlayer.playWhenReady = true
+                onDispose { previewPlayer.release() }
+            }
+            androidx.compose.ui.viewinterop.AndroidView(
+                factory = { ctx ->
+                    val view = android.view.LayoutInflater.from(ctx)
+                        .inflate(com.duck.app.R.layout.player_view_layout, null)
+                            as androidx.media3.ui.PlayerView
+                    view.apply {
+                        player = previewPlayer
+                        useController = true
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().aspectRatio(0.5625f),
+            )
+        }
+    }
+}
+
 }
 
 

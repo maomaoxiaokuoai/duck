@@ -25,6 +25,9 @@ object MotionPhotoWriter {
 
     private const val TAG = "MotionPhotoWriter"
 
+    /** How far back from the end an EOI marker may sit: JPEG allows a little trailing pad. */
+    private const val EOI_TAIL_BYTES = 64
+
     /**
      * Returns [jpeg] with [video] appended and the XMP block inserted, or null when the
      * inputs do not look like the expected formats.
@@ -88,10 +91,23 @@ object MotionPhotoWriter {
         append("<?xpacket end=\"w\"?>")
     }
 
-    private fun isJpeg(bytes: ByteArray): Boolean =
-        bytes.size > 4 &&
-            bytes[0] == 0xFF.toByte() &&
-            bytes[1] == 0xD8.toByte()
+    /**
+     * True for a JPEG that is both SOI-led and EOI-terminated.
+     *
+     * The SOI check alone accepted a download the connection cut short, and the result
+     * was a motion photo whose still no viewer could decode. A short pad after EOI is
+     * normal, so the marker is searched for in the tail instead of being required in
+     * the last two bytes.
+     */
+    private fun isJpeg(bytes: ByteArray): Boolean {
+        if (bytes.size < 4) return false
+        if (bytes[0] != 0xFF.toByte() || bytes[1] != 0xD8.toByte()) return false
+        val from = (bytes.size - EOI_TAIL_BYTES).coerceAtLeast(2)
+        for (i in bytes.size - 2 downTo from) {
+            if (bytes[i] == 0xFF.toByte() && bytes[i + 1] == 0xD9.toByte()) return true
+        }
+        return false
+    }
 
     private fun isMp4(bytes: ByteArray): Boolean =
         bytes.size > 12 && String(bytes, 4, 4, Charsets.ISO_8859_1) == "ftyp"
