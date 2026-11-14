@@ -1122,7 +1122,7 @@ fun MainDownloaderTab(
                     // The Scaffold bottom bar IS the floating navigation bar, so
                     // calculateBottomPadding already equals its full height. Adding
                     // more on top of it left ~200dp of empty space below a gallery.
-                    bottom = contentPadding.calculateBottomPadding(),
+                    bottom = contentPadding.calculateBottomPadding() + 20.dp,
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -1447,14 +1447,12 @@ fun MainDownloaderTab(
                         Column(modifier = Modifier.padding(16.dp)) {
                             // Full title: this card summarises one post, and cutting it
                             // short hid the part that identifies the clip.
-                            // Douyin captions run to hundreds of characters; without
-                            // a cap the card grows taller than the screen.
+                            // The full caption, however long: cutting it hid the
+                            // part that identifies the post.
                             Text(
                                 meta.title ?: "无标题",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 3,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             )
 
                             if (!meta.author.isNullOrBlank()) {
