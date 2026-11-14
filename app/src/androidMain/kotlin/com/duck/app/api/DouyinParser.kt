@@ -451,7 +451,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             ext = items.first().ext,
             // A gallery of one image is still a gallery: the post carries an image
             // list, which is what decides the kind, not how many entries it holds.
-            is_gallery = (detail["images"]?.asArray()?.size ?: 0) > 0
+            is_gallery = (item["images"]?.asArray()?.size ?: 0) > 0
         )
     }
 
