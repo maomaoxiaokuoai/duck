@@ -118,6 +118,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.foundation.border
 import androidx.compose.ui.zIndex
+import androidx.compose.material.icons.filled.ErrorOutline
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -564,11 +565,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (false) {
-                                            m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
-                                        } else {
-                                            m.background(bg0)
-                                        }
+                                        m.background(bg0)
                                     }.clickable {
                                         selectedTab = 0
                                     }.padding(horizontal = pad0, vertical = 10.dp),
@@ -589,11 +586,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (false) {
-                                            m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
-                                        } else {
-                                            m.background(bg1)
-                                        }
+                                        m.background(bg1)
                                     }.clickable {
                                         selectedTab = 1
                                     }.padding(horizontal = pad1, vertical = 10.dp),
@@ -615,11 +608,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                             ) {
                                 Box(
                                     modifier = Modifier.clip(CircleShape).let { m ->
-                                        if (false) {
-                                            m.hazeChild(state = hazeState, shape = CircleShape, style = HazeStyle(tint = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f), blurRadius = 16.dp)).background(Color.Transparent)
-                                        } else {
-                                            m.background(bg2)
-                                        }
+                                        m.background(bg2)
                                     }.clickable {
                                         selectedTab = 2
                                     }.padding(horizontal = pad2, vertical = 10.dp),
@@ -1294,6 +1283,39 @@ fun MainDownloaderTab(
         // empty "Unknown Title" placeholder, which looked like a result while saying
         // nothing, so nothing is drawn until there is something to show.
         val resolved = preview?.takeIf { it.status == "success" }
+
+        // A failed resolution has to say why. Leaving the screen blank made a
+        // rejected link look like the app had ignored the paste.
+        val failure = preview?.takeIf { it.status == "error" }
+        AnimatedVisibility(visible = failure != null) {
+            failure?.let { bad ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                    ),
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Icon(
+                            Icons.Default.ErrorOutline,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                        Text(
+                            bad.message ?: "解析失败",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                    }
+                }
+            }
+        }
+
         AnimatedVisibility(visible = resolved != null) {
             resolved?.let { meta ->
                 val isImageOrGallery = meta.is_gallery == true ||
@@ -1861,27 +1883,6 @@ internal fun formatBytes(bytes: Long): String {
     }
 }
 
-@Composable
-fun DownloadProgressBox(progress: Float, onCancel: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.downloading), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-                IconButton(onClick = onCancel, modifier = Modifier.size(24.dp)) {
-                    Icon(Icons.Default.Close, null, tint = MaterialTheme.colorScheme.error)
-                }
-            }
-            WavyProgressIndicator(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth().height(16.dp)
-            )
-            Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.labelMedium, modifier = Modifier.align(Alignment.End))
-        }
-    }
-}
 
 @Composable
 fun WavyProgressIndicator(
@@ -2998,56 +2999,6 @@ fun LogsTab(
     }
 }
 
-@Composable
-fun StatusInfo(state: DownloadState, onOpenFolder: () -> Unit) {
-    val color = when (state) {
-        is DownloadState.Success -> MaterialTheme.colorScheme.primary
-        is DownloadState.Error -> MaterialTheme.colorScheme.error
-        else -> MaterialTheme.colorScheme.secondary
-    }
-    Surface(
-        color = color.copy(alpha = 0.08f),
-        shape = RoundedCornerShape(24.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (state is DownloadState.Success) Modifier.clickable { onOpenFolder() } else Modifier)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                if (state is DownloadState.Error) Icons.Default.Error else Icons.Default.Movie,
-                null,
-                tint = color,
-                modifier = Modifier.size(20.dp)
-            )
-            Column {
-                val title = when (state) {
-                    is DownloadState.Downloading -> "Downloading... ${(state.progress * 100).toInt()}%"
-                    is DownloadState.Success -> "Done!"
-                    is DownloadState.Error -> "Error"
-                    else -> ""
-                }
-                Text(title, style = MaterialTheme.typography.labelLarge, color = color)
-                if (state is DownloadState.Error) {
-                    Text(state.message, style = MaterialTheme.typography.bodySmall, color = color, maxLines = 1)
-                } else if (state is DownloadState.Success) {
-                    Text(stringResource(R.string.check_your_selected_folder), style = MaterialTheme.typography.bodySmall, color = color)
-                }
-            }
-        }
-    }
-}
 
 
-/** Chinese labels for the download mode chips. */
-private fun modeLabel(mode: String): String = when (mode) {
-    "auto" -> "自动"
-    "video" -> "视频"
-    "audio" -> "音频"
-    "image" -> "图片"
-    else -> mode
-}
 

@@ -524,8 +524,19 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun fetchPreview(url: String, quality: String, mode: String = "auto") {
-        val link = douyinParser.extractUrl(url)
+        val link = extractUrl(url)
         currentPreviewJob?.cancel()
+
+        // Nothing hosts these links, so no parser would claim them and the screen
+        // simply went blank - which reads as the app ignoring the paste rather than
+        // rejecting the site.
+        if (!isDouyinUrl(link)) {
+            _previewMetadata.value = ExtractionResult(
+                status = "error",
+                message = "只支持抖音、小红书、快手的链接",
+            )
+            return
+        }
         currentPreviewJob = viewModelScope.launch {
             clearConsole()
             logToConsole("----------------------------------------")
@@ -586,9 +597,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         logToConsole("Cleared preview metadata")
     }
 
-    fun setPreviewMetadata(result: com.duck.app.api.ExtractionResult) {
-        _previewMetadata.value = result
-    }
 
     /**
      * Resolves [url] with DouyinParser and streams the resulting direct links to disk.
