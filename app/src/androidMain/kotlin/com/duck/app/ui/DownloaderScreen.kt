@@ -861,7 +861,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                 },
                 confirmButton = {
                     TextButton(onClick = { showSupportedSitesDialog = false }) {
-                        Text(stringResource(R.string.close))
+                        Text(stringResource(R.string.close), maxLines = 1)
                     }
                 },
                 dismissButton = {
@@ -3015,9 +3015,9 @@ fun LogsTab(
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         ),
                     ) {
-                        Icon(Icons.Default.Link, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("复制链接")
+                        // Three buttons share the row now; the icon plus two
+                        // characters wrapped onto two lines at this width.
+                        Text("复制链接", maxLines = 1)
                     }
 
                     // Deleting the row is the obvious action from here, and it used to
@@ -3025,7 +3025,8 @@ fun LogsTab(
                     var confirmDelete by remember { mutableStateOf(false) }
                     Button(
                         onClick = { confirmDelete = true },
-                        modifier = Modifier.height(52.dp),
+                        modifier = Modifier.height(52.dp).width(72.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
                         colors = ButtonDefaults.filledTonalButtonColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
@@ -3049,7 +3050,7 @@ fun LogsTab(
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         ),
                     ) {
-                        Text(stringResource(R.string.close))
+                        Text(stringResource(R.string.close), maxLines = 1)
                     }
 
                     // Deleting a record leaves the file in the gallery, so the wording
