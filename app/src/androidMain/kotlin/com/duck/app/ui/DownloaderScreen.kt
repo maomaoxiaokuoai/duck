@@ -120,6 +120,7 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.material.icons.filled.Delete
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -3019,6 +3020,21 @@ fun LogsTab(
                         Text("复制链接")
                     }
 
+                    // Deleting the row is the obvious action from here, and it used to
+                    // be reachable only from the list behind the sheet.
+                    var confirmDelete by remember { mutableStateOf(false) }
+                    Button(
+                        onClick = { confirmDelete = true },
+                        modifier = Modifier.height(52.dp),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(100),
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f),
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        ),
+                    ) {
+                        Icon(Icons.Default.Delete, null, modifier = Modifier.size(18.dp))
+                    }
+
                     Button(
                         onClick = {
                             closeScope.launch {
@@ -3034,6 +3050,31 @@ fun LogsTab(
                         ),
                     ) {
                         Text(stringResource(R.string.close))
+                    }
+
+                    // Deleting a record leaves the file in the gallery, so the wording
+                    // says record rather than media.
+                    if (confirmDelete) {
+                        androidx.compose.material3.AlertDialog(
+                            onDismissRequest = { confirmDelete = false },
+                            title = { Text("删除这条记录？") },
+                            text = { Text("只删除历史记录，相册里的文件会保留。") },
+                            confirmButton = {
+                                androidx.compose.material3.TextButton(onClick = {
+                                    selectedLog?.let { onDelete(it) }
+                                    confirmDelete = false
+                                    closeScope.launch {
+                                        sheetState.hide()
+                                        selectedLog = null
+                                    }
+                                }) { Text("删除") }
+                            },
+                            dismissButton = {
+                                androidx.compose.material3.TextButton(onClick = { confirmDelete = false }) {
+                                    Text("取消")
+                                }
+                            },
+                        )
                     }
                 }
         }
