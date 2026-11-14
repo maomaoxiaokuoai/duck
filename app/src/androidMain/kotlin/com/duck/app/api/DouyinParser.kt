@@ -268,12 +268,24 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
         val items = mutableListOf<Media>()
 
+        // A Douyin gallery image may be a live photo: the still carries its own short
+        // clip under video.play_addr. Pairing them here is what lets the downloader
+        // write one motion photo instead of a still and an unrelated video.
+        val liveClips = mutableListOf<String?>()
         detail["images"]?.asArray()?.forEach { image ->
             val urls = image.jsonObject["urlList"]?.asArray()
                 ?.mapNotNull { it.asString() }
                 .orEmpty()
             val best = urls.lastOrNull { it.startsWith("http") } ?: urls.firstOrNull()
-            if (best != null) items += Media(best, extensionOf(best, "jpg"))
+            if (best != null) {
+                items += Media(best, extensionOf(best, "jpg"))
+                liveClips += image.jsonObject["video"]?.asObject()
+                    ?.get("playAddr")?.asObject()
+                    ?.get("urlList")?.asArray()
+                    ?.mapNotNull { it.asString() }
+                    ?.firstOrNull { it.startsWith("http") }
+                    ?.let { playUrl(it) }
+            }
         }
 
         val videoUrls = detail["video"]?.asObject()
@@ -305,6 +317,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             platform = "抖音",
             is_gallery = items.size > 1,
             media_kind = if (items.size > 1) "gallery" else "video",
+            live_video_urls = liveClips.takeIf { list -> list.any { it != null } },
             like_count = stats?.get("diggCount")?.longOrNull(),
             comment_count = stats?.get("commentCount")?.longOrNull(),
             share_count = stats?.get("shareCount")?.longOrNull(),
