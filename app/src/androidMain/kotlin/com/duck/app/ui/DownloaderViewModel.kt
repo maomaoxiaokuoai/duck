@@ -35,6 +35,8 @@ import com.duck.app.api.ExtractionResult
 import com.duck.app.ui.theme.AppTheme
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 
 class DownloaderViewModel(application: Application) : AndroidViewModel(application) {
@@ -485,7 +487,8 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         if (result.is_gallery != true || urls.isEmpty()) return result
         if (result.media_size != null && result.media_size!! > 0) return result
 
-        val totals = urls.map { url ->
+        val totals = kotlinx.coroutines.coroutineScope {
+            urls.map { url ->
             kotlinx.coroutines.async(kotlinx.coroutines.Dispatchers.IO) {
                 runCatching {
                     val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
@@ -501,6 +504,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 }.getOrDefault(0L)
             }
         }.map { it.await() }
+        }
 
         val total = totals.sum()
         return if (total > 0) result.copy(media_size = total) else result
