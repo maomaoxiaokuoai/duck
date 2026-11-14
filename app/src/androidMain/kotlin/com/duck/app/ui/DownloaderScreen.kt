@@ -503,6 +503,14 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
             containerColor = androidx.compose.ui.graphics.Color.Transparent,
             bottomBar = {
                 if (!isExpanded) {
+                    // A Surface with tonal elevation: Scaffold stacks content above a
+                    // plain bottomBar, and a tall card could sit over the bolt so the
+                    // tap hit the card. An elevated surface brings the bar forward.
+                    Surface(
+                        tonalElevation = 3.dp,
+                        shadowElevation = 0.dp,
+                        color = androidx.compose.ui.graphics.Color.Transparent,
+                    ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -758,6 +766,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                 }
                             }
                         }
+                    }
                     }
                 }
             }
