@@ -392,9 +392,17 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
     // Typing a URL parses it after a pause. Tracking the last link that was resolved
     // keeps this from re-parsing the same one the paste button just handled, while
     // still resolving the next link that is typed.
+    // Tracks the link that was last handed to the parser, so typing does not resolve
+    // the same URL twice. Cleared whenever there is no preview, otherwise returning to
+    // this tab left a stale entry that blocked the link already in the field.
     var lastParsedUrl by remember { mutableStateOf("") }
-    LaunchedEffect(url) {
+    LaunchedEffect(preview) {
+        if (preview == null) lastParsedUrl = ""
+    }
+    LaunchedEffect(url, preview) {
         if (url.isNotBlank() && url.startsWith("http") && url != lastParsedUrl) {
+            // A successful preview for this same link means it is already resolved.
+            if (preview?.status == "success" && lastParsedUrl == url) return@LaunchedEffect
             delay(1000)
             lastParsedUrl = url
             viewModel.fetchPreview(url, quality, downloadMode)
