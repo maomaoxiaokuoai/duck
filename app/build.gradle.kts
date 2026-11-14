@@ -78,8 +78,8 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 20000079
-        versionName = "2.6.2"
+        versionCode = 20000080
+        versionName = "2.6.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
