@@ -764,6 +764,40 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         logToConsole("正在下载: $fileName")
         logToConsole("保存目录: $targetPath")
 
+        val liveClip = result.urls.orEmpty().indexOf(downloadUrl)
+            .takeIf { it >= 0 }
+            ?.let { result.live_video_urls?.getOrNull(it) }
+
+        if (!liveClip.isNullOrBlank() && isImage) {
+            val merged = downloadMotionPhoto(downloadUrl, liveClip, fileName, notificationId)
+            if (merged != null) {
+                logToConsole("动图已保存: $targetPath/$fileName")
+                val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
+                logDao.insertLog(
+                    DownloadLog(
+                        title = title,
+                        url = sourceUrl,
+                        status = "Success",
+                        path = targetPath + "/" + fileName,
+                        thumbnailPath = cachedThumb,
+                        author = result.author,
+                        createTime = result.create_time,
+                        platform = result.platform ?: "抖音",
+                        likeCount = result.like_count,
+                        commentCount = result.comment_count,
+                        shareCount = result.share_count,
+                        collectCount = result.collect_count,
+                        duration = result.duration,
+                        mediaKind = "live",
+                        fileSize = merged.size.toLong(),
+                    )
+                )
+                _uiState.value = DownloadState.Success(path = targetPath + "/" + fileName)
+                return
+            }
+            logToConsole("动图合成失败，改为保存静态图")
+        }
+
         downloader.downloadFile(
             url = downloadUrl,
             fileName = fileName,
