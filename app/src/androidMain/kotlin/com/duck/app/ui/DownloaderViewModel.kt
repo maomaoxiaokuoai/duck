@@ -268,6 +268,18 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * from a raced mirror (see GithubMirror) and the download link is rewritten to
      * that same mirror. Nothing ever talks to github.com directly.
      */
+    /**
+     * Hides the update prompt for this version.
+     *
+     * The next release shows up again; only the version the user said later to is
+     * suppressed, so the reminder does not come back on every start.
+     */
+    fun dismissUpdate() {
+        updateAvailable.value?.let { info ->
+            prefs.edit().putString("skipped_version", info.version).apply()
+        }
+        updateAvailable.value = null
+    }
     fun checkForUpdates(manual: Boolean = false) {
         viewModelScope.launch {
             isCheckingUpdates.value = true
@@ -306,7 +318,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 val current = com.duck.app.BuildConfig.VERSION_NAME
                 val isNewer = isVersionNewer(latestVersion, current)
 
-                if (isNewer && !latestVersion.contains("beta", ignoreCase = true)) {
+                // A version the user dismissed should stay quiet until the next release,
+                // otherwise the dialog returns on every cold start.
+                val skipped = prefs.getString("skipped_version", null)
+                if (isNewer && !latestVersion.contains("beta", ignoreCase = true) && (manual || skipped != latestVersion)) {
                     updateAvailable.value = UpdateInfo(
                         version = latestVersion,
                         apkUrl = apkUrl,
@@ -566,7 +581,15 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 _previewMetadata.value = withGallerySize(result)
             } catch (e: Exception) {
                 logToConsole("预览异常: ${e.message}")
-                _previewMetadata.value = ExtractionResult(status = "error", message = e.message ?: "解析失败")
+                // Raw socket text reaches the user here, and a message like
+                // "Unable to resolve host" means nothing in Chinese.
+                val reason = when (e) {
+                    is java.net.UnknownHostException -> "网络不可用，请检查连接"
+                    is java.net.SocketTimeoutException -> "连接超时，请重试"
+                    is java.net.ConnectException -> "无法连接服务器"
+                    else -> e.message?.takeIf { it.isNotBlank() } ?: "解析失败"
+                }
+                _previewMetadata.value = ExtractionResult(status = "error", message = reason)
             }
         }
     }

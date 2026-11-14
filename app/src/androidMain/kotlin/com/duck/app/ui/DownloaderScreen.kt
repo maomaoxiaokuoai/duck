@@ -900,7 +900,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         val isDownloading = progress >= 0f
 
         AlertDialog(
-            onDismissRequest = { if (!isDownloading) viewModel.updateAvailable.value = null },
+            onDismissRequest = { if (!isDownloading) viewModel.dismissUpdate() },
             title = {
                 Text(
                     if (isDownloading) "正在下载更新"
@@ -960,7 +960,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.updateAvailable.value = null },
+                    onClick = { viewModel.dismissUpdate() },
                     enabled = !isDownloading,
                 ) {
                     Text(stringResource(R.string.later))

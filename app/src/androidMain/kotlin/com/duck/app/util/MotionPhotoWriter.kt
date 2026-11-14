@@ -101,26 +101,51 @@ object MotionPhotoWriter {
      * must ignore those attributes, so a viewer that follows the spec would not have
      * treated the file as a motion photo at all.
      */
+    /**
+     * The XMP packet the motion photo spec defines, with Xiaomi's fields beside it.
+     *
+     * Two namespaces matter and both come from the format document: the camera one
+     * (prefix Camera) marks the file as a motion photo, and the container one (prefix
+     * Container) is the directory saying where the clip starts.
+     *
+     * Xiaomi's gallery does not read that directory. Older models look for the
+     * MicroVideo fields that the format document removed, under the same namespace
+     * declared as GCamera, and its own camera writes exactly such a mixed packet:
+     * a Container directory plus the legacy offset. Both are written here so one
+     * file animates on a Xiaomi phone and on Google Photos without a second export.
+     *
+     * MicroVideoOffset counts backwards from the end of the file to where the clip
+     * begins - the same number as the clip's length while the clip sits last.
+     */
     private fun buildXmp(stillLength: Int, videoLength: Int): String = buildString {
         append("<?xpacket begin=\"\uFEFF\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")
         append("<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">")
         append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">")
-        append("<rdf:Description rdf:about=\"\"")
+        append("<rdf:Description rdf:about=\"")
         append(" xmlns:Camera=\"http://ns.google.com/photos/1.0/camera/\"")
         append(" xmlns:Container=\"http://ns.google.com/photos/1.0/container/\"")
         append(" xmlns:Item=\"http://ns.google.com/photos/1.0/container/item/\"")
+        append(" xmlns:GCamera=\"http://ns.google.com/photos/1.0/camera/\"")
+        append(" xmlns:MiCamera=\"http://ns.xiaomi.com/photos/1.0/camera/\"")
         append(" Camera:MotionPhoto=\"1\"")
         append(" Camera:MotionPhotoVersion=\"1\"")
-        append(" Camera:MotionPhotoPresentationTimestampUs=\"0\">")
+        append(" Camera:MotionPhotoPresentationTimestampUs=\"0\"")
+        // The legacy fields, for the readers that predate the directory.
+        append(" GCamera:MotionPhoto=\"1\"")
+        append(" GCamera:MicroVideo=\"1\"")
+        append(" GCamera:MicroVideoVersion=\"1\"")
+        append(" GCamera:MicroVideoPresentationTimestampUs=\"0\"")
+        append(" GCamera:MicroVideoOffset=\"")
+        append(videoLength)
+        append("\">")
         append("<Container:Directory><rdf:Seq>")
-        // The primary image must be the first entry, and its length is what precedes
-        // the video in this file.
+        // The primary image comes first, and its length is what precedes the clip.
         append("<rdf:li rdf:parseType=\"Resource\">")
         append("<Container:Item Item:Mime=\"image/jpeg\" Item:Semantic=\"Primary\" Item:Length=\"")
         append(stillLength)
         append("\"/>")
         append("</rdf:li>")
-        // The video must be last, and nothing may follow it.
+        // The clip comes last, and nothing may follow it.
         append("<rdf:li rdf:parseType=\"Resource\">")
         append("<Container:Item Item:Mime=\"video/mp4\" Item:Semantic=\"MotionPhoto\" Item:Length=\"")
         append(videoLength)

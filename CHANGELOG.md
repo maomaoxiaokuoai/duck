@@ -1,3 +1,43 @@
+## v3.4.0 — 2026-11-15
+
+### 新增：小米兼容的动图格式
+
+**国产手机读不懂我们生成的动图，原因找到了。**
+
+查了 [Albresky/MotionPhoto2AppleLivePhoto](https://github.com/Albresky/MotionPhoto2AppleLivePhoto)
+和 [wszqkzqk/live-photo-conv](https://github.com/wszqkzqk/live-photo-conv) 的实现，
+小米自己就有**两套格式并存**：
+
+```
+新机型：Google 的 Container:Directory 规范   ← 我们之前只用这个
+老机型：GCamera:MicroVideoOffset 旧字段     ← 小米相册读的是这个
+```
+
+而且小米相机本身输出的就是**混合包**（Directory + 旧字段同时存在）。
+
+现在两套都写：
+
+```xml
+<!-- Google 标准 -->
+<Container:Item Item:Semantic="Primary" Item:Length="579330"/>
+<Container:Item Item:Semantic="MotionPhoto" Item:Length="577605"/>
+
+<!-- 小米旧格式，同一个文件里并存 -->
+GCamera:MicroVideo="1"
+GCamera:MicroVideoOffset="577605"   ← 从文件末尾到视频起点的距离
+MiCamera:XMPMeta=""
+```
+
+两个数字都正确，所以 Google Photos 读 Directory、小米相册读 Offset，
+同一个文件两边都能播。
+
+### 修复
+
+- **更新弹窗每次启动都弹**：加了「忽略此版本」记录，点「稍后」后同一版本不再提示，
+  下个版本会重新提示。手动检查更新不受影响
+- **网络错误直接显示英文**：`Unable to resolve host "v.douyin.com"` 这种
+  socket 原文对用户毫无意义。现在分类成「网络不可用，请检查连接」等中文提示
+
 ## v3.3.0 — 2026-11-15
 
 ### 新增
