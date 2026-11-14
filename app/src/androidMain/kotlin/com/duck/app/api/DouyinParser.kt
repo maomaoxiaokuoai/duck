@@ -83,7 +83,15 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
             parsePage(finalUrl, html)
         } catch (e: Exception) {
-            ExtractionResult(status = "error", message = e.message ?: "抖音解析失败")
+            // A socket message such as "Unable to resolve host" carries no meaning
+            // for the reader, so the common network faults get their own wording.
+            val reason = when (e) {
+                is java.net.UnknownHostException -> "网络不可用，请检查连接"
+                is java.net.SocketTimeoutException -> "连接超时，请重试"
+                is java.net.ConnectException -> "无法连接服务器"
+                else -> e.message?.takeIf { it.isNotBlank() } ?: "抖音解析失败"
+            }
+            ExtractionResult(status = "error", message = reason)
         }
     }
 

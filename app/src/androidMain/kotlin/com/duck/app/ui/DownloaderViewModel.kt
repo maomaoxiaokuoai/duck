@@ -161,74 +161,94 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * failure is surfaced as a short Chinese message rather than the raw exception: the
      * user cannot act on a stack of query parameters.
      */
-    fun downloadUpdate(context: android.content.Context, url: String) {
+    fun downloadUpdate(context: android.content.Context, url: String, alternates: List<String> = emptyList()) {
         viewModelScope.launch(Dispatchers.IO) {
-            var connection: java.net.HttpURLConnection? = null
-            try {
-                updateDownloadProgress.value = 0f
-                connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
-                    connectTimeout = 20_000
-                    readTimeout = 120_000
-                    instanceFollowRedirects = true
-                    setRequestProperty("User-Agent", "duck-updater")
-                    setRequestProperty("Accept", "application/octet-stream")
-                }
+            // A release can name its APK differently than expected, and a mirror can
+            // refuse a path it has not cached. Walking every candidate turns a 404 into
+            // a retry instead of a dead end.
+            val targets = (listOf(url) + alternates).distinct()
+            var lastError: String? = null
 
-                val status = connection.responseCode
-                if (status !in 200..299) {
-                    throw java.io.IOException("HTTP " + status)
-                }
-
-                val fileLength = connection.contentLengthLong
-
-                val apkFile = java.io.File(
-                    android.os.Environment.getExternalStoragePublicDirectory(
-                        android.os.Environment.DIRECTORY_DOWNLOADS,
-                    ),
-                    "duck-update.apk",
-                )
-
-                // Both streams are closed by use {}: a dropped connection throws straight
-                // out of the copy loop, and the explicit close() calls after it were never
-                // reached, leaving the half-written APK open until the process died.
-                connection.inputStream.use { input ->
-                    java.io.FileOutputStream(apkFile).use { output ->
-                        val data = ByteArray(8192)
-                        var total = 0L
-                        var count: Int
-                        while (input.read(data).also { count = it } != -1) {
-                            total += count
-                            if (fileLength > 0) {
-                                updateDownloadProgress.value = total.toFloat() / fileLength.toFloat()
-                            }
-                            output.write(data, 0, count)
-                        }
-                        output.flush()
+            for ((index, target) in targets.withIndex()) {
+                var connection: java.net.HttpURLConnection? = null
+                try {
+                    updateDownloadProgress.value = 0f
+                    connection = (java.net.URL(target).openConnection() as java.net.HttpURLConnection).apply {
+                        connectTimeout = 20_000
+                        readTimeout = 120_000
+                        instanceFollowRedirects = true
+                        setRequestProperty("User-Agent", "duck-updater")
+                        setRequestProperty("Accept", "application/octet-stream")
                     }
-                }
 
-                updateDownloadProgress.value = -1f
-                updateAvailable.value = null
-                withContext(Dispatchers.Main) {
-                    com.duck.app.util.AppUpdater(context).installApk(apkFile.name)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                    val status = connection.responseCode
+                    if (status !in 200..299) {
+                        throw java.io.IOException("HTTP " + status)
+                    }
+
+                    val fileLength = connection.contentLengthLong
+
+                    val apkFile = java.io.File(
+                        android.os.Environment.getExternalStoragePublicDirectory(
+                            android.os.Environment.DIRECTORY_DOWNLOADS,
+                        ),
+                        "duck-update.apk",
+                    )
+
+                    // Both streams are closed by use {}: a dropped connection throws
+                    // straight out of the copy loop, and the explicit close() calls
+                    // that used to follow were never reached, leaving a half-written
+                    // APK open until the process died.
+                    connection.inputStream.use { input ->
+                        java.io.FileOutputStream(apkFile).use { output ->
+                            val data = ByteArray(8192)
+                            var total = 0L
+                            var count: Int
+                            while (input.read(data).also { count = it } != -1) {
+                                total += count
+                                if (fileLength > 0) {
+                                    updateDownloadProgress.value = total.toFloat() / fileLength.toFloat()
+                                }
+                                output.write(data, 0, count)
+                            }
+                            output.flush()
+                        }
+                    }
+
+                    // A truncated file would fail at install time with a confusing
+                    // parse error, so it is rejected here where the reason is clear.
+                    if (fileLength > 0 && apkFile.length() != fileLength) {
+                        throw java.io.IOException("下载不完整")
+                    }
+
                     updateDownloadProgress.value = -1f
-                    val reason = when {
+                    updateAvailable.value = null
+                    withContext(Dispatchers.Main) {
+                        com.duck.app.util.AppUpdater(context).installApk(apkFile.name)
+                    }
+                    return@launch
+                } catch (e: Exception) {
+                    lastError = when {
                         e.message?.contains("HTTP") == true -> e.message.orEmpty()
                         e is java.net.UnknownHostException -> "网络不可用"
                         e is java.net.SocketTimeoutException -> "连接超时"
-                        else -> "下载中断"
+                        else -> e.message?.takeIf { it.isNotBlank() } ?: "下载中断"
                     }
-                    android.widget.Toast.makeText(
-                        context,
-                        "更新下载失败：" + reason + "，请稍后重试",
-                        android.widget.Toast.LENGTH_LONG,
-                    ).show()
+                    logToConsole(
+                        "更新源 " + (index + 1) + "/" + targets.size + " 失败: " + lastError,
+                    )
+                } finally {
+                    runCatching { connection?.disconnect() }
                 }
-            } finally {
-                connection?.disconnect()
+            }
+
+            withContext(Dispatchers.Main) {
+                updateDownloadProgress.value = -1f
+                android.widget.Toast.makeText(
+                    context,
+                    "更新下载失败：" + (lastError ?: "未知原因") + "，请稍后重试",
+                    android.widget.Toast.LENGTH_LONG,
+                ).show()
             }
         }
     }
@@ -307,13 +327,46 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         return@launch
                     }
 
-                // The feed carries the release page, not the asset. The asset name
-                // follows a fixed pattern, so build the direct link from the tag.
+                // The feed carries the release page, not the asset names, and the
+                // naming has changed between releases - older tags shipped one file per
+                // ABI, newer ones ship a single duck-<version>-release.apk. Rather than
+                // assume, ask the API for the real list and fall back to the known
+                // patterns so a 404 cannot happen.
                 val tag = latestVersion.removePrefix("v")
-                val assetName = "duck-" + tag + "-arm64-v8a-release.apk"
-                val rawUrl = "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
-                    latestVersion + "/" + assetName
-                val apkUrl = githubMirror.accelerateDownloadUrl(rawUrl, release.downloadPrefix)
+                val assets = githubMirror.fetchAssetNames(latestVersion)
+                val candidates = if (assets.isNotEmpty()) {
+                    assets.filter { it.endsWith(".apk", ignoreCase = true) }
+                } else {
+                    // No API answer: try every shape the project has ever used, the
+                    // newest first, so at least one of them resolves.
+                    listOf(
+                        "duck-" + tag + "-release.apk",
+                        "duck-" + tag + "-arm64-v8a-release.apk",
+                        "duck-" + tag + "-universal-release.apk",
+                        "duck-" + tag + "-arm64-release.apk",
+                    )
+                }
+                if (candidates.isEmpty()) {
+                    if (manual) updateCheckMessage.value = "该版本没有可下载的安装包"
+                    return@launch
+                }
+
+                // Prefer an ARM64 build when the release still ships per-ABI files.
+                val ordered = candidates.sortedByDescending {
+                    when {
+                        it.contains("universal") -> 2
+                        it.contains("arm64") -> 3
+                        else -> 1
+                    }
+                }
+                val urls = ordered.map { name ->
+                    githubMirror.accelerateDownloadUrl(
+                        "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
+                            latestVersion + "/" + name,
+                        release.downloadPrefix,
+                    )
+                }
+                val apkUrl = urls.first()
 
                 val current = com.duck.app.BuildConfig.VERSION_NAME
                 val isNewer = isVersionNewer(latestVersion, current)
@@ -325,6 +378,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                     updateAvailable.value = UpdateInfo(
                         version = latestVersion,
                         apkUrl = apkUrl,
+                        alternateUrls = urls.drop(1),
                         notes = extractReleaseNotes(entry),
                     )
                     updateCheckMessage.value = "发现新版本 " + latestVersion
@@ -1466,6 +1520,14 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
 data class UpdateInfo(
     val version: String,
     val apkUrl: String,
+    /**
+     * Other places the same build may live.
+     *
+     * A release can ship the APK under a different name than the one guessed, and a
+     * mirror can reject a path it has not cached. The download walks this list until
+     * one succeeds instead of failing the whole update on the first 404.
+     */
+    val alternateUrls: List<String> = emptyList(),
     val notes: String = "",
 )
 

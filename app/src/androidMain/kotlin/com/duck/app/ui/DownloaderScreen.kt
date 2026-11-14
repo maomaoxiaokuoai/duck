@@ -950,7 +950,7 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                 TextButton(
                     onClick = {
                         if (!isDownloading) {
-                            viewModel.downloadUpdate(context, updateInfo.apkUrl)
+                            viewModel.downloadUpdate(context, updateInfo.apkUrl, updateInfo.alternateUrls)
                         }
                     },
                     enabled = !isDownloading,

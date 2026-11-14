@@ -90,6 +90,28 @@ class GithubMirror {
     }
 
     /**
+     * The file names attached to one release.
+     *
+     * The Atom feed only carries the release page, so the asset names cannot be read
+     * from it. Guessing them broke whenever the naming changed - one release shipped
+     * per-ABI files, the next shipped a single APK - and the download answered 404.
+     * Asking the API removes the guess; an empty result means the caller should fall
+     * back to the patterns it knows.
+     */
+    suspend fun fetchAssetNames(tag: String): List<String> = withContext(Dispatchers.IO) {
+        val body = getText(
+            "https://api.github.com/repos/maomaoxiaokuoai/duck/releases/tags/" + tag,
+        ) ?: return@withContext emptyList()
+
+        // Read names out of the JSON without pulling in a parser for one field.
+        Regex(""name\s*":\s*"([^"]+\.apk)"")
+            .findAll(body)
+            .map { it.groupValues[1] }
+            .distinct()
+            .toList()
+    }
+
+    /**
      * Rewrites a github.com download link to travel through the chosen mirror.
      *
      * Everything after "github.com/" is carried over, because that tail holds the

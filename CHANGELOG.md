@@ -1,3 +1,37 @@
+## v3.4.2 — 2026-11-15
+
+### 修复（重要）
+
+**更新下载 404，装不上新版本。**
+
+根因：资产名是**硬编码**的。
+
+```kotlin
+val assetName = "duck-" + tag + "-arm64-v8a-release.apk"
+```
+
+而从 v2.8.8 起只发一个包 `duck-3.4.1-release.apk`（去掉了 ABI 拆分），
+这个名字在 release 里根本不存在，所以每次更新都 404。
+
+**现在的做法：**
+
+1. 先问 GitHub API 拿该版本**真实的资产名列表**
+2. 拿不到就按历史上出现过的所有命名逐个尝试（新的在前）
+3. 下载时逐个候选重试，任何一个成功就停
+
+```
+duck-<version>-release.apk          ← 现在
+duck-<version>-arm64-v8a-release.apk ← 旧版
+duck-<version>-universal-release.apk
+duck-<version>-arm64-release.apk
+```
+
+**顺带加固：**
+
+- 下载完比对 `Content-Length`，截断就报错，不会拿半个 APK 去装
+- 每次失败都记录是第几个源，日志里能看到
+- 全部失败才提示，提示里带最后一次的真实原因
+
 ## v3.4.1 — 2026-11-15
 
 ### 修复
