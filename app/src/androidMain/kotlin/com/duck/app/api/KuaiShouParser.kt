@@ -68,8 +68,9 @@ class KuaiShouParser {
         first.disconnect()
 
         val photoUrl = location.replace("/fw/long-video/", "/fw/photo/")
-        val cookies = firstCookies(shareUrl)
-        val page = open(photoUrl, cookie = cookies, followRedirects = true)
+        // The 302 carries anonymous did cookies, but the photo page does not check
+        // them - it answers the same without any cookie at all.
+        val page = open(photoUrl, cookie = null, followRedirects = true)
         val html = page.inputStream.bufferedReader().use { it.readText() }
         page.disconnect()
 
@@ -85,10 +86,17 @@ class KuaiShouParser {
 
         // The state is keyed by widget id; the post lives in whichever entry has both
         // result and photo.
-        val photo = root.values
+        // result 223 means the post was deleted or never uploaded.
+        val entry = root.values
             .filterIsInstance<JsonObject>()
             .firstOrNull { it.containsKey("result") && it.containsKey("photo") }
-            ?.get("photo")?.jsonObject
+            ?: return ExtractionResult(status = "error", message = "作品不存在或已被删除")
+        val code = entry["result"]?.jsonPrimitive?.content?.toIntOrNull()
+        if (code != null && code != 1) {
+            return ExtractionResult(status = "error", message = "作品不可用（code=" + code + "）")
+        }
+
+        val photo = entry.get("photo")?.jsonObject
             ?: return ExtractionResult(status = "error", message = "作品不存在或已被删除")
 
         val caption = photo["caption"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
@@ -179,20 +187,7 @@ class KuaiShouParser {
             if (!cookie.isNullOrBlank()) setRequestProperty("Cookie", cookie)
         }
 
-    /** Cookies from the first hop, which the photo page requires. */
-    private fun firstCookies(shareUrl: String): String {
-        val connection = open(shareUrl, cookie = null, followRedirects = false)
-        return try {
-            (connection.headerFields["Set-Cookie"] ?: emptyList())
-                .map { it.substringBefore(';') }
-                .filter { it.isNotBlank() }
-                .joinToString("; ")
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private data class Stats(
+private data class Stats(
         val like: Long?,
         val comment: Long?,
         val share: Long?,
