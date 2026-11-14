@@ -472,6 +472,40 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
             result
         }
 
+    /**
+     * Fills in the byte size of a gallery.
+     *
+     * A gallery is many files, so its size is the sum of every page. The platform does
+     * not report that, and no single page does either, so each image is asked for its
+     * Content-Length. Failures are ignored: a size is nice to have, not a reason to
+     * fail a preview that already resolved.
+     */
+    private suspend fun withGallerySize(result: ExtractionResult): ExtractionResult {
+        val urls = result.urls.orEmpty().filter { it.isNotBlank() }
+        if (result.is_gallery != true || urls.isEmpty()) return result
+        if (result.media_size != null && result.media_size!! > 0) return result
+
+        val totals = urls.map { url ->
+            kotlinx.coroutines.async(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching {
+                    val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                        requestMethod = "HEAD"
+                        connectTimeout = 8_000
+                        readTimeout = 8_000
+                        instanceFollowRedirects = true
+                        setRequestProperty("Referer", "https://www.douyin.com/")
+                    }
+                    val length = connection.contentLengthLong
+                    connection.disconnect()
+                    if (length > 0) length else 0L
+                }.getOrDefault(0L)
+            }
+        }.map { it.await() }
+
+        val total = totals.sum()
+        return if (total > 0) result.copy(media_size = total) else result
+    }
+
     fun fetchPreview(url: String, quality: String, mode: String = "auto") {
         val link = douyinParser.extractUrl(url)
         currentPreviewJob?.cancel()
@@ -494,7 +528,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 // Preview only. Downloading is a separate, explicit step: pasting a link
                 // is a request to find out what it is, and the bolt is the shortcut for
                 // callers that want the file straight away.
-                _previewMetadata.value = result
+                _previewMetadata.value = withGallerySize(result)
             } catch (e: Exception) {
                 logToConsole("预览异常: ${e.message}")
                 _previewMetadata.value = ExtractionResult(status = "error", message = e.message ?: "解析失败")

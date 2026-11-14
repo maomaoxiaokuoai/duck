@@ -108,10 +108,9 @@ class RedBookParser {
                 status = "success",
                 url = videoUrl,
                 urls = listOf(videoUrl),
-                title = note["title"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
-                    ?: "小红书视频",
+                title = noteTitle(note) ?: "小红书视频",
                 author = author,
-                thumbnail = pickImages(note).firstOrNull(),
+                thumbnail = pickCover(note),
                 ext = "mp4",
                 platform = "小红书",
                 is_gallery = false,
@@ -132,8 +131,7 @@ class RedBookParser {
             status = "success",
             url = images.first(),
             urls = images,
-            title = note["title"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
-                ?: "小红书图文",
+            title = noteTitle(note) ?: "小红书图文",
             author = author,
             thumbnail = images.first(),
             ext = "jpg",
@@ -146,6 +144,24 @@ class RedBookParser {
             collect_count = countOf(stats, "collectedCount"),
         )
     }
+
+
+    /**
+     * The note title.
+     *
+     * Video notes often leave \`title\` empty and put the caption in \`desc\`; the card
+     * showed the fallback string for those until this looked in both places.
+     */
+    private fun noteTitle(note: JsonObject): String? =
+        note["title"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+            ?: note["desc"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+
+    /** The still shown on the card: the first page of the gallery, else the video frame. */
+    private fun pickCover(note: JsonObject): String? =
+        pickImages(note).firstOrNull()
+            ?: note["video"]?.jsonObject
+                ?.get("image")?.jsonObject
+                ?.get("firstFrame")?.jsonPrimitive?.content
 
     /**
      * The h265 stream first.
