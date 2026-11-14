@@ -1142,12 +1142,20 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
 
     /** Reads a URL fully into memory; the live-photo halves are only a few hundred KB. */
     private fun fetchBytes(url: String): ByteArray {
+        // The system agent is a short "Dalvik/..." string and CDNs answer it with a 403,
+        // which surfaced as a merge failure rather than a network error.
+        val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
+        val referer = when {
+            host.contains("xhscdn") || host.contains("xiaohongshu") -> "https://www.xiaohongshu.com/"
+            host.contains("douyin") || host.contains("amemv") || host.contains("iesdouyin") -> "https://www.douyin.com/"
+            else -> "https://www.douyin.com/"
+        }
         val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
             connectTimeout = 20_000
             readTimeout = 30_000
             instanceFollowRedirects = true
-            setRequestProperty("Referer", "https://www.xiaohongshu.com/")
-            setRequestProperty("User-Agent", System.getProperty("http.agent") ?: "duck")
+            setRequestProperty("Referer", referer)
+            setRequestProperty("User-Agent", FETCH_USER_AGENT)
         }
         return connection.inputStream.use { it.readBytes() }.also { connection.disconnect() }
     }
@@ -1267,3 +1275,8 @@ private const val MOBILE_USER_AGENT =
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) " +
         "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 " +
         "Mobile/15E148 Safari/604.1"
+
+/** Agent the media CDNs expect; the system one is rejected. */
+private const val FETCH_USER_AGENT =
+    "Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"
