@@ -67,6 +67,17 @@ jobs:
           mkdir -p artifacts
           find app/build/outputs/apk -name '*.apk' -exec cp {} artifacts/ \;
           echo "### APK" >> "$GITHUB_STEP_SUMMARY"
+
+          # A misconfigured split silently ships one APK under several names.
+          # Identical hashes mean the flavours packaged the same libraries.
+          count=$(ls artifacts/*.apk | wc -l)
+          hashes=$(sha256sum artifacts/*.apk | awk "{print \$1}" | sort -u | wc -l)
+          if [ "$hashes" -lt "$count" ]; then
+            echo "::error::APKs are not distinct: $count files, $hashes unique hashes"
+            sha256sum artifacts/*.apk
+            exit 1
+          fi
+          echo "distinct APKs: $count" >> "$GITHUB_STEP_SUMMARY"
           for f in artifacts/*.apk; do
             size=$(du -h "$f" | cut -f1)
             echo "- `$(basename "$f")` — $size" >> "$GITHUB_STEP_SUMMARY"

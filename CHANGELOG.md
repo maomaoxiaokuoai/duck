@@ -1,3 +1,14 @@
+## v2.8.7 — 2026-11-14
+
+### 修复（重要）
+
+- **5 个 APK 其实是同一个**：release 页面上 5 个包的 SHA-256 完全一致。原因是
+  `splits { abi }` 对 Kotlin Multiplatform 模块无效，AGP 忽略了它，每个包都打进了全部 ABI。
+  改用 product flavour（arm64 / arm32 / universal），每个 flavor 用 `ndk.abiFilters`
+  只打对应架构，才是真实差异
+- **CI 加了校验**：收集 APK 后比对 SHA-256，如果少于文件数就直接 fail，
+  以后再出现「多包同源」不会静默发布
+
 ## v2.8.6 — 2026-11-14
 
 ### 修复

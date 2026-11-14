@@ -78,8 +78,8 @@ android {
         applicationId = "com.duck.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 20000101
-        versionName = "2.8.6"
+        versionCode = 20000102
+        versionName = "2.8.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
@@ -98,23 +98,35 @@ android {
         }
     }
 
-    // One APK per ABI plus a universal one, named the way the release page expects.
-    // Shipping every ABI in a single file doubled the download for no benefit.
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-            isUniversalApk = true
-        }
-    }
 
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
             // FilterType.ABI.value is the string the API expects here.
-            val abi = output.getFilter("ABI") ?: "universal"
+            val abi = productFlavors.firstOrNull()?.name ?: "universal"
             output.outputFileName = "duck-" + versionName + "-" + abi + "-release.apk"
+        }
+    }
+
+    // ABI splits do not apply to a Kotlin Multiplatform module: every APK came out
+    // identical, all five with the same SHA-256. Each ABI gets its own product
+    // flavour instead, which is a real difference in the packaged native libraries.
+    flavorDimensions += "abi"
+    productFlavors {
+        create("arm64") {
+            dimension = "abi"
+            ndk { abiFilters += "arm64-v8a" }
+            versionCodeOverride = versionCode * 10 + 1
+        }
+        create("arm32") {
+            dimension = "abi"
+            ndk { abiFilters += "armeabi-v7a" }
+            versionCodeOverride = versionCode * 10 + 2
+        }
+        create("universal") {
+            dimension = "abi"
+            ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64") }
+            versionCodeOverride = versionCode * 10 + 9
         }
     }
 
