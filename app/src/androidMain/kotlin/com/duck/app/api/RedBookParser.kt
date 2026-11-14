@@ -180,6 +180,7 @@ class RedBookParser {
                 ?.jsonObject
                 ?.get("masterUrl")?.jsonPrimitive?.content
                 ?.takeIf { it.startsWith("http") }
+                ?.replaceFirst("http://", "https://")
                 ?.let { return it }
         }
         return ""
@@ -215,12 +216,22 @@ class RedBookParser {
      * original URL because the new path would 404.
      */
     private fun unwatermarked(original: String): String {
+        // The page hands out http:// URLs and the app runs over https, so an unupgraded
+        // link is blocked as mixed content and the image silently fails to load.
+        val upgraded = if (original.startsWith("http://")) {
+            "https://" + original.removePrefix("http://")
+        } else {
+            original
+        }
+
+        // Only notes_pre_post paths survive a host swap; everything else keeps the
+        // signed CDN host it came with, because rebuilding it would 404.
         val marker = "notes_pre_post/"
-        val at = original.indexOf(marker)
-        if (at < 0) return original
-        val tail = original.substring(at + marker.length)
+        val at = upgraded.indexOf(marker)
+        if (at < 0) return upgraded
+        val tail = upgraded.substring(at + marker.length)
         val fileId = tail.substringBefore('!').substringBefore('?')
-        if (fileId.isBlank()) return original
+        if (fileId.isBlank()) return upgraded
         val spectrum = if (tail.contains("spectrum/")) "spectrum/" else ""
         return "https://ci.xiaohongshu.com/$marker$spectrum$fileId?imageView2/format/jpg"
     }
