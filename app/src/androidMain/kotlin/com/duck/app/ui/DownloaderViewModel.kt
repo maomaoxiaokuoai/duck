@@ -958,7 +958,12 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
      * previous job first, so only the last pick ever landed. This runs them in one
      * job and reports a single history row for the batch.
      */
-    fun downloadPickedImages(imageUrls: List<String>, title: String? = null) {
+    fun downloadPickedImages(
+        imageUrls: List<String>,
+        title: String? = null,
+        /** Per-page clip URL; a non-null entry makes that page a motion photo. */
+        liveVideoUrls: List<String?> = emptyList(),
+    ) {
         if (imageUrls.isEmpty()) return
         currentDownloadJob?.cancel()
         currentDownloadJob = viewModelScope.launch {
@@ -974,21 +979,31 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
 
                 imageUrls.forEachIndexed { index, imageUrl ->
                     val name = safe + "_" + (index + 1) + "_" + System.currentTimeMillis() + ".jpg"
-                    downloader.downloadFile(
-                        url = imageUrl,
-                        fileName = name,
-                        relativePath = "Pictures/duck",
-                        httpHeaders = previewReferer(imageUrl),
-                    ).collect { state ->
-                        if (state is DownloadState.Downloading) {
-                            // Overall progress across the batch, not per file.
-                            val done = (index + state.progress) / imageUrls.size
-                            _uiState.value = DownloadState.Downloading(done.coerceIn(0f, 1f))
+                    val clip = liveVideoUrls.getOrNull(index)
+
+                    if (!clip.isNullOrBlank()) {
+                        // A moving image: still plus clip, written as one file.
+                        val merged = downloadMotionPhoto(imageUrl, clip, name, notificationId)
+                        if (merged != null) {
+                            savedPaths += "Pictures/duck/" + name
+                            logToConsole("动图 " + (index + 1) + "/" + imageUrls.size + " 已保存")
                         }
-                        if (state is DownloadState.Success) {
-                            downloader.finalizeFile(Uri.parse(state.path), name)
-                            savedPaths += state.path
-                            logToConsole("图片 " + (index + 1) + "/" + imageUrls.size + " 已保存")
+                    } else {
+                        downloader.downloadFile(
+                            url = imageUrl,
+                            fileName = name,
+                            relativePath = "Pictures/duck",
+                            httpHeaders = previewReferer(imageUrl),
+                        ).collect { state ->
+                            if (state is DownloadState.Downloading) {
+                                val done = (index + state.progress) / imageUrls.size
+                                _uiState.value = DownloadState.Downloading(done.coerceIn(0f, 1f))
+                            }
+                            if (state is DownloadState.Success) {
+                                downloader.finalizeFile(Uri.parse(state.path), name)
+                                savedPaths += state.path
+                                logToConsole("图片 " + (index + 1) + "/" + imageUrls.size + " 已保存")
+                            }
                         }
                     }
                 }

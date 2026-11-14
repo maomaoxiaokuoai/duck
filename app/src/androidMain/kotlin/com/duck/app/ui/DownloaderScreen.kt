@@ -686,7 +686,15 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                         // One call, not a loop: downloadOneImage
                                                         // cancels the previous job, so looping
                                                         // over it saved only the last pick.
-                                                        viewModel.downloadPickedImages(picks, preview?.title)
+                                                        // Map each pick back to its page
+                                                        // so a live photo keeps its clip.
+                                                        val allUrls = preview?.urls.orEmpty()
+                                                        val clips = picks.map { url ->
+                                                            allUrls.indexOf(url)
+                                                                .takeIf { it >= 0 }
+                                                                ?.let { preview?.live_video_urls?.getOrNull(it) }
+                                                        }
+                                                        viewModel.downloadPickedImages(picks, preview?.title, clips)
                                                     } else {
                                                         viewModel.downloadMedia(link, quality, downloadMode)
                                                     }
