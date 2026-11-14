@@ -47,6 +47,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private val douyinSigner = com.duck.app.api.DouyinSigner(application)
     private val douyinParser = DouyinParser(douyinSigner)
     private val redBookParser = com.duck.app.api.RedBookParser()
+    private val kuaiShouParser = com.duck.app.api.KuaiShouParser()
     private val db = Room.databaseBuilder(application, AppDatabase::class.java, "duck_db")
         .addMigrations(
             com.duck.app.db.MIGRATION_1_2,
@@ -455,15 +456,23 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
             // Both parsers accept a share sentence, so each cleans the input
             // itself and only the matching site is contacted.
+            // Each parser claims its own hosts, so the matching one is chosen
+            // before any network call and the others never see the link.
             val redBookLink = redBookParser.extractUrl(url)
+            val kuaiShouLink = kuaiShouParser.extractUrl(url)
             val isRedBook = redBookParser.isRedBookUrl(redBookLink)
-            if (isRedBook) {
-                logToConsole("解析小红书链接: " + redBookLink)
-            } else {
-                logToConsole("解析抖音链接: " + douyinParser.extractUrl(url))
+            val isKuaiShou = !isRedBook && kuaiShouParser.isKuaiShouUrl(kuaiShouLink)
+            when {
+                isRedBook -> logToConsole("解析小红书链接: " + redBookLink)
+                isKuaiShou -> logToConsole("解析快手链接: " + kuaiShouLink)
+                else -> logToConsole("解析抖音链接: " + douyinParser.extractUrl(url))
             }
 
-val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve(url)
+            val result = when {
+                isRedBook -> redBookParser.resolve(url)
+                isKuaiShou -> kuaiShouParser.resolve(url)
+                else -> douyinParser.resolve(url)
+            }
             if (result.status == "success") {
                 if (result.is_gallery == true) {
                     logToConsole("解析成功：图集，共 ${result.urls?.size ?: 0} 个直链")
@@ -561,12 +570,16 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
     fun extractUrl(input: String): String {
         val redBook = redBookParser.extractUrl(input)
         if (redBookParser.isRedBookUrl(redBook)) return redBook
+        val kuaiShou = kuaiShouParser.extractUrl(input)
+        if (kuaiShouParser.isKuaiShouUrl(kuaiShou)) return kuaiShou
         return douyinParser.extractUrl(input)
     }
 
     /** True for a link this app can parse, from either site. */
     fun isDouyinUrl(url: String): Boolean =
-        douyinParser.isDouyinUrl(url) || redBookParser.isRedBookUrl(url)
+        douyinParser.isDouyinUrl(url) ||
+            redBookParser.isRedBookUrl(url) ||
+            kuaiShouParser.isKuaiShouUrl(url)
 
     fun clearPreview() {
         _previewMetadata.value = null
@@ -882,6 +895,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
         val host = runCatching { java.net.URL(url).host.lowercase() }.getOrNull().orEmpty()
         return when {
             host.contains("xiaohongshu") || host.contains("xhscdn") || host.contains("xhslink") -> "小红书"
+            host.contains("kuaishou") || host.contains("kwaicdn") || host.contains("yximgs") -> "快手"
             host.contains("douyin") || host.contains("amemv") || host.contains("iesdouyin") -> "抖音"
             else -> "抖音"
         }
