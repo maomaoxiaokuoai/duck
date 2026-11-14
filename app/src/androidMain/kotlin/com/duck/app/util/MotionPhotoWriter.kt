@@ -31,6 +31,11 @@ object MotionPhotoWriter {
     /**
      * Returns [jpeg] with [video] appended and the XMP block inserted, or null when the
      * inputs do not look like the expected formats.
+     *
+     * The XMP has to state how long the primary image is, and that length includes the
+     * APP1 segment being inserted - so the packet is built twice: once to learn its own
+     * size, then again with the real figure. A reader that needs the primary length
+     * would otherwise measure the video from the wrong offset.
      */
     fun build(jpeg: ByteArray, video: ByteArray): ByteArray? {
         if (!isJpeg(jpeg) || !isMp4(video)) {
@@ -38,11 +43,21 @@ object MotionPhotoWriter {
             return null
         }
 
-        val xmp = buildXmp(video.size)
         val namespace = "http://ns.adobe.com/xap/1.0/\u0000".toByteArray(Charsets.ISO_8859_1)
-        val payload = namespace + xmp.toByteArray(Charsets.UTF_8)
 
-        // The APP1 length field counts itself, so it is payload + 2.
+        // First pass: no primary length, purely to measure the packet.
+        val probe = namespace + buildXmp(0, video.size).toByteArray(Charsets.UTF_8)
+        // The APP1 length field counts itself, so the whole segment is payload + 4
+        // (two marker bytes plus the two-byte length).
+        val app1Size = probe.size + 4
+        if (probe.size + 2 > 0xFFFF) {
+            Log.d(TAG, "xmp too large: " + probe.size)
+            return null
+        }
+
+        // Second pass: the still now includes the segment that was not there before.
+        val payload = namespace + buildXmp(jpeg.size + app1Size, video.size)
+            .toByteArray(Charsets.UTF_8)
         if (payload.size + 2 > 0xFFFF) {
             Log.d(TAG, "xmp too large: " + payload.size)
             return null
@@ -61,26 +76,38 @@ object MotionPhotoWriter {
     }
 
     /**
-     * The XMP packet Android, Google Photos and Samsung Gallery look for.
+     * The XMP packet the motion photo spec defines.
      *
-     * Two items are declared: the primary image and the appended video. The viewer reads
-     * the video's Length to know how many trailing bytes belong to it.
+     * Two namespaces matter and both come straight from the format document: the camera
+     * one (prefix `Camera`) carries the flag that says this file is a motion photo, and
+     * the container one (prefix `Container`) is the directory that says where the video
+     * starts. A reader finds the clip by walking back from the end of the file by the
+     * MotionPhoto item's Length, so that number has to be exact.
+     *
+     * The old `GCamera` prefix was the micro-video v1 spelling; the spec says readers
+     * must ignore those attributes, so a viewer that follows the spec would not have
+     * treated the file as a motion photo at all.
      */
-    private fun buildXmp(videoLength: Int): String = buildString {
+    private fun buildXmp(stillLength: Int, videoLength: Int): String = buildString {
         append("<?xpacket begin=\"\uFEFF\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>")
         append("<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">")
         append("<rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">")
         append("<rdf:Description rdf:about=\"\"")
-        append(" xmlns:GCamera=\"http://ns.google.com/photos/1.0/camera/\"")
+        append(" xmlns:Camera=\"http://ns.google.com/photos/1.0/camera/\"")
         append(" xmlns:Container=\"http://ns.google.com/photos/1.0/container/\"")
         append(" xmlns:Item=\"http://ns.google.com/photos/1.0/container/item/\"")
-        append(" GCamera:MotionPhoto=\"1\"")
-        append(" GCamera:MotionPhotoVersion=\"1\"")
-        append(" GCamera:MotionPhotoPresentationTimestampUs=\"0\">")
+        append(" Camera:MotionPhoto=\"1\"")
+        append(" Camera:MotionPhotoVersion=\"1\"")
+        append(" Camera:MotionPhotoPresentationTimestampUs=\"0\">")
         append("<Container:Directory><rdf:Seq>")
+        // The primary image must be the first entry, and its length is what precedes
+        // the video in this file.
         append("<rdf:li rdf:parseType=\"Resource\">")
-        append("<Container:Item Item:Mime=\"image/jpeg\" Item:Semantic=\"Primary\" Item:Length=\"0\"/>")
+        append("<Container:Item Item:Mime=\"image/jpeg\" Item:Semantic=\"Primary\" Item:Length=\"")
+        append(stillLength)
+        append("\"/>")
         append("</rdf:li>")
+        // The video must be last, and nothing may follow it.
         append("<rdf:li rdf:parseType=\"Resource\">")
         append("<Container:Item Item:Mime=\"video/mp4\" Item:Semantic=\"MotionPhoto\" Item:Length=\"")
         append(videoLength)

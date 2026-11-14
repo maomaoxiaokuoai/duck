@@ -1,3 +1,22 @@
+## v2.9.1 — 2026-11-15
+
+### 修复（动图格式不合规）
+
+下载的动图**在遵循规范的阅读器里不会被识别**。对照官方 Motion Photo format 1.0 逐项检查后发现：
+
+**1. 命名空间前缀用错**
+
+- 之前：`xmlns:GCamera="http://ns.google.com/photos/1.0/camera/"` + `GCamera:MotionPhoto="1"`
+- 现在：`xmlns:Camera="http://ns.google.com/photos/1.0/camera/"` + `Camera:MotionPhoto="1"`
+
+官方原文：「MicroVideo 这些属性是**微视频 V1 规范**的一部分，**已从此规范中删除**，
+如果存在，**必须忽略**。」`GCamera` 就是那个被废弃的写法。
+
+**2. 主图长度写成 0**
+
+`Item:Length` 是让阅读器从文件末尾回溯定位视频的依据。现在两遍构建 XMP：
+先量出 APP1 段多大，再用真实的主图长度重写一遍。
+
 ## v2.9.0 — 2026-11-14
 
 ### 新增
