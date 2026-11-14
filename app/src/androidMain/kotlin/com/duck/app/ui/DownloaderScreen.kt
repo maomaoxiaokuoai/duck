@@ -389,10 +389,15 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         }
     }
 
+    // Typing a URL parses it after a pause. The paste button already parsed the same
+    // link, and this ran again a second later: two resolutions racing, the second
+    // overwriting a card the first had just filled in.
     LaunchedEffect(url) {
         if (url.isNotBlank() && url.startsWith("http")) {
-            delay(1000) // Debounce for 1 second
-            viewModel.fetchPreview(url, quality, downloadMode)
+            delay(1000)
+            if (preview?.status != "success" || preview?.resolved_at == null) {
+                viewModel.fetchPreview(url, quality, downloadMode)
+            }
         }
     }
 
