@@ -69,15 +69,20 @@ class FileDownloader(private val context: Context, private val client: HttpClien
                 // set and the entry is invisible in the gallery while still occupying
                 // storage. Removing it on failure keeps the library honest.
                 try {
-                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                        var bytesRead = 0L
+                    // A null stream means the destination could not be opened; skipping
+                    // the block used to fall through to Success and leave a zero-byte
+                    // file behind a green check mark.
+                    val outputStream = context.contentResolver.openOutputStream(uri)
+                        ?: throw Exception("无法写入目标文件")
+                    var bytesRead = 0L
+                    outputStream.use { out ->
                         val buffer = ByteArray(8192)
                         var lastEmitTime = System.currentTimeMillis()
                         var bytesSinceLastEmit = 0L
                         while (!channel.isClosedForRead) {
                             val read = channel.readAvailable(buffer, 0, buffer.size)
                             if (read > 0) {
-                                outputStream.write(buffer, 0, read)
+                                out.write(buffer, 0, read)
                                 bytesRead += read
                                 bytesSinceLastEmit += read
                                 val now = System.currentTimeMillis()
@@ -97,17 +102,32 @@ class FileDownloader(private val context: Context, private val client: HttpClien
                                 }
                             }
                         }
-                        // One final emit with the real totals, so the screen shows 100%
-                        // rather than whatever the last 200 ms tick happened to see.
-                        emit(
-                            DownloadState.Downloading(
-                                1f,
-                                bytesRead,
-                                if (contentLength > 0) contentLength else bytesRead,
-                                0L,
-                            )
-                        )
                     }
+
+                    // A connection that dies mid-transfer closes the channel cleanly,
+                    // so the loop above cannot tell. Comparing against the declared
+                    // length is what catches a truncated file.
+                    if (contentLength > 0 && bytesRead < contentLength) {
+                        throw Exception("下载不完整: " + bytesRead + "/" + contentLength + " 字节")
+                    }
+                    if (bytesRead <= 0L) {
+                        throw Exception("没有收到任何数据")
+                    }
+
+                    emit(
+                        DownloadState.Downloading(
+                            1f,
+                            bytesRead,
+                            if (contentLength > 0) contentLength else bytesRead,
+                            0L,
+                        )
+                    )
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    // Cancellation is not a failure to report, but the half-written row
+                    // still has to go: the generic handler never sees it because this
+                    // exception has to be rethrown to stop the coroutine.
+                    runCatching { context.contentResolver.delete(uri, null, null) }
+                    throw cancelled
                 } catch (inner: Exception) {
                     runCatching { context.contentResolver.delete(uri, null, null) }
                     throw inner

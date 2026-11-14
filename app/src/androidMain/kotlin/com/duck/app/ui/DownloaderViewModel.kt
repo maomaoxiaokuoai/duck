@@ -400,8 +400,6 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     private var currentPreviewJob: Job? = null
     private var lastNotificationId: Int? = null
 
-    private val activeTempFiles = java.util.Collections.synchronizedList(mutableListOf<java.io.File>())
-    private val activeDownloadUris = java.util.Collections.synchronizedList(mutableListOf<Uri>())
 
     private val _uiState = MutableStateFlow<DownloadState>(DownloadState.Idle)
     val uiState: StateFlow<DownloadState> = _uiState
@@ -797,8 +795,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             ?.let { result.live_video_urls?.getOrNull(it) }
 
         if (!liveClip.isNullOrBlank() && isImage) {
-            val merged = downloadMotionPhoto(downloadUrl, liveClip, fileName, notificationId)
-            if (merged != null) {
+            val mergedUri = downloadMotionPhoto(downloadUrl, liveClip, fileName, notificationId)
+            if (mergedUri != null) {
                 logToConsole("动图已保存: $targetPath/$fileName")
                 val cachedThumb = saveThumbnailToCache(_previewMetadata.value?.thumbnail, null)
                 logDao.insertLog(
@@ -806,7 +804,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         title = title,
                         url = sourceUrl,
                         status = "Success",
-                        path = targetPath + "/" + fileName,
+                        path = mergedUri.toString(),
                         thumbnailPath = cachedThumb,
                         author = result.author,
                         createTime = result.create_time,
@@ -817,10 +815,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         collectCount = result.collect_count,
                         duration = result.duration,
                         mediaKind = "live",
-                        fileSize = merged.size.toLong(),
+                        fileSize = queryFileSize(mergedUri),
                     )
                 )
-                _uiState.value = DownloadState.Success(path = targetPath + "/" + fileName)
+                _uiState.value = DownloadState.Success(path = mergedUri.toString())
                 return
             }
             logToConsole("动图合成失败，改为保存静态图")
@@ -1010,11 +1008,26 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
 
                     if (!clip.isNullOrBlank()) {
                         // A moving image: still plus clip, written as one file.
-                        val merged = downloadMotionPhoto(imageUrl, clip, name, notificationId)
-                        if (merged != null) {
-                            savedPaths += "Pictures/duck/" + name
+                        val mergedUri = downloadMotionPhoto(imageUrl, clip, name, notificationId)
+                        if (mergedUri != null) {
+                            savedPaths += mergedUri.toString()
                             savedLiveCount++
                             logToConsole("动图 " + (index + 1) + "/" + imageUrls.size + " 已保存")
+                        } else {
+                            // The merge failed but the still is still worth keeping;
+                            // dropping it would silently shorten the batch.
+                            logToConsole("动图合成失败，改存静态图")
+                            downloader.downloadFile(
+                                url = imageUrl,
+                                fileName = name,
+                                relativePath = "Pictures/duck",
+                                httpHeaders = previewReferer(imageUrl),
+                            ).collect { state ->
+                                if (state is DownloadState.Success) {
+                                    downloader.finalizeFile(Uri.parse(state.path), name)
+                                    savedPaths += state.path
+                                }
+                            }
                         }
                     } else {
                         downloader.downloadFile(
@@ -1080,16 +1093,18 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 var savedSize = 0L
 
                 if (!liveVideoUrl.isNullOrBlank()) {
-                    val merged = downloadMotionPhoto(imageUrl, liveVideoUrl, name, notificationId)
-                    if (merged != null) {
-                        savedPath = "Pictures/duck/" + name
-                        savedSize = merged.size.toLong()
+                    val mergedUri = downloadMotionPhoto(imageUrl, liveVideoUrl, name, notificationId)
+                    if (mergedUri != null) {
+                        savedPath = mergedUri.toString()
+                        savedSize = queryFileSize(mergedUri) ?: 0L
                         _uiState.value = DownloadState.Success(path = savedPath)
-                        logToConsole("动图已保存: Pictures/duck/" + name)
-                    } else {
-                        throw Exception("动图合成失败")
+                        logToConsole("动图已保存: " + savedPath)
                     }
-                } else {
+                }
+
+                // Also the fallback when the merge fails: the page still has a still
+                // worth saving, and dropping it would lose the download entirely.
+                if (savedPath == null) {
                     downloader.downloadFile(
                         url = imageUrl,
                         fileName = name,
@@ -1101,7 +1116,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         if (state is DownloadState.Success) {
                             downloader.finalizeFile(Uri.parse(state.path), name)
                             savedPath = state.path
-                            logToConsole("图片已保存: Pictures/duck/" + name)
+                            logToConsole("图片已保存: " + state.path)
                         }
                     }
                 }
@@ -1134,34 +1149,32 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    /**
+        /**
      * Downloads a still and its clip, then writes them as one motion photo.
      *
-     * Both halves are fetched into memory because the XMP block has to declare the
-     * clip's exact length before it can be prepended, and that length is only known
-     * once the clip has fully arrived.
+     * Both halves are held in memory because the XMP block has to declare the clip's
+     * exact length before it can be prepended, and that length is only known once the
+     * clip has fully arrived.
+     *
+     * Returns the saved row URI, or null when the merge could not be done - in which
+     * case the caller saves the still on its own rather than dropping the page.
      */
     private suspend fun downloadMotionPhoto(
         imageUrl: String,
         videoUrl: String,
         fileName: String,
         notificationId: Int,
-    ): ByteArray? = withContext(Dispatchers.IO) {
+    ): Uri? = withContext(Dispatchers.IO) {
         runCatching {
-            logToConsole("动图合成: 下载静态图")
             val still = fetchBytes(imageUrl)
-            logToConsole("动图合成: 静态图 " + still.size + " 字节")
-            logToConsole("动图合成: 下载视频")
             val clip = fetchBytes(videoUrl)
-            logToConsole("动图合成: 视频 " + clip.size + " 字节")
             val merged = MotionPhotoWriter.build(still, clip)
             if (merged == null) {
-                logToConsole("动图合成失败: 格式不符")
+                logToConsole("动图合成失败: 格式不符，改存静态图")
                 return@runCatching null
             }
             logToConsole("动图合成完成: " + merged.size + " 字节")
             saveImageBytes(fileName, merged)
-            merged
         }.onFailure { e ->
             logToConsole("动图合成异常: " + (e.message ?: e.toString()))
         }.getOrNull()
@@ -1188,13 +1201,31 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     /** Writes bytes straight into the gallery and clears the pending flag. */
-    private suspend fun saveImageBytes(fileName: String, bytes: ByteArray) {
+    /**
+     * Writes bytes into the gallery and returns the row URI.
+     *
+     * The URI is what the history stores: a relative path would not resolve through
+     * Coil, which is why a motion photo showed as a blank tile in the detail sheet
+     * while an ordinary image showed fine.
+     */
+    private suspend fun saveImageBytes(fileName: String, bytes: ByteArray): Uri {
         val uri = downloader.createMediaStoreUri(fileName, "Pictures/duck")
             ?: throw Exception("无法创建文件")
-        getApplication<android.app.Application>().contentResolver
-            .openOutputStream(uri)?.use { it.write(bytes) } ?: throw Exception("无法写入文件")
-        downloader.finalizeFile(uri, fileName)
+        try {
+            getApplication<android.app.Application>().contentResolver
+                .openOutputStream(uri)?.use { it.write(bytes) } ?: throw Exception("无法写入文件")
+            downloader.finalizeFile(uri, fileName)
+        } catch (e: Exception) {
+            // Leaving the row pending would keep an invisible, empty entry in the
+            // gallery forever.
+            runCatching {
+                getApplication<android.app.Application>().contentResolver.delete(uri, null, null)
+            }
+            throw e
+        }
+        return uri
     }
+
     private fun sanitizeFileName(title: String): String {
         val cleaned = title
             .replace(Regex("[^a-zA-Z0-9\\u4e00-\\u9fa5]"), "_")
@@ -1221,42 +1252,28 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         _uiState.value = DownloadState.Idle
 
         lastNotificationId?.let { notificationHelper.cancelNotification(it) }
-
-        synchronized(activeTempFiles) {
-            activeTempFiles.forEach { file ->
-                try {
-                    if (file.exists()) file.delete()
-                } catch (_: Exception) {}
-            }
-            activeTempFiles.clear()
-        }
-
-        val resolver = getApplication<Application>().contentResolver
-        synchronized(activeDownloadUris) {
-            activeDownloadUris.forEach { uri ->
-                try {
-                    resolver.delete(uri, null, null)
-                } catch (e: Exception) {
-                    logToConsole("URI deletion notice: ${e.message}")
-                }
-            }
-            activeDownloadUris.clear()
-        }
-
-        logToConsole("Download cancelled. Leftover files removed successfully.")
+        // The download flow deletes its own half-written row when it is cancelled, so
+        // there is nothing to sweep here. The two collections that used to be walked
+        // were never filled by anything.
+        logToConsole("下载已取消")
     }
 
+    /**
+     * Removes one row from the history list.
+     *
+     * Only the record: the file it describes stays in the gallery, because the list is
+     * a log of what was downloaded, not a second handle on the media.
+     */
     fun deleteLog(log: DownloadLog) {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             log.thumbnailPath?.let { path ->
-                try {
+                // The cached thumbnail exists only for this list, so it goes with the row.
+                runCatching {
                     val file = java.io.File(path)
-                    if (file.exists() && file.path.contains("thumbnails")) {
-                        file.delete()
-                    }
-                } catch (_: Exception) {}
+                    if (file.exists() && file.path.contains("thumbnails")) file.delete()
+                }
             }
-            logDao.deleteLog(log) 
+            logDao.deleteLog(log)
         }
     }
 
