@@ -290,12 +290,7 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             val best = urls.lastOrNull { it.startsWith("http") } ?: urls.firstOrNull()
             if (best != null) {
                 items += Media(best, extensionOf(best, "jpg"))
-                liveClips += image.jsonObject["video"]?.asObject()
-                    ?.get("playAddr")?.asObject()
-                    ?.get("urlList")?.asArray()
-                    ?.mapNotNull { it.asString() }
-                    ?.firstOrNull { it.startsWith("http") }
-                    ?.let { playUrl(it) }
+                liveClips += liveClipFor(image.jsonObject, detail)
             }
         }
 
@@ -336,6 +331,38 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         )
     }
 
+    /**
+     * The clip that animates one page of a Douyin gallery.
+     *
+     * Douyin marks a moving image with livePhotoType/clipType on the page itself and
+     * keeps the clip under the post-level video.bitRateList, not on the image: a per-image
+     * video.playAddr exists on newer payloads and is checked first.
+     */
+    private fun liveClipFor(image: JsonObject, detail: JsonObject): String? {
+        image["video"]?.asObject()
+            ?.get("playAddr")?.asArray()
+            ?.firstOrNull { it is JsonObject }
+            ?.jsonObject
+            ?.get("src")?.asString()
+            ?.takeIf { it.startsWith("http") }
+            ?.let { return playUrl(it) }
+
+        // Post-level fallback: only meaningful when the page says it is a live photo.
+        val isLive = image["livePhotoType"]?.asString()?.toIntOrNull() == 1 ||
+            image["clipType"]?.asString()?.toIntOrNull() == 5
+        if (!isLive) return null
+
+        return detail["video"]?.asObject()
+            ?.get("bitRateList")?.asArray()
+            ?.firstOrNull { it is JsonObject }
+            ?.jsonObject
+            ?.get("playAddr")?.asArray()
+            ?.firstOrNull { it is JsonObject }
+            ?.jsonObject
+            ?.get("src")?.asString()
+            ?.takeIf { it.startsWith("http") }
+            ?.let { playUrl(it) }
+    }
     private fun parsePage(pageUrl: String, html: String): ExtractionResult {
         Log.d(TAG, "page len=" + html.length + " pace=" + html.split("__pace_f").size + " router=" + html.split("_ROUTER_DATA").size + " aweme=" + html.split("awemeId").size)
         // The signed page streams __pace_f; older captures still carry _ROUTER_DATA.
