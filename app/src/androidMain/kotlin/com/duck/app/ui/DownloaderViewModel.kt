@@ -896,11 +896,14 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 var savedSize = 0L
 
                 if (!liveVideoUrl.isNullOrBlank()) {
-                    downloadMotionPhoto(imageUrl, liveVideoUrl, name, notificationId)?.let { bytes ->
-                        _uiState.value = DownloadState.Success(path = "Pictures/duck/" + name)
+                    val merged = downloadMotionPhoto(imageUrl, liveVideoUrl, name, notificationId)
+                    if (merged != null) {
                         savedPath = "Pictures/duck/" + name
-                        savedSize = bytes.toLong()
+                        savedSize = merged.size.toLong()
+                        _uiState.value = DownloadState.Success(path = savedPath)
                         logToConsole("动图已保存: Pictures/duck/" + name)
+                    } else {
+                        throw Exception("动图合成失败")
                     }
                 } else {
                     downloader.downloadFile(
