@@ -290,6 +290,10 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
         val cover = detail["video"]?.asObject()
             ?.get("cover")?.asString()
 
+        // The SSR payload carries the same stats as the API, under camelCase
+        // names. Without them a gallery card showed no engagement at all.
+        val stats = detail["stats"]?.asObject()
+
         return ExtractionResult(
             status = "success",
             url = items.first().url,
@@ -298,7 +302,13 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             author = author ?: "抖音",
             thumbnail = cover ?: items.first().url,
             ext = items.first().ext,
+            platform = "抖音",
             is_gallery = items.size > 1,
+            media_kind = if (items.size > 1) "gallery" else "video",
+            like_count = stats?.get("diggCount")?.longOrNull(),
+            comment_count = stats?.get("commentCount")?.longOrNull(),
+            share_count = stats?.get("shareCount")?.longOrNull(),
+            collect_count = stats?.get("collectCount")?.longOrNull(),
         )
     }
 
@@ -501,10 +511,10 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             author = authorName,
             create_time = detail["create_time"]?.asString()?.toLongOrNull(),
             platform = "抖音",
-            like_count = stats?.get("digg_count")?.asString()?.toLongOrNull(),
-            comment_count = stats?.get("comment_count")?.asString()?.toLongOrNull(),
-            share_count = stats?.get("share_count")?.asString()?.toLongOrNull(),
-            collect_count = stats?.get("collect_count")?.asString()?.toLongOrNull(),
+            like_count = stats?.get("digg_count")?.longOrNull(),
+            comment_count = stats?.get("comment_count")?.longOrNull(),
+            share_count = stats?.get("share_count")?.longOrNull(),
+            collect_count = stats?.get("collect_count")?.longOrNull(),
             duration = detail["video"]?.asObject()?.get("duration")?.asString()?.toLongOrNull(),
             media_size = detail["video"]?.asObject()
                 ?.get("play_addr")?.asObject()
@@ -579,6 +589,11 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
 
     private fun JsonPrimitive.contentOrNull(): String? =
         if (isString) content else content.takeIf { it.isNotEmpty() }
+
+
+/** Reads a JSON value that may be a number or a numeric string. */
+private fun JsonElement.longOrNull(): Long? =
+    runCatching { jsonPrimitive.content.trim().toLongOrNull() }.getOrNull()
 
     private companion object {
         const val TAG = "DouyinParser"
