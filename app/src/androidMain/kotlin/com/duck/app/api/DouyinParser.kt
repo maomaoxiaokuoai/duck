@@ -116,7 +116,26 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             runCatching { URL(candidate).host }.getOrNull()
                 ?.let { host -> host.contains(".") && !host.contains(":") } == true
         }
-        val chosen = usable.firstOrNull { isDouyinUrl(it) }
+
+        // Typing over an existing link leaves the old prefix in front of the new
+        // one, as in "https://whttps://v.douyin.com/xxx". That string still parses
+        // as a URL, so the filter above keeps it and the request then fails on a
+        // host that does not exist. Starting from the last scheme marker keeps
+        // the link the user actually pasted.
+        val deFused = usable.map { candidate ->
+            val lastTls = candidate.lastIndexOf("https://")
+            val lastPlain = candidate.lastIndexOf("http://")
+            when {
+                lastTls > 0 -> candidate.substring(lastTls)
+                lastPlain > 0 -> candidate.substring(lastPlain)
+                else -> candidate
+            }
+        }.filter { candidate ->
+            runCatching { URL(candidate).host }.getOrNull()
+                ?.let { host -> host.contains(".") && !host.contains(":") } == true
+        }
+        val chosen = deFused.firstOrNull { isDouyinUrl(it) }
+            ?: deFused.firstOrNull()
             ?: usable.firstOrNull()
             ?: all.firstOrNull()
             ?: text
