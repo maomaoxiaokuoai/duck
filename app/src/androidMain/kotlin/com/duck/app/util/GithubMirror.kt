@@ -104,7 +104,7 @@ class GithubMirror {
         ) ?: return@withContext emptyList()
 
         // Read names out of the JSON without pulling in a parser for one field.
-        Regex(""name\s*":\s*"([^"]+\.apk)"")
+        Regex("\"name\"\\s*:\\s*\"([^\"]+\\.apk)\"")
             .findAll(body)
             .map { it.groupValues[1] }
             .distinct()
