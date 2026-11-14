@@ -389,15 +389,15 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
         }
     }
 
-    // Typing a URL parses it after a pause. The paste button already parsed the same
-    // link, and this ran again a second later: two resolutions racing, the second
-    // overwriting a card the first had just filled in.
+    // Typing a URL parses it after a pause. Tracking the last link that was resolved
+    // keeps this from re-parsing the same one the paste button just handled, while
+    // still resolving the next link that is typed.
+    var lastParsedUrl by remember { mutableStateOf("") }
     LaunchedEffect(url) {
-        if (url.isNotBlank() && url.startsWith("http")) {
+        if (url.isNotBlank() && url.startsWith("http") && url != lastParsedUrl) {
             delay(1000)
-            if (preview?.status != "success" || preview?.resolved_at == null) {
-                viewModel.fetchPreview(url, quality, downloadMode)
-            }
+            lastParsedUrl = url
+            viewModel.fetchPreview(url, quality, downloadMode)
         }
     }
 
@@ -1197,11 +1197,10 @@ fun MainDownloaderTab(
                 // Put the resolved link in the field rather than the whole sentence
                 // the share button copied.
                 val link = viewModel.extractUrl(clipText)
-                // The resolved link stays in the field. Clearing it left the user
-                // looking at a card with no way to tell what it belonged to, and
-                // the bolt with nothing to act on.
+                // Only fill the field. The LaunchedEffect watching it does the
+                // resolving, so this cannot start a second resolution that races
+                // the first.
                 onUrlChange(link)
-                viewModel.fetchPreview(link, quality, downloadMode)
             } else if (url.isNotBlank()) {
                 // Nothing copied: parse whatever is already in the field instead of
                 // wiping it.
