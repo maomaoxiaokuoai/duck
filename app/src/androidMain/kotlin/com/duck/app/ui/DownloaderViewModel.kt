@@ -972,6 +972,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
             val savedPaths = mutableListOf<String>()
             var savedSize = 0L
             try {
+                logToConsole("批量下载开始: " + imageUrls.size + " 张")
                 _uiState.value = DownloadState.Downloading(0f)
                 val safe = sanitizeFileName(title ?: "image")
                 val platform = platformOf(imageUrls.first())
@@ -1032,6 +1033,7 @@ val result = if (isRedBook) redBookParser.resolve(url) else douyinParser.resolve
                 )
                 _uiState.value = DownloadState.Success(path = savedPaths.first())
             } catch (e: Exception) {
+                logToConsole("批量下载异常: " + (e.message ?: e.toString()))
                 _uiState.value = DownloadState.Error(e.message ?: "图片下载失败")
             }
         }
