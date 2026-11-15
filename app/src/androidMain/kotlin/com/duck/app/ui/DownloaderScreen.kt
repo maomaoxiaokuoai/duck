@@ -2725,9 +2725,17 @@ fun LogsTab(
                                         // Local save time, not the post's publish date: an
                                         // entry in this list is a download, and when it was
                                         // downloaded is what the list is about.
+                                        // A gallery has no single file size worth quoting,
+                                        // so the count stands in for it: "2 张" says more
+                                        // than a sum of two unrelated JPEGs.
+                                        val galleryCount = log.imagePaths
+                                            ?.split(",")
+                                            ?.count { it.isNotBlank() }
+                                            ?.takeIf { it > 1 }
                                         val itemFacts = listOfNotNull(
                                             log.platform ?: "抖音",
-                                            log.fileSize?.takeIf { it > 0 }?.let { formatBytes(it) },
+                                            galleryCount?.let { it.toString() + " 张" }
+                                                ?: log.fileSize?.takeIf { it > 0 }?.let { formatBytes(it) },
                                             log.duration?.let { formatDuration(it) },
                                             formatPostDateTime(log.timestamp / 1000),
                                         )
@@ -2764,8 +2772,13 @@ fun LogsTab(
         }
     }
 
-    if (selectedLog != null && selectedLog?.path != null) {
-        val log = selectedLog!!
+    // A gallery row stores its files in imagePaths; path can be empty there, and the
+    // sheet used to refuse to open because of it. Either field is enough to show.
+    val sheetTarget = selectedLog?.takeIf {
+        !it.path.isNullOrBlank() || !it.imagePaths.isNullOrBlank()
+    }
+    if (sheetTarget != null) {
+        val log = sheetTarget
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val ext = log.path?.substringAfterLast('.', "") ?: ""
         // The saved kind is authoritative. Deriving it from the extension alone
@@ -2818,6 +2831,13 @@ fun LogsTab(
                                 "已下载 " + saved.size + " 张",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
+                            )
+                            // The file lives in the system gallery, not only in this app.
+                            // Saying where saves the user from hunting for it.
+                            Text(
+                                "相册 Pictures/duck",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
 
