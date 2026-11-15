@@ -1,3 +1,49 @@
+## v3.4.5 — 2026-11-15
+
+### 修复（真正的根因）
+
+**镜像一直是好的，是 URL 拼错了。**
+
+`accelerateDownloadUrl` 把 `github.com/` 连同前面的 `https://` 一起剥掉：
+
+```kotlin
+return downloadPrefix + url.substring(at + host.length)  // 丢掉 https://
+```
+
+而每个镜像的 `downloadPrefix` 本身**已经写着完整的源站**：
+
+```
+downloadPrefix = "https://gh-proxy.com/https://github.com/"
+```
+
+拼出来就变成 `https://gh-proxy.com/maomaoxiaokuoai/duck/...`，少了
+`https://github.com/`，镜像当然 404。
+
+**实测对比：**
+
+```
+404  https://gh-proxy.com/maomaoxiaokuoai/duck/...                        ← 旧拼法
+200  https://gh-proxy.com/https://github.com/maomaoxiaokuoai/duck/...    ← 正确
+```
+
+修复后三个镜像全部恢复：
+
+```
+200  1.2s  accelerate.772399.xyz
+200  0.5s  gh-proxy.com
+200  1.2s  gh.noki.icu
+```
+
+这才是更新慢/要试好几次的真正原因 —— 镜像一直 404，只能退化到直连，
+而直连在国内很慢。
+
+### 策略调整
+
+按要求改成两轮：
+
+1. **第一轮**：三个镜像（有缓存就快，没有就秒回 404）
+2. **第二轮**：直连 github.com（慢但一定有）
+
 ## v3.4.4 — 2026-11-15
 
 ### 修复

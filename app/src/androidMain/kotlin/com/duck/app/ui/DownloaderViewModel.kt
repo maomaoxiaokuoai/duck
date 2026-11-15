@@ -359,15 +359,25 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         else -> 1
                     }
                 }
-                // A mirror can be up for the feed and still 404 the asset - caching a
-                // path it has never seen is not something it promises. Every name is
-                // therefore paired with every route, and github.com is tried first
-                // because it answers for the asset itself rather than a cache of it.
-                val urls = ordered.flatMap { name ->
+                // Two rounds, because the two kinds of route fail differently.
+                //
+                // A mirror either has the asset cached - in which case it is fast, and
+                // reaching github.com from some networks is not - or it answers 404 at
+                // once, which costs nothing to rule out. The direct host always has
+                // the file but can crawl or be blocked, so it goes last: slow but
+                // certain beats fast-but-missing when the goal is that an update never
+                // fails. Round one is every mirror for every name, round two is the
+                // direct host.
+                val mirrored = ordered.flatMap { name ->
                     val direct = "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
                         latestVersion + "/" + name
-                    listOf(direct) + githubMirror.allDownloadUrls(direct)
+                    githubMirror.allDownloadUrls(direct)
                 }.distinct()
+                val directUrls = ordered.map { name ->
+                    "https://github.com/maomaoxiaokuoai/duck/releases/download/" +
+                        latestVersion + "/" + name
+                }
+                val urls = (mirrored + directUrls).distinct()
                 if (urls.isEmpty()) {
                     if (manual) updateCheckMessage.value = "没有可用的下载地址"
                     return@launch

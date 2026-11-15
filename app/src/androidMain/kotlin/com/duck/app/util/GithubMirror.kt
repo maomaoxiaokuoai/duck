@@ -127,15 +127,25 @@ class GithubMirror {
     /**
      * Rewrites a github.com download link to travel through the chosen mirror.
      *
-     * Everything after "github.com/" is carried over, because that tail holds the
-     * owner and repository. Slicing from "/releases/download/" dropped both, and the
-     * mirror answered 403 for a path that does not exist.
+     * The prefix of every mirror here already spells out the whole origin it proxies
+     * - "https://gh-proxy.com/https://github.com/" - so the original URL has to be
+     * appended whole, scheme included. Stripping down to the path left
+     * "https://gh-proxy.com/owner/repo/..." and every mirror answered 404 while the
+     * direct host still worked, which is why downloads fell back to the slow route.
      */
     fun accelerateDownloadUrl(url: String, downloadPrefix: String): String {
-        val host = "github.com/"
-        val at = url.indexOf(host)
+        val prefix = if (downloadPrefix.endsWith("/")) downloadPrefix else downloadPrefix + "/"
+        // github.com direct: nothing to rewrite.
+        if (prefix == "https://github.com/") return url
+        // Already proxied by an earlier pass.
+        if (url.startsWith(prefix)) return url
+
+        // The prefix already carries the origin it proxies, so only the path after
+        // "github.com/" is appended. Appending the whole URL doubled the host and the
+        // mirror answered 404 for a path like /https://github.com/https://github.com/.
+        val at = url.indexOf("github.com/")
         if (at < 0) return url
-        return downloadPrefix + url.substring(at + host.length)
+        return prefix + url.substring(at + "github.com/".length)
     }
 
     private fun getText(url: String): String? {
