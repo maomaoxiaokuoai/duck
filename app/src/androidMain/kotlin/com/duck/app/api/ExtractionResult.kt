@@ -31,6 +31,14 @@ data class ExtractionResult(
      * first address.
      */
     val audio_urls: List<String>? = null,
+
+    /**
+     * Size of the standalone audio track, when the platform states one.
+     *
+     * The video's own size is not it: saving the soundtrack writes a different file,
+     * and quoting the video's figure on a Music entry is simply wrong.
+     */
+    val audio_size: Long? = null,
     val max_resolution: String? = null,
     val available_qualities: List<String>? = null,
     val http_headers: Map<String, String>? = null,

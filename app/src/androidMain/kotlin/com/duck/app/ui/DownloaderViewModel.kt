@@ -894,6 +894,8 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         val title = result.title ?: "抖音作品"
         val targetPath = mediaTargetPath(mode, isImage)
         val fileName = "${sanitizeFileName(title)}_${System.currentTimeMillis()}.$extension"
+        // Bytes counted as they arrive, for when the finished row cannot be measured.
+        var downloadedBytes = 0L
 
         logToConsole("正在下载: $fileName")
 
@@ -980,6 +982,11 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
             httpHeaders = result.http_headers
         ).collect { state ->
             _uiState.value = state
+            // Kept as a fallback for the history row: querying the finished file can
+            // return nothing on some providers, but the bytes did pass through here.
+            if (state is DownloadState.Downloading && state.downloadedBytes > 0) {
+                downloadedBytes = state.downloadedBytes
+            }
             if (state is DownloadState.Downloading) {
                 notificationHelper.showProgressNotification(
                     notificationId,
@@ -1008,7 +1015,12 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         playCount = result.play_count,
                         duration = result.duration,
                         mediaKind = if (mode == "audio") "audio" else (result.media_kind ?: "video"),
-                        fileSize = queryFileSize(savedUri) ?: result.media_size,
+                        // An audio save writes the mp3, not the video container, so the
+                        // video's size does not describe it. The track's own figure is
+                        // used, and only then the queried size as a last resort.
+                        fileSize = queryFileSize(savedUri)
+                            ?: downloadedBytes.takeIf { it > 0 }
+                            ?: if (mode == "audio") result.audio_size else result.media_size,
                     )
                 )
                 logToConsole("文件已保存: $targetPath/$fileName")

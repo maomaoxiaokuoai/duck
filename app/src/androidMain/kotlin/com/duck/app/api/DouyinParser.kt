@@ -634,6 +634,11 @@ class DouyinParser(private val signer: DouyinSigner? = null) {
             audio_url = detail["music"]?.asObject()
                 ?.get("play_url")?.asObject()
                 ?.get("url_list")?.asArray()?.firstOrNull()?.asString(),
+            // Quoted on the Music entry, so it has to be the mp3's figure rather than
+            // the video container's.
+            audio_size = detail["music"]?.asObject()
+                ?.get("play_url")?.asObject()
+                ?.get("data_size")?.asString()?.toLongOrNull(),
             thumbnail = detail["video"]?.asObject()
                 ?.get("cover")?.asObject()
                 ?.get("url_list")?.asArray()?.firstOrNull()?.asString() ?: items.first().url,

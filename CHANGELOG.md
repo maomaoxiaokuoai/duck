@@ -1,3 +1,25 @@
+## v3.4.8 — 2026-11-16
+
+### 修复
+
+**音频下载记录不显示文件大小。**
+
+音频保存的是作品自带的 mp3，但记录里写的大小取自 `result.media_size` ——
+那是**视频容器的**大小，跟 mp3 没关系。所以要么显示成视频的尺寸，要么干脆是空的。
+
+三处改动：
+
+1. `ExtractionResult` 加 `audio_size`，从 `music.play_url.data_size` 读
+2. 音频模式用 `audio_size` 而不是视频的
+3. 兜底：下载过程中累计实际字节数（`downloadedBytes`），
+   查不到文件大小时用它 —— 这个数字一定是真的
+
+```kotlin
+fileSize = queryFileSize(savedUri)      // 查已写入的文件
+    ?: downloadedBytes.takeIf { it > 0 } // 下载时数出来的
+    ?: if (mode == "audio") result.audio_size else result.media_size
+```
+
 ## v3.4.7 — 2026-11-16
 
 ### 修复
