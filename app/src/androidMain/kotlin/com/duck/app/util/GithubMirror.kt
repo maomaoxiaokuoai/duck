@@ -32,13 +32,10 @@ class GithubMirror {
     )
 
     private val mirrors = listOf(
-        // Self-hosted: it cannot be shut down by someone else, so it belongs in the
-        // race even when a public mirror happens to be faster today.
-        Mirror(
-            label = "accelerate.772399.xyz",
-            feed = "https://accelerate.772399.xyz/https://github.com/OWNER/REPO/releases.atom",
-            downloadPrefix = "https://accelerate.772399.xyz/https://github.com/",
-        ),
+        // Ordered by measured download time, not by preference: from an emulator on
+        // a home connection gh-proxy served the APK in 2.2s while the others took
+        // 18-20s. allDownloadUrls keeps this order, so the fastest route is tried
+        // first instead of after two slow ones.
         Mirror(
             label = "gh-proxy.com",
             feed = "https://gh-proxy.com/https://github.com/OWNER/REPO/releases.atom",
@@ -48,6 +45,13 @@ class GithubMirror {
             label = "gh.noki.icu",
             feed = "https://gh.noki.icu/https://github.com/OWNER/REPO/releases.atom",
             downloadPrefix = "https://gh.noki.icu/https://github.com/",
+        ),
+        // Self-hosted: it cannot be shut down by someone else, so it stays in the
+        // list even when a public mirror is faster.
+        Mirror(
+            label = "accelerate.772399.xyz",
+            feed = "https://accelerate.772399.xyz/https://github.com/OWNER/REPO/releases.atom",
+            downloadPrefix = "https://accelerate.772399.xyz/https://github.com/",
         ),
         Mirror(
             label = "github.com",
@@ -178,7 +182,10 @@ class GithubMirror {
 
     private companion object {
         const val TAG = "GithubMirror"
-        const val PROBE_TIMEOUT_MS = 10_000
+        // Measured from an emulator on a home connection: github.com answered the
+        // release asset in 20.5s and one mirror took 18.8s. A ten second ceiling
+        // rejected every route that would have worked.
+        const val PROBE_TIMEOUT_MS = 30_000
         const val MARK_ENTRY = "<entry>"
         const val OWNER = "maomaoxiaokuoai"
         const val REPO = "duck"

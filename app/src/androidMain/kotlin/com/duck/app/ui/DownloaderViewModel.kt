@@ -174,8 +174,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 try {
                     updateDownloadProgress.value = 0f
                     connection = (java.net.URL(target).openConnection() as java.net.HttpURLConnection).apply {
-                        connectTimeout = 20_000
-                        readTimeout = 120_000
+                        // A slow route still beats a failed update, so the ceiling is
+                        // generous: one hop can take twenty seconds to answer.
+                        connectTimeout = 40_000
+                        readTimeout = 180_000
                         instanceFollowRedirects = true
                         setRequestProperty("User-Agent", "duck-updater")
                         setRequestProperty("Accept", "application/octet-stream")
