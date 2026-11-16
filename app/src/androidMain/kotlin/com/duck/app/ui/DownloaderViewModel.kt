@@ -618,8 +618,28 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun fetchPreview(url: String, quality: String, mode: String = "auto") {
-        val link = extractUrl(url)
+        val raw = url.trim()
         currentPreviewJob?.cancel()
+
+        // An empty field and a line of plain text end up here too, and neither would
+        // produce anything: no parser claims them, the screen stayed blank, and the tap
+        // looked like it had been ignored. Each gets its own sentence instead.
+        if (raw.isEmpty()) {
+            _previewMetadata.value = ExtractionResult(
+                status = "error",
+                message = "请先粘贴链接",
+            )
+            return
+        }
+
+        val link = extractUrl(url)
+        if (!link.contains("://")) {
+            _previewMetadata.value = ExtractionResult(
+                status = "error",
+                message = "没找到链接，请粘贴分享内容",
+            )
+            return
+        }
 
         // Nothing hosts these links, so no parser would claim them and the screen
         // simply went blank - which reads as the app ignoring the paste rather than

@@ -140,8 +140,10 @@ class RedBookParser {
             thumbnail = images.first(),
             ext = "jpg",
             platform = "小红书",
-            is_gallery = images.size > 1,
-            media_kind = "gallery",
+            // A gallery where any page carries a clip is a set of motion photos, and
+            // calling it 图文 hides the one thing that makes it different.
+            is_gallery = images.size > 1 || pages.any { it.second != null },
+            media_kind = if (pages.any { it.second != null }) "live" else "gallery",
             live_video_urls = pages.map { it.second },
             http_headers = CDN_HEADERS,
             like_count = countOf(stats, "likedCount"),
