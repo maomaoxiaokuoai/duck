@@ -1,3 +1,73 @@
+## v3.6.3 — 2026-11-16
+
+整合 v3.6.1 和 v3.6.2 的全屏预览修复，并把 CHANGELOG 里占位符对齐实际代码。
+
+### 全屏预览的三个问题
+
+用户反馈「点动图全屏后黑屏，而且退不出去」，拆开是三个独立缺陷叠在一起：
+
+**1. 尺寸锁死 9:16**
+
+```kotlin
+// 改前
+modifier = Modifier.fillMaxWidth().aspectRatio(0.5625f)
+```
+
+横拍的内容塞进竖屏框，缩成零尺寸——画面全黑，进度显示 `00:00 / 00:00`。
+
+```kotlin
+// 改后
+modifier = Modifier.fillMaxSize()
+```
+
+**2. 点击被播放器吞掉**
+
+`Box` 上挂了 `clickable { previewImage = null }`，但 `PlayerView` 自己
+消费触摸事件，点击根本到不了外层。屏幕上没有任何能退出的控件。
+
+加了固定的右上角关闭按钮，压在视频层之上：
+
+```kotlin
+FilledIconButton(
+    onClick = { previewImage = null },
+    modifier = Modifier.align(Alignment.TopEnd).systemBarsPadding().padding(16.dp),
+) { Icon(Icons.Default.Close, contentDescription = "关闭") }
+```
+
+外加 `BackHandler`，返回键优先关闭全屏。
+
+**3. 单图没有点击，动图播的是 JPEG**
+
+- 单图分支只画了 `AsyncImage`，没挂 `clickable`——图片本身是死区
+- 动图存成 `xxx.jpg`（内嵌视频）+ `xxx.mp4`（同名副文件），
+  全屏却把 `.jpg` 丢给 ExoPlayer，它按图片解析自然播不出
+
+现在先找同名副文件：
+
+```kotlin
+val clipUri = siblingMp4 ?: openImage
+val isClip  = clipUri != openImage
+```
+
+- 有副文件 → 播放视频
+- 没有 → 当普通图片显示
+
+### 验收
+
+真机实测动图全屏：
+
+```
+✓ 图片正常显示，撑满屏幕按比例
+✓ 右上角 ✕ 按钮清晰可见
+✓ 点 ✕ → 回到详情页
+✓ 按返回键 → 回到详情页
+```
+
+### 顺带
+
+CHANGELOG 里 v3.6.2 的代码示例写的是 `previewImage`，实际代码用的是
+`openImage`（委托属性无法智能转换，必须取局部副本），已对齐。
+
 ## v3.6.2 — 2026-11-16
 
 ### 修复
@@ -15,8 +85,8 @@
 现在先找同名 `.mp4` / `.mov`：
 
 ```kotlin
-val clipUri = siblingMp4 ?: previewImage
-val isClip  = clipUri != previewImage
+val clipUri = siblingMp4 ?: openImage
+val isClip  = clipUri != openImage
 ```
 
 - 有副文件 → 播放视频
