@@ -1,3 +1,38 @@
+## v3.5.0 — 2026-11-16
+
+### 新增：音频目录
+
+设置页的「下载位置」现在列出三处，音频单独一栏：
+
+```
+图片  Pictures/duck
+视频  Movies/duck
+音频  Music/duck   ← 新增
+```
+
+`Music/duck` 才会被 MediaStore 归类为录音，本地音乐播放器才能扫到。
+放在 Movies 或 Download 下，按媒体类型列文件的播放器根本看不到它。
+
+### 新增：动图兼容 vivo / iQOO / OPPO / 一加
+
+查了两个开源项目的实现，确认各家读法不同：
+
+| 厂商 | 形式 | 依据 |
+| --- | --- | --- |
+| 小米 | 单文件，`GCamera:MicroVideoOffset` | [MotionPhoto2AppleLivePhoto](https://github.com/Albresky/MotionPhoto2AppleLivePhoto) |
+| **vivo / iQOO** | **同名 JPG + MP4 双文件** | [motion-photo-bridge](https://github.com/duruonanni/motion-photo-bridge) 的 `IMG_SAMPLE.jpg` + `IMG_SAMPLE.mp4` |
+| **OPPO / 一加 / realme** | 同为双文件 | ColorOS 沿用同一套配对规则 |
+
+它们的相册**靠文件名配对**，不看 JPEG 里的 XMP。
+
+所以现在动图保存时会做两件事：
+
+1. 合成标准 Motion Photo（XMP 含 Google + 小米两套字段）
+2. **额外写一个同名 mp4 作为副文件**
+
+同一个名字，两种形式，三类系统都能认。副文件写入失败不影响主流程 ——
+内嵌的那份在支持标准的设备上照常工作。
+
 ## v3.4.8 — 2026-11-16
 
 ### 修复

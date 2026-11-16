@@ -1393,6 +1393,33 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
      * Returns the saved row URI, or null when the merge could not be done - in which
      * case the caller saves the still on its own rather than dropping the page.
      */
+    /**
+     * Writes the clip beside the still under the same name.
+     *
+     * Xiaomi reads the clip out of the JPEG, but vivo, iQOO and the ColorOS phones
+     * keep a live photo as two files that share a stem - IMG_001.jpg next to
+     * IMG_001.mp4 - and their galleries pair them by that name alone. One embedded
+     * file cannot satisfy both, so the same clip is also written as a sibling.
+     *
+     * A failure here is not reported: the embedded copy already works everywhere
+     * that reads the standard, and a missing sibling only costs the pairing.
+     */
+    private suspend fun writeClipSibling(
+        clip: ByteArray,
+        stillFileName: String,
+    ): Boolean = withContext(Dispatchers.IO) {
+        runCatching {
+            val clipName = stillFileName.substringBeforeLast(".jpg") + ".mp4"
+            val uri = downloader.createMediaStoreUri(clipName, "Pictures/duck") ?: return@runCatching false
+            getApplication<android.app.Application>().contentResolver
+                .openOutputStream(uri)?.use { it.write(clip) }
+                ?: return@runCatching false
+            downloader.finalizeFile(uri, clipName)
+            logToConsole("动图副文件: " + clipName)
+            true
+        }.getOrDefault(false)
+    }
+
     private suspend fun downloadMotionPhoto(
         imageUrl: String,
         videoUrl: String,
@@ -1408,7 +1435,11 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 return@runCatching null
             }
             logToConsole("动图合成完成: " + merged.size + " 字节")
-            saveImageBytes(fileName, merged)
+            val saved = saveImageBytes(fileName, merged)
+            // vivo, iQOO and ColorOS pair a still with a same-named mp4 rather than
+            // reading one out of the JPEG, so the clip is written beside it too.
+            writeClipSibling(clip, fileName)
+            saved
         }.onFailure { e ->
             logToConsole("动图合成异常: " + (e.message ?: e.toString()))
         }.getOrNull()

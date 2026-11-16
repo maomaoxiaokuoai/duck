@@ -121,6 +121,7 @@ import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MusicNote
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -2392,13 +2393,13 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
             fontWeight = FontWeight.Bold,
         )
         Text(
-            "图片和视频分开保存，两个目录都会被系统相册索引。",
+            "三类文件分开保存，都会被系统索引 —— 相册看得到图片和视频，音乐播放器看得到音频。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        // Two rows rather than one: images and video genuinely land in different
-        // folders, and showing a single path made it look like both went there.
+        // One row per destination: each kind really does land somewhere different,
+        // and a single path made it look like everything went there.
         StorageRow(
             icon = Icons.Default.Photo,
             title = "图片",
@@ -2409,6 +2410,15 @@ fun DownloadsSettingsScreen(viewModel: DownloaderViewModel, onBack: () -> Unit, 
             icon = Icons.Default.Videocam,
             title = "视频",
             path = "Movies/duck",
+        )
+
+        // Music/duck is what MediaStore files as a recording, so a local player
+        // lists it. Putting the mp3 under Movies or Download leaves it invisible to
+        // anything that lists by media type.
+        StorageRow(
+            icon = Icons.Default.MusicNote,
+            title = "音频",
+            path = "Music/duck",
         )
 
         Spacer(Modifier.height(8.dp))
