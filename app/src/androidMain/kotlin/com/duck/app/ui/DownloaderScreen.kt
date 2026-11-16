@@ -662,6 +662,10 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                             // What it must not do is act on a post the user already
                                             // moved on from, so a preview older than the current
                                             // field state is ignored.
+                                            val fromClipboard = clipboardManager.getText()?.text?.trim()
+                                            val usedClipboard = typed.isEmpty() &&
+                                                preview?.url?.isNotBlank() != true &&
+                                                fromClipboard.isNullOrEmpty().not()
                                             val text = typed.takeIf { it.isNotEmpty() }
                                                 ?: preview?.url?.takeIf {
                                                     // lastParsedUrl survives exactly as long as the
@@ -671,7 +675,18 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                                     // something the user already moved past.
                                                     it.isNotBlank() && lastParsedUrl.isNotBlank()
                                                 }
-                                                ?: clipboardManager.getText()?.text?.trim()
+                                                ?: fromClipboard
+                                            if (usedClipboard) {
+                                                // Nothing was typed and nothing was on screen, so the
+                                                // clipboard decided what got saved. Say so: otherwise
+                                                // a clip copied for something else looks like the app
+                                                // inventing a download out of nothing.
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    "已使用剪贴板里的链接",
+                                                    android.widget.Toast.LENGTH_SHORT,
+                                                ).show()
+                                            }
                                             when {
                                                 text.isNullOrEmpty() -> {
                                                     android.widget.Toast.makeText(
