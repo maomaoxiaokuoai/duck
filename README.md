@@ -137,8 +137,6 @@ qn=[80,64,32,16]  1920x1080, 1280x720, 852x480, 640x360
 
 ### 动图（LivePhoto）
 
-
-
 动图 = 一张静态图 + 一小段视频。各平台的字段位置不同：
 
 | 平台 | 静态图 | 视频 | 标记 |
@@ -155,34 +153,64 @@ FFE1 <len> <XMP>         APP1 段，描述 Motion Photo
 <mp4>                    追加的视频
 ```
 
-XMP 里声明两个 Item（Primary + MotionPhoto），系统相册和 Google Photos
-读到这段就知道怎么播放。存下来仍是一个 `.jpg`，不会留下两个文件。
+但在国产手机上「标准」不够用。查了几家厂商的实现，读法各不相同：
+
+| 厂商 | 形式 | 依据 |
+| --- | --- | --- |
+| Google / 三星 | 单文件，`Container:Directory` | Android Motion Photo 规范 |
+| 小米 | 单文件，`GCamera:MicroVideoOffset` | [MotionPhoto2AppleLivePhoto](https://github.com/Albresky/MotionPhoto2AppleLivePhoto) |
+| vivo / iQOO | **同名 JPG + MP4 双文件** | [motion-photo-bridge](https://github.com/duruonanni/motion-photo-bridge) 的样例 |
+| OPPO / 一加 / realme | **同名 JPG + MP4 双文件** | ColorOS 沿用同一套配对规则 |
+
+官方的 Motion Photo 规范里写着，`MicroVideo` 那批字段「已从此规范中删除，
+如果存在必须忽略」——但小米相册实际读的就是它们。所以写入时两套都写：
+
+```xml
+<!-- Google 标准 -->
+<Container:Item Item:Semantic="Primary"      Item:Length="579330"/>
+<Container:Item Item:Semantic="MotionPhoto"  Item:Length="577605"/>
+
+<!-- 小米旧格式，同一文件里并存 -->
+GCamera:MicroVideo="1"
+GCamera:MicroVideoOffset="577605"
+```
+
+vivo 和 OPPO 系的相册**只按文件名配对，不看 XMP**，所以保存时还会写一个同名
+mp4 作为副文件：
+
+```
+xxx.jpg   内嵌视频 + 双格式 XMP
+xxx.mp4   同名副文件，供双文件系统配对
+```
+
+一个名字两种形式，五类系统都能认。
 
 ## 自动更新
 
-程序不直接连接 `github.com`（国内延迟高）。启动时会并发探测多个 CDN 节点，
-选出最快的那个再拉取版本信息：
+拉版本信息和下 APK 是两件事，分开处理。
 
-| 节点 | 说明 |
+**查版本**：并发请求几个镜像的 Atom feed，取最快的那个。
+
+| 节点 | 实测 |
 | --- | --- |
-| `api.github.com` | 官方 API |
-| `ghproxy.net` | 第三方加速 |
-| `gitmirror.xyz` | 第三方加速 |
-| `ghfast.top` | 第三方加速 |
+| `gh-proxy.com` | 0.8-2.2s |
+| `gh.noki.icu` | 1.2s |
+| `accelerate.772399.xyz` | 1.8-18.8s |
+| `github.com` | 1.1-20.5s |
 
-优选结果会记住，下次启动直接使用。下载 APK 时同样走该节点。
+**下 APK** 分两轮，因为两类路由的失败方式不同：
 
-## 下载位置
+1. **第一轮：镜像**（按实测速度排序）。有缓存就快，没缓存就立刻 404，代价很小
+2. **第二轮：直连 `github.com`**。慢，但文件一定在
 
-| 内容 | 路径 |
-| --- | --- |
-| 视频 | `Movies/duck` |
-| 图集 / 动图 | `Pictures/duck` |
-| 音频 | `Music/duck` |
+APK 的文件名不再靠猜 —— 先从 GitHub API 拿该版本真实的资产列表，
+拿不到才退回历史上用过的命名模式。
 
-都在系统相册索引的标准目录下，下载完刷新即可看到。
+下载完会比对 `Content-Length`，截断的 APK 直接拒绝，不会拿去装。
 
 ## 构建
+
+
 
 ```bash
 ./gradlew :app:assembleRelease
@@ -221,6 +249,8 @@ DUCK_KEY_PASSWORD
 - **小红书不返回播放量**：只有点赞、评论、分享、收藏
 - 抖音若改动签名算法，需要更新 `acrawler.js`
 - 小红书桌面 UA 会被 302 到登录页，必须用移动端 UA
+- **抖音受限作品只出封面**：接口返回的 \`filter_list\` 里带 \`reason: 8\` 时，服务端不给完整图集，只能拿到一张封面。
+  这类作品可能是审核中、私密或限制了分享，与解析器无关
 - 私有作品需要作者公开
 
 ## 许可
