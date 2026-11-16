@@ -2934,10 +2934,17 @@ fun LogsTab(
                             }
                         }
                     } else if (!log.path.isNullOrEmpty()) {
+                        // A single saved page, or a motion photo. Tapping it opens the
+                        // same full view the grid tiles use; without this the image was
+                        // the one thing on the sheet that did not respond to a tap.
                         coil.compose.AsyncImage(
                             model = log.path,
                             contentDescription = null,
-                            modifier = Modifier.fillMaxWidth().height(300.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                                .clickable { previewImage = log.path },
                             contentScale = androidx.compose.ui.layout.ContentScale.Fit
                         )
                     }
@@ -3149,8 +3156,9 @@ fun LogsTab(
             }
     }
 
-// A saved motion photo is a JPEG with a clip inside it, so a thumbnail can only
-// show the still and opening one has to play the clip.
+// A saved motion photo is a JPEG with a clip appended, so a plain image loader
+// can only show its still. Opening one plays the clip, which is the reason the
+// file is a motion photo at all.
 //
 // The close control sits above the player rather than relying on a tap on the
 // backdrop: a PlayerView consumes touches for its own controller, so the tap
@@ -3163,20 +3171,39 @@ if (previewImage != null) {
             dismissOnClickOutside = true,
         ),
     ) {
-        val previewPlayer = remember(previewImage) {
-            androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
+        // A motion photo is stored as xxx.jpg plus a same-named xxx.mp4 written
+        // beside it for the phones that pair by name. The clip is what should
+        // animate, so it is preferred; only when there is no sibling does the
+        // image itself get shown.
+        val clipUri = remember(previewImage) {
+            val sibling = previewImage.substringBeforeLast('.').let { stem ->
+                listOf(stem + ".mp4", stem + ".mov").firstOrNull { path ->
+                    runCatching {
+                        context.contentResolver.openFileDescriptor(
+                            android.net.Uri.parse(path), "r",
+                        )?.use { true } ?: false
+                    }.getOrDefault(false)
+                }
+            }
+            sibling ?: previewImage
         }
-        DisposableEffect(previewImage) {
-            val item = androidx.media3.common.MediaItem.fromUri(
-                android.net.Uri.parse(previewImage),
-            )
-            previewPlayer.setMediaItem(item)
-            previewPlayer.prepare()
-            previewPlayer.playWhenReady = true
-            onDispose { previewPlayer.release() }
+        val isClip = clipUri != previewImage
+
+        val previewPlayer = remember(clipUri) {
+            if (isClip) androidx.media3.exoplayer.ExoPlayer.Builder(context).build() else null
+        }
+        DisposableEffect(clipUri) {
+            previewPlayer?.let { player ->
+                player.setMediaItem(
+                    androidx.media3.common.MediaItem.fromUri(android.net.Uri.parse(clipUri)),
+                )
+                player.prepare()
+                player.playWhenReady = true
+            }
+            onDispose { previewPlayer?.release() }
         }
 
-        // Back closes this before anything else: a full-screen player that swallows
+        // Back closes this before anything else: a full-screen viewer that swallows
         // the back key traps the user in it.
         androidx.activity.compose.BackHandler(enabled = true) { previewImage = null }
 
@@ -3185,20 +3212,30 @@ if (previewImage != null) {
                 .fillMaxSize()
                 .background(Color.Black),
         ) {
-            androidx.compose.ui.viewinterop.AndroidView(
-                factory = { ctx ->
-                    android.view.LayoutInflater.from(ctx)
-                        .inflate(com.duck.app.R.layout.player_view_layout, null)
-                            as androidx.media3.ui.PlayerView
-                },
-                update = { view ->
-                    view.player = previewPlayer
-                    view.useController = true
-                },
-                // Fills the screen rather than a fixed 9:16 box: a landscape clip in
-                // a portrait frame played at zero size, which is the black screen.
-                modifier = Modifier.fillMaxSize(),
-            )
+            if (previewPlayer != null) {
+                androidx.compose.ui.viewinterop.AndroidView(
+                    factory = { ctx ->
+                        android.view.LayoutInflater.from(ctx)
+                            .inflate(com.duck.app.R.layout.player_view_layout, null)
+                                as androidx.media3.ui.PlayerView
+                    },
+                    update = { view ->
+                        view.player = previewPlayer
+                        view.useController = true
+                    },
+                    // Fills the screen rather than a fixed 9:16 box: a landscape clip in
+                    // a portrait frame played at zero size, which is the black screen.
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                // No clip beside it, so this is an ordinary image: show it whole.
+                coil.compose.AsyncImage(
+                    model = previewImage,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                )
+            }
 
             // Always reachable, whatever the player is doing.
             FilledIconButton(
