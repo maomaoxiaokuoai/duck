@@ -651,8 +651,26 @@ fun DownloaderScreen(viewModel: DownloaderViewModel = viewModel()) {
                                             // fallback the bolt had nothing to act on
                                             // and silently did nothing.
                                             val typed = url.trim()
+                                            // Order: what was typed, then the post on screen, then
+                                            // the clipboard.
+                                            //
+                                            // The clipboard is last because it may hold something
+                                            // copied for another purpose long ago. The preview is
+                                            // second because resolving a link and then pressing the
+                                            // bolt is the normal flow and the field is empty by then.
+                                            //
+                                            // What it must not do is act on a post the user already
+                                            // moved on from, so a preview older than the current
+                                            // field state is ignored.
                                             val text = typed.takeIf { it.isNotEmpty() }
-                                                ?: preview?.url?.takeIf { it.isNotBlank() }
+                                                ?: preview?.url?.takeIf {
+                                                    // lastParsedUrl survives exactly as long as the
+                                                    // preview it produced: it is cleared whenever the
+                                                    // preview is. A blank one therefore means the post on
+                                                    // screen is a leftover, and acting on it would save
+                                                    // something the user already moved past.
+                                                    it.isNotBlank() && lastParsedUrl.isNotBlank()
+                                                }
                                                 ?: clipboardManager.getText()?.text?.trim()
                                             when {
                                                 text.isNullOrEmpty() -> {
