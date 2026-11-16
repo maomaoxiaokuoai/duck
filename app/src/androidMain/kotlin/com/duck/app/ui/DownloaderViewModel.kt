@@ -730,7 +730,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
 
                 val isGallery = result.is_gallery == true
 
-                // Audio saves the post's own mp3, not the video container. Falling back to
+                // Audio saves the post's own track, not the video container. Falling back to
                 // the video URL would put a renamed mp4 in Music/duck, which is what used to
                 // happen and played as silence in most audio apps.
                 if (mode == "audio") {
@@ -742,7 +742,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         sourceUrl = link,
                         mode = mode,
                         notificationId = notificationId,
-                        forceExt = "mp3",
+                        // Douyin's soundtrack is an M4A - AAC in an MP4 box. Naming it
+                        // .mp3 makes the container lie about its contents, and a strict
+                        // player refuses a file whose header disagrees with its suffix.
+                        forceExt = "m4a",
                     )
                     return@launch
                 }
@@ -886,7 +889,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         sourceUrl: String,
         mode: String,
         notificationId: Int,
-        /** Overrides the container extension, e.g. when saving the mp3 track. */
+        /** Overrides the container extension, e.g. when saving the audio track. */
         forceExt: String? = null,
     ) {
         val isImage = result.ext in IMAGE_EXTENSIONS
@@ -1015,7 +1018,7 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                         playCount = result.play_count,
                         duration = result.duration,
                         mediaKind = if (mode == "audio") "audio" else (result.media_kind ?: "video"),
-                        // An audio save writes the mp3, not the video container, so the
+                        // An audio save writes the audio track, not the video container, so the
                         // video's size does not describe it. The track's own figure is
                         // used, and only then the queried size as a last resort.
                         fileSize = queryFileSize(savedUri)

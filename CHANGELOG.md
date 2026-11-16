@@ -1,3 +1,46 @@
+## v3.5.1 — 2026-11-16
+
+### 修复：音频扩展名撒谎
+
+系统音乐播放器扫不到、或扫到了不播的第一个原因找到了：**文件后缀与实际格式不符**。
+
+拉出来验真实格式：
+
+```
+$ xxd -l 32 xxx.mp3
+00000000: 0000 0018 6674 7970 4d34 4120   ....ftypM4A
+                                  ↑
+                            这是 M4A，不是 MP3
+
+$ ffprobe xxx.mp3
+codec_name=aac  sample_rate=44100  stereo  212.6s  128kbps
+format_name=mov,mp4,m4a,3gp,3g2,mj2
+```
+
+抖音给的就是 **M4A（AAC + MP4 容器）**，但代码硬编码了 `.mp3`：
+
+```kotlin
+forceExt = "mp3"    // 改前
+forceExt = "m4a"    // 改后
+```
+
+严格的播放器会检查文件头与后缀是否一致，对不上就拒绝。
+
+### MediaStore 收录验证
+
+改之前查了一次 MediaStore，收录本身是正常的：
+
+```
+relative_path = Music/duck/     ✓ 归类正确
+album         = duck            ✓
+is_music      = 1               ✓ 会被音乐播放器列出
+is_pending    = 0               ✓ 不是半成品
+duration      = 212631 ms       ✓ 时长解析出来了
+mime_type     = audio/mp4       ✓ 系统按真实内容识别
+```
+
+问题只在外层文件名，改完就一致了。
+
 ## v3.5.0 — 2026-11-16
 
 ### 新增：音频目录
