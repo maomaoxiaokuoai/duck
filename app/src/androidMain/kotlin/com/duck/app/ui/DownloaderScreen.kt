@@ -122,6 +122,10 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material.icons.filled.Close
 
 
 /** Release notes can be long; the dialog shows a readable prefix. */
@@ -3145,49 +3149,74 @@ fun LogsTab(
             }
     }
 
-// A saved motion photo is a JPEG with a clip inside it; the still is all a
-// thumbnail or an image loader can show, so opening one plays the clip that
-// makes it a moving image.
+// A saved motion photo is a JPEG with a clip inside it, so a thumbnail can only
+// show the still and opening one has to play the clip.
+//
+// The close control sits above the player rather than relying on a tap on the
+// backdrop: a PlayerView consumes touches for its own controller, so the tap
+// never reached the Box behind it and the screen looked like it had no way out.
 if (previewImage != null) {
     androidx.compose.ui.window.Dialog(
         onDismissRequest = { previewImage = null },
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+        properties = androidx.compose.ui.window.DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = true,
+        ),
     ) {
+        val previewPlayer = remember(previewImage) {
+            androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
+        }
+        DisposableEffect(previewImage) {
+            val item = androidx.media3.common.MediaItem.fromUri(
+                android.net.Uri.parse(previewImage),
+            )
+            previewPlayer.setMediaItem(item)
+            previewPlayer.prepare()
+            previewPlayer.playWhenReady = true
+            onDispose { previewPlayer.release() }
+        }
+
+        // Back closes this before anything else: a full-screen player that swallows
+        // the back key traps the user in it.
+        androidx.activity.compose.BackHandler(enabled = true) { previewImage = null }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.95f))
-                .clickable { previewImage = null },
-            contentAlignment = Alignment.Center,
+                .background(Color.Black),
         ) {
-            val previewPlayer = remember(previewImage) {
-                androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
-            }
-            DisposableEffect(previewImage) {
-                val item = androidx.media3.common.MediaItem.fromUri(
-                    android.net.Uri.parse(previewImage),
-                )
-                previewPlayer.setMediaItem(item)
-                previewPlayer.prepare()
-                previewPlayer.playWhenReady = true
-                onDispose { previewPlayer.release() }
-            }
             androidx.compose.ui.viewinterop.AndroidView(
                 factory = { ctx ->
-                    val view = android.view.LayoutInflater.from(ctx)
+                    android.view.LayoutInflater.from(ctx)
                         .inflate(com.duck.app.R.layout.player_view_layout, null)
                             as androidx.media3.ui.PlayerView
-                    view.apply {
-                        player = previewPlayer
-                        useController = true
-                    }
                 },
-                modifier = Modifier.fillMaxWidth().aspectRatio(0.5625f),
+                update = { view ->
+                    view.player = previewPlayer
+                    view.useController = true
+                },
+                // Fills the screen rather than a fixed 9:16 box: a landscape clip in
+                // a portrait frame played at zero size, which is the black screen.
+                modifier = Modifier.fillMaxSize(),
             )
+
+            // Always reachable, whatever the player is doing.
+            FilledIconButton(
+                onClick = { previewImage = null },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .systemBarsPadding()
+                    .padding(16.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Color.Black.copy(alpha = 0.55f),
+                    contentColor = Color.White,
+                ),
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "关闭")
+            }
         }
     }
 }
-
 }
 
 
