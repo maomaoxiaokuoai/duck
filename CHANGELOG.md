@@ -1,3 +1,46 @@
+## v3.6.4 — 2026-11-19
+
+### 新增：快手音频
+
+快手把作品的原始配乐挂在 `soundTrack.audioUrls` 下，本来就是 `.m4a`：
+
+```json
+"soundTrack": {
+  "name": "小帅帅苹果的作品原声",
+  "audioUrls": [
+    { "cdn": "hw.a.yximgs.com", "url": "https://.../xxx.m4a" }
+  ]
+}
+```
+
+之前只取了 `mainMvUrls`（视频），音频模式会报「这个作品没有独立音频」。
+
+### 修复：B站音频下载必然失败
+
+音频模式读的是单数字段：
+
+```kotlin
+val audioUrl = result.audio_url ?: throw ...
+```
+
+但 B站返回的是 `audio_urls`（列表，DASH 分离音轨），所以 B站的音频下载
+100% 走不到。现在两个字段都认：
+
+```kotlin
+val audioUrl = result.audio_url
+    ?: result.audio_urls?.firstOrNull()
+    ?: throw Exception("这个作品没有独立音频")
+```
+
+### 音频支持现状
+
+| 平台 | 音频 | 来源 |
+| --- | --- | --- |
+| 抖音 | ✅ | `music.play_url.url_list` |
+| 快手 | ✅ | `soundTrack.audioUrls` |
+| B站 | ✅ | DASH `dash.audio[].baseUrl` |
+| 小红书 | ❌ | 接口只给 `stream`，没有独立音轨 |
+
 ## v3.6.3 — 2026-11-16
 
 整合 v3.6.1 和 v3.6.2 的全屏预览修复，并把 CHANGELOG 里占位符对齐实际代码。

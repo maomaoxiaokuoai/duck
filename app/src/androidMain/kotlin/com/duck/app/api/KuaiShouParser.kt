@@ -117,6 +117,15 @@ class KuaiShouParser {
             ?.jsonObject?.get("url")?.jsonPrimitive?.content
             ?.takeIf { it.startsWith("http") }
 
+        // The soundtrack the post was published with, already an .m4a on the same
+        // CDN. Saving the video container instead would give a file with a picture
+        // in it, which no music player lists.
+        val soundTrack = photo["soundTrack"]?.jsonObject
+        val audioUrls = soundTrack?.get("audioUrls")?.jsonArray
+            ?.mapNotNull { it.jsonObject["url"]?.jsonPrimitive?.content }
+            ?.filter { it.startsWith("http") }
+            .orEmpty()
+
         // A gallery carries an atlas list and no video; a video post is the reverse.
         if (images.isNotEmpty() && videoUrl.isNullOrBlank()) {
             return ExtractionResult(
@@ -134,6 +143,7 @@ class KuaiShouParser {
                 comment_count = comment,
                 share_count = share,
                 play_count = views,
+                audio_url = audioUrls.firstOrNull(),
             )
         }
 
@@ -153,6 +163,7 @@ class KuaiShouParser {
                 comment_count = comment,
                 share_count = share,
                 play_count = views,
+                audio_url = audioUrls.firstOrNull(),
             )
         }
 

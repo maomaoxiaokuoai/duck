@@ -754,7 +754,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
                 // the video URL would put a renamed mp4 in Music/duck, which is what used to
                 // happen and played as silence in most audio apps.
                 if (mode == "audio") {
+                    // Bilibili publishes its audio as a DASH track, so it arrives in the
+                    // list form; Douyin and Kuaishou name a single track. Either is valid.
                     val audioUrl = result.audio_url
+                        ?: result.audio_urls?.firstOrNull()
                         ?: throw Exception("这个作品没有独立音频")
                     downloadSingle(
                         downloadUrl = audioUrl,
