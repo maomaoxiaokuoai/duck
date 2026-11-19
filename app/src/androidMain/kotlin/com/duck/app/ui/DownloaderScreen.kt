@@ -1486,9 +1486,9 @@ fun MainDownloaderTab(
                                 // in the bar still takes the whole set.
                             }
                         }
-                        // Videos get a single cover. Galleries render as a grid
-                        // below instead, so their cover would be a duplicate.
-                        if (!isImageOrGallery) {
+                        // A video, or a post with one page, gets a cover. Only a
+                        // multi-page gallery renders as a grid, where a cover would dupe.
+                        if ((meta.urls.orEmpty().count { it.isNotBlank() }) <= 1) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
