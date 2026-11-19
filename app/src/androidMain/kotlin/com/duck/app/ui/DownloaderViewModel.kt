@@ -1435,7 +1435,10 @@ class DownloaderViewModel(application: Application) : AndroidViewModel(applicati
         stillFileName: String,
     ): Boolean = withContext(Dispatchers.IO) {
         runCatching {
-            val clipName = stillFileName.substringBeforeLast(".jpg") + ".mp4"
+            // Chained extensions are possible - Douyin hands out .jpeg names - so the
+            // suffix is stripped by finding the first dot, not by assuming one.
+            val stem = stillFileName.substringBeforeLast('.', stillFileName)
+            val clipName = stem + ".mp4"
             val uri = downloader.createMediaStoreUri(clipName, "Pictures/duck") ?: return@runCatching false
             getApplication<android.app.Application>().contentResolver
                 .openOutputStream(uri)?.use { it.write(clip) }

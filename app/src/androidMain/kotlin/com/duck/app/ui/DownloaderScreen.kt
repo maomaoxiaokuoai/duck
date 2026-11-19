@@ -1377,10 +1377,11 @@ fun MainDownloaderTab(
                     shape = RoundedCornerShape(24.dp),
                 ) {
                     Column {
-                        // A gallery is a set of images, not one cover. Showing only the
-                        // first hid what the post actually contains, so every page gets a
-                        // tile and each tile downloads on its own.
-                        if (isImageOrGallery && !meta.urls.isNullOrEmpty()) {
+                        // The grid is for choosing among several pages. A single image -
+                        // which is what every motion photo post is - has nothing to
+                        // choose between, and "共 1 张 / 点图片开始选择" asked the user to
+                        // pick from one item. It falls through to the plain cover below.
+                        if (isImageOrGallery && (meta.urls?.count { it.isNotBlank() } ?: 0) > 1) {
                             val galleryUrls = meta.urls.filter { it.isNotBlank() }
                             val selected = pickedImages
                             Column(
